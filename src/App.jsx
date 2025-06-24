@@ -8,6 +8,8 @@ import MaterialPage from './adminpages/material';
 import SalesmanDashboard from './salesmanpages/dashboard';
 import SalesPage from './salesmanpages/sales';
 import CustomerPage from './adminpages/customer';
+import UserPage from './adminpages/UserPage';
+import UserTypePage from './adminpages/UserType';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/admin/material" element={<MaterialPage />} />
       <Route path="/admin/customer/" element={<CustomerPage/>} />
+      <Route path="/admin/userpage/" element={<UserPage/>} />
+      <Route path="/admin/usertype/" element={<UserTypePage/>} />
 
 
 

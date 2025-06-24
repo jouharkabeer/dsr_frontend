@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Form, Button, Card } from 'react-bootstrap';
-
+import { Api } from './api';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -13,11 +13,10 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('https://dsr-backend-rimy.onrender.com/user/login/', {
+      const res = await axios.post(`${Api}/user/login/`, {
         username,
         password,
       });
-      console.log(res)
       const { access, refresh, usertype } = res.data;
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);

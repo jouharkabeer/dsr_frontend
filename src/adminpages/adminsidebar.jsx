@@ -21,6 +21,12 @@ function AdminSidebar() {
         <Nav.Link as={Link} to="/admin/customer" active={isActive('/admin/customer')}>
           Customer
         </Nav.Link>
+        <Nav.Link as={Link} to="/admin/userpage" active={isActive('/admin/userpage')}>
+          User
+        </Nav.Link>
+        <Nav.Link as={Link} to="/admin/usertype" active={isActive('/admin/usertype')}>
+          User Type
+        </Nav.Link>
         {/* Add more options here */}
       </Nav>
     </div>

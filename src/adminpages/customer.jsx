@@ -4,6 +4,7 @@ import {
 } from 'react-bootstrap';
 import axios from 'axios';
 import AdminSidebar from './adminsidebar';
+import { Api } from '../api';
 
 function CustomerPage() {
   const [customers, setCustomers] = useState([]);
@@ -14,7 +15,7 @@ function CustomerPage() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get('https://dsr-backend-rimy.onrender.com/master/view_allCustomers/', {
+      const res = await axios.get(`${Api}/master/view_allCustomers/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
@@ -47,8 +48,8 @@ function CustomerPage() {
 
   const handleSave = async () => {
     const url = editCustomer
-      ? `https://dsr-backend-rimy.onrender.com/master/update_Customer/${editCustomer.id}/`
-      : 'https://dsr-backend-rimy.onrender.com/master/create_Customer/';
+      ? `${Api}/master/update_Customer/${editCustomer.id}/`
+      : `${Api}/master/create_Customer/`;
     const method = editCustomer ? 'put' : 'post';
     try {
       await axios({
@@ -72,7 +73,7 @@ function CustomerPage() {
 
   const toggleCustomerStatus = async (id, action) => {
     try {
-      await axios.delete(`https://dsr-backend-rimy.onrender.com/master/${action}_Customer/${id}/`, {
+      await axios.delete(`${Api}/master/${action}_Customer/${id}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
