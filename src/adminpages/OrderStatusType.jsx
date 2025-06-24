@@ -7,50 +7,50 @@ import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
 
-function ProspectPage() {
-  const [prospects, setProspects] = useState([]);
+function OrderStatusTypePage() {
+  const [orderStatusTypes, setOrderStatusTypes] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
-  const [editProspect, setEditProspect] = useState(null);
+  const [editOrderStatusType, setEditOrderStatusType] = useState(null);
   const [form, setForm] = useState({
-    prospect_name: '',
+    order_type_name: '',
     text_color: '#000000',
     text_bg: '#ffffff',
     remarks: '',
   });
 
-  const fetchProspects = async () => {
+  const fetchOrderStatusTypes = async () => {
     try {
-      const res = await axios.get(`${Api}/master/view_allProspects/`, {
+      const res = await axios.get(`${Api}/master/view_allOrderStatusTypes/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
-      setProspects(res.data);
+      setOrderStatusTypes(res.data);
     } catch (err) {
-      console.error('Failed to fetch prospects:', err);
+      console.error('Failed to fetch orderStatusTypes:', err);
     }
   };
-console.log(prospects)
+
   useEffect(() => {
-    fetchProspects();
+    fetchOrderStatusTypes();
   }, []);
 
-  const filteredProspects = prospects.filter((p) => {
+  const filteredOrderStatusTypes = orderStatusTypes.filter((p) => {
     if (filter === 'active') return p.is_active;
     if (filter === 'inactive') return !p.is_active;
     return true;
   });
 
-  const handleShowModal = (prospect = null) => {
-    setEditProspect(prospect);
-    setForm(prospect ? {
-      prospect_name: prospect.prospect_name,
-      text_color: prospect.text_color || '#000000',
-      text_bg: prospect.text_bg || '#ffffff',
-      remarks: prospect.remarks || '',
+  const handleShowModal = (orderStatusType = null) => {
+    setEditOrderStatusType(orderStatusType);
+    setForm(orderStatusType ? {
+      order_type_name: orderStatusType.order_type_name,
+      text_color: orderStatusType.text_color || '#000000',
+      text_bg: orderStatusType.text_bg || '#ffffff',
+      remarks: orderStatusType.remarks || '',
     } : {
-      prospect_name: '',
+      order_type_name: '',
       text_color: '#000000',
       text_bg: '#ffffff',
       remarks: '',
@@ -59,10 +59,10 @@ console.log(prospects)
   };
 
   const handleSave = async () => {
-    const url = editProspect
-      ? `${Api}/master/update_Prospect/${editProspect.id}/`
-      : `${Api}/master/create_Prospect/`;
-    const method = editProspect ? 'put' : 'post';
+    const url = editOrderStatusType
+      ? `${Api}/master/update_OrderStatusType/${editOrderStatusType.id}/`
+      : `${Api}/master/create_OrderStatusType/`;
+    const method = editOrderStatusType ? 'put' : 'post';
 
     try {
       await axios({
@@ -77,22 +77,22 @@ console.log(prospects)
         },
       });
       setShowModal(false);
-      fetchProspects();
+      fetchOrderStatusTypes();
     } catch (err) {
-      console.error('Failed to save prospect:', err);
+      console.error('Failed to save orderStatusType:', err);
     }
   };
 
-  const toggleProspectStatus = async (id, action) => {
+  const toggleOrderStatusTypeStatus = async (id, action) => {
     try {
-      await axios.delete(`${Api}/master/${action}_Prospect/${id}/`, {
+      await axios.delete(`${Api}/master/${action}_OrderStatusType/${id}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
-      fetchProspects();
+      fetchOrderStatusTypes();
     } catch (err) {
-      console.error(`Failed to ${action} prospect:`, err);
+      console.error(`Failed to ${action} orderStatusType:`, err);
     }
   };
 
@@ -103,9 +103,9 @@ console.log(prospects)
         <AdminSidebar />
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
-            <Col><h3>Prospects</h3></Col>
+            <Col><h3>OrderStatusTypes</h3></Col>
             <Col className="text-end">
-              <Button onClick={() => handleShowModal()} variant="primary">+ Add Prospect</Button>
+              <Button onClick={() => handleShowModal()} variant="primary">+ Add OrderStatusType</Button>
             </Col>
           </Row>
 
@@ -127,9 +127,9 @@ console.log(prospects)
               </tr>
             </thead>
             <tbody>
-              {filteredProspects.map((p) => (
+              {filteredOrderStatusTypes.map((p) => (
                 <tr key={p.id}>
-                  <td>{p.prospect_name}</td>
+                  <td>{p.order_type_name}</td>
                   <td><span style={{ color: p.text_color }}>{p.text_color}</span></td>
                   <td><span style={{ backgroundColor: p.text_bg, padding: '2px 6px' }}>{p.text_bg}</span></td>
                   <td>{p.remarks}</td>
@@ -146,7 +146,7 @@ console.log(prospects)
                     <Button
                       size="sm"
                       variant={p.is_active ? 'danger' : 'success'}
-                      onClick={() => toggleProspectStatus(p.id, p.is_active ? 'disable' : 'enable')}
+                      onClick={() => toggleOrderStatusTypeStatus(p.id, p.is_active ? 'disable' : 'enable')}
                     >
                       {p.is_active ? 'Disable' : 'Enable'}
                     </Button>
@@ -159,16 +159,16 @@ console.log(prospects)
           {/* Modal */}
           <Modal show={showModal} onHide={() => setShowModal(false)} centered>
             <Modal.Header closeButton>
-              <Modal.Title>{editProspect ? 'Edit' : 'Add'} Prospect</Modal.Title>
+              <Modal.Title>{editOrderStatusType ? 'Edit' : 'Add'} OrderStatusType</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form>
                 <Form.Group className="mb-3">
-                  <Form.Label>Prospect Name</Form.Label>
+                  <Form.Label>OrderStatusType Name</Form.Label>
                   <Form.Control
                     type="text"
-                    value={form.prospect_name}
-                    onChange={(e) => setForm({ ...form, prospect_name: e.target.value })}
+                    value={form.order_type_name}
+                    onChange={(e) => setForm({ ...form, order_type_name: e.target.value })}
                     required
                   />
                 </Form.Group>
@@ -202,7 +202,7 @@ console.log(prospects)
             <Modal.Footer>
               <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
               <Button variant="primary" onClick={handleSave}>
-                {editProspect ? 'Update' : 'Create'}
+                {editOrderStatusType ? 'Update' : 'Create'}
               </Button>
             </Modal.Footer>
           </Modal>
@@ -212,4 +212,4 @@ console.log(prospects)
   );
 }
 
-export default ProspectPage;
+export default OrderStatusTypePage;

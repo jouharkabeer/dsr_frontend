@@ -33,10 +33,12 @@ function UserPage() {
         },
       });
       setUsers(res.data);
+      console.log(users)
     } catch (err) {
       console.error('Failed to fetch users:', err);
     }
   };
+      console.log(users)
 
   const fetchUserTypes = async () => {
   try {
@@ -46,7 +48,6 @@ function UserPage() {
       },
     });
     setUserTypes(res.data);
-    console.log (userTypes)
   } catch (err) {
     console.error('Failed to fetch user types:', err);
   }
@@ -168,7 +169,7 @@ function UserPage() {
             <tbody>
               {filteredUsers.map((user) => (
                 <tr key={user.id}>
-                  <td>{user.full_name}</td>
+                  <td>{user.first_name} {user.last_name}</td>
                   <td>{user.username}</td>
                   <td>{user.email}</td>
                   <td>{user.user_type_name}</td>

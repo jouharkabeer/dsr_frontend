@@ -6,56 +6,56 @@ import axios from 'axios';
 import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
-function MaterialPage() {
-  const [materials, setMaterials] = useState([]);
+function CallStatusPage() {
+  const [callStatuss, setCallStatuss] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
-  const [editMaterial, setEditMaterial] = useState(null);
-  const [form, setForm] = useState({ material_name: '', remarks: '' });
+  const [editCallStatus, setEditCallStatus] = useState(null);
+  const [form, setForm] = useState({ call_status_name: '', remarks: '' });
 
-  const fetchMaterials = async () => {
+  const fetchCallStatuss = async () => {
     try {
-      const res = await axios.get(`${Api}/master/view_allMaterials/`, {
+      const res = await axios.get(`${Api}/master/view_allCallStatuss/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
-      setMaterials(res.data);
+      setCallStatuss(res.data);
     } catch (err) {
-      console.error('Failed to fetch materials:', err);
+      console.error('Failed to fetch callStatuss:', err);
     }
   };
 
   useEffect(() => {
-    fetchMaterials();
+    fetchCallStatuss();
   }, []);
 
-  const filteredMaterials = materials.filter((mat) => {
+  const filteredCallStatuss = callStatuss.filter((mat) => {
     if (filter === 'active') return mat.is_active;
     if (filter === 'inactive') return !mat.is_active;
     return true;
   });
 
-  const handleShowModal = (material = null) => {
-    setEditMaterial(material);
-    setForm(material ? {
-      material_name: material.material_name,
-      remarks: material.remarks || '',
-    } : { material_name: '', remarks: '' });
+  const handleShowModal = (callStatus = null) => {
+    setEditCallStatus(callStatus);
+    setForm(callStatus ? {
+      call_status_name: callStatus.call_status_name,
+      remarks: callStatus.remarks || '',
+    } : { call_status_name: '', remarks: '' });
     setShowModal(true);
   };
 
   const handleSave = async () => {
-    const url = editMaterial
-      ? `${Api}/master/update_Material/${editMaterial.id}/`
-      : `${Api}/master/create_Material/`;
-    const method = editMaterial ? 'put' : 'post';
+    const url = editCallStatus
+      ? `${Api}/master/update_CallStatus/${editCallStatus.id}/`
+      : `${Api}/master/create_CallStatus/`;
+    const method = editCallStatus ? 'put' : 'post';
     try {
       await axios({
         method,
         url,
         data: {
-          material_name: form.material_name,
+          call_status_name: form.call_status_name,
           remarks: form.remarks,
           is_active : true
         },
@@ -64,22 +64,22 @@ function MaterialPage() {
         },
       });
       setShowModal(false);
-      fetchMaterials();
+      fetchCallStatuss();
     } catch (err) {
-      console.error('Failed to save material:', err);
+      console.error('Failed to save callStatus:', err);
     }
   };
 
-  const toggleMaterialStatus = async (id, action) => {
+  const toggleCallStatusStatus = async (id, action) => {
     try {
-      await axios.delete(`${Api}/master/${action}_Material/${id}/`, {
+      await axios.delete(`${Api}/master/${action}_CallStatus/${id}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
-      fetchMaterials();
+      fetchCallStatuss();
     } catch (err) {
-      console.error(`Failed to ${action} material:`, err);
+      console.error(`Failed to ${action} callStatus:`, err);
     }
   };
 
@@ -90,9 +90,9 @@ return (
       <AdminSidebar />
       <div className="p-4 flex-grow-1 overflow-auto" style={{ maxHeight: '100%', backgroundColor: '#f8f9fa' }}>
         <Row className="mb-3 align-items-center">
-          <Col><h3>Materials</h3></Col>
+          <Col><h3>CallStatuss</h3></Col>
           <Col className="text-end">
-            <Button onClick={() => handleShowModal()} variant="primary">+ Add Material</Button>
+            <Button onClick={() => handleShowModal()} variant="primary">+ Add CallStatus</Button>
           </Col>
         </Row>
 
@@ -103,7 +103,7 @@ return (
         </ToggleButtonGroup>
 
         <Table bordered hover responsive className="bg-white shadow-sm">
-          <thead className="">
+          <thead className="table-dark">
             <tr>
               <th>Name</th>
               <th>Remarks</th>
@@ -112,9 +112,9 @@ return (
             </tr>
           </thead>
           <tbody>
-            {filteredMaterials.map((mat) => (
+            {filteredCallStatuss.map((mat) => (
               <tr key={mat.id}>
-                <td>{mat.material_name}</td>
+                <td>{mat.call_status_name}</td>
                 <td>{mat.remarks}</td>
                 <td>{mat.is_active ? 'Active' : 'Inactive'}</td>
                 <td>
@@ -129,7 +129,7 @@ return (
                   <Button
                     size="sm"
                     variant={mat.is_active ? 'danger' : 'success'}
-                    onClick={() => toggleMaterialStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
+                    onClick={() => toggleCallStatusStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
                   >
                     {mat.is_active ? 'Disable' : 'Enable'}
                   </Button>
@@ -140,16 +140,16 @@ return (
         </Table>
                 <Modal show={showModal} onHide={() => setShowModal(false)} centered>
           <Modal.Header closeButton>
-            <Modal.Title>{editMaterial ? 'Edit' : 'Add'} Material</Modal.Title>
+            <Modal.Title>{editCallStatus ? 'Edit' : 'Add'} CallStatus</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
               <Form.Group className="mb-3">
-                <Form.Label>Material Name</Form.Label>
+                <Form.Label>CallStatus Name</Form.Label>
                 <Form.Control
                   type="text"
-                  value={form.material_name}
-                  onChange={(e) => setForm({ ...form, material_name: e.target.value })}
+                  value={form.call_status_name}
+                  onChange={(e) => setForm({ ...form, call_status_name: e.target.value })}
                   required
                 />
               </Form.Group>
@@ -167,7 +167,7 @@ return (
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
             <Button variant="primary" onClick={handleSave}>
-              {editMaterial ? 'Update' : 'Create'}
+              {editCallStatus ? 'Update' : 'Create'}
             </Button>
           </Modal.Footer>
         </Modal>
@@ -179,4 +179,4 @@ return (
 
 }
 
-export default MaterialPage;
+export default CallStatusPage;

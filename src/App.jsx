@@ -13,6 +13,10 @@ import UserTypePage from './adminpages/UserType';
 import ProspectPage from './adminpages/Prospect';
 import RegionPage from './adminpages/Region';
 import BranchPage from './adminpages/Branch';
+import PaymentMethodPage from './adminpages/PaymentMethod';
+import CallStatusPage from './adminpages/CallStatus';
+import OrderStatusTypePage from './adminpages/OrderStatusType';
+import SalesPageAdmin from './adminpages/Sales';
 
 function App() {
   return (
@@ -26,6 +30,10 @@ function App() {
       <Route path="/admin/branch/" element={<BranchPage/>} />
       <Route path="/admin/region/" element={<RegionPage/>} />
       <Route path="/admin/prospect/" element={<ProspectPage/>} />
+      <Route path="/admin/paymentmethod/" element={<PaymentMethodPage/>} />
+      <Route path="/admin/callstatus/" element={<CallStatusPage/>} />
+      <Route path="/admin/ordertype/" element={<OrderStatusTypePage/>} />
+      <Route path="/sales/salespage/" element={<SalesPageAdmin/>} />
 
 
 

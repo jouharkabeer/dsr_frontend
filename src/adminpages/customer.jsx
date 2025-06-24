@@ -11,7 +11,7 @@ function CustomerPage() {
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editCustomer, setEditCustomer] = useState(null);
-  const [form, setForm] = useState({ customer_name: '', remarks: '' });
+  const [form, setForm] = useState({ customer_name: '', remarks: '', address: '' });
 
   const fetchCustomers = async () => {
     try {
@@ -41,8 +41,8 @@ function CustomerPage() {
     setEditCustomer(customer);
     setForm(customer ? {
       customer_name: customer.customer_name,
-      remarks: customer.remarks || '',
-    } : { customer_name: '', remarks: '' });
+      remarks: customer.remarks, address: customer.address || '',
+    } : { customer_name: '', remarks: '', address: ''});
     setShowModal(true);
   };
 
@@ -58,6 +58,7 @@ function CustomerPage() {
         data: {
           customer_name: form.customer_name,
           remarks: form.remarks,
+          address: form.address,
           is_active : true
         },
         headers: {
@@ -154,6 +155,15 @@ function CustomerPage() {
                   value={form.customer_name}
                   onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
                   required
+                />
+              </Form.Group>
+                            <Form.Group>
+                <Form.Label>Address</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
                 />
               </Form.Group>
               <Form.Group>

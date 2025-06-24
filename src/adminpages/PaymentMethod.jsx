@@ -6,56 +6,56 @@ import axios from 'axios';
 import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
-function MaterialPage() {
-  const [materials, setMaterials] = useState([]);
+function PaymentMethodPage() {
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
-  const [editMaterial, setEditMaterial] = useState(null);
-  const [form, setForm] = useState({ material_name: '', remarks: '' });
+  const [editPaymentMethod, setEditPaymentMethod] = useState(null);
+  const [form, setForm] = useState({ payment_type_name: '', remarks: '' });
 
-  const fetchMaterials = async () => {
+  const fetchPaymentMethods = async () => {
     try {
-      const res = await axios.get(`${Api}/master/view_allMaterials/`, {
+      const res = await axios.get(`${Api}/master/view_allPaymentMethods/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
-      setMaterials(res.data);
+      setPaymentMethods(res.data);
     } catch (err) {
-      console.error('Failed to fetch materials:', err);
+      console.error('Failed to fetch paymentMethods:', err);
     }
   };
 
   useEffect(() => {
-    fetchMaterials();
+    fetchPaymentMethods();
   }, []);
 
-  const filteredMaterials = materials.filter((mat) => {
+  const filteredPaymentMethods = paymentMethods.filter((mat) => {
     if (filter === 'active') return mat.is_active;
     if (filter === 'inactive') return !mat.is_active;
     return true;
   });
 
-  const handleShowModal = (material = null) => {
-    setEditMaterial(material);
-    setForm(material ? {
-      material_name: material.material_name,
-      remarks: material.remarks || '',
-    } : { material_name: '', remarks: '' });
+  const handleShowModal = (paymentMethod = null) => {
+    setEditPaymentMethod(paymentMethod);
+    setForm(paymentMethod ? {
+      payment_type_name: paymentMethod.payment_type_name,
+      remarks: paymentMethod.remarks || '',
+    } : { payment_type_name: '', remarks: '' });
     setShowModal(true);
   };
 
   const handleSave = async () => {
-    const url = editMaterial
-      ? `${Api}/master/update_Material/${editMaterial.id}/`
-      : `${Api}/master/create_Material/`;
-    const method = editMaterial ? 'put' : 'post';
+    const url = editPaymentMethod
+      ? `${Api}/master/update_PaymentMethod/${editPaymentMethod.id}/`
+      : `${Api}/master/create_PaymentMethod/`;
+    const method = editPaymentMethod ? 'put' : 'post';
     try {
       await axios({
         method,
         url,
         data: {
-          material_name: form.material_name,
+          payment_type_name: form.payment_type_name,
           remarks: form.remarks,
           is_active : true
         },
@@ -64,22 +64,22 @@ function MaterialPage() {
         },
       });
       setShowModal(false);
-      fetchMaterials();
+      fetchPaymentMethods();
     } catch (err) {
-      console.error('Failed to save material:', err);
+      console.error('Failed to save paymentMethod:', err);
     }
   };
 
-  const toggleMaterialStatus = async (id, action) => {
+  const togglePaymentMethodStatus = async (id, action) => {
     try {
-      await axios.delete(`${Api}/master/${action}_Material/${id}/`, {
+      await axios.delete(`${Api}/master/${action}_PaymentMethod/${id}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
-      fetchMaterials();
+      fetchPaymentMethods();
     } catch (err) {
-      console.error(`Failed to ${action} material:`, err);
+      console.error(`Failed to ${action} paymentMethod:`, err);
     }
   };
 
@@ -90,9 +90,9 @@ return (
       <AdminSidebar />
       <div className="p-4 flex-grow-1 overflow-auto" style={{ maxHeight: '100%', backgroundColor: '#f8f9fa' }}>
         <Row className="mb-3 align-items-center">
-          <Col><h3>Materials</h3></Col>
+          <Col><h3>PaymentMethods</h3></Col>
           <Col className="text-end">
-            <Button onClick={() => handleShowModal()} variant="primary">+ Add Material</Button>
+            <Button onClick={() => handleShowModal()} variant="primary">+ Add PaymentMethod</Button>
           </Col>
         </Row>
 
@@ -103,7 +103,7 @@ return (
         </ToggleButtonGroup>
 
         <Table bordered hover responsive className="bg-white shadow-sm">
-          <thead className="">
+          <thead className="table-dark">
             <tr>
               <th>Name</th>
               <th>Remarks</th>
@@ -112,9 +112,9 @@ return (
             </tr>
           </thead>
           <tbody>
-            {filteredMaterials.map((mat) => (
+            {filteredPaymentMethods.map((mat) => (
               <tr key={mat.id}>
-                <td>{mat.material_name}</td>
+                <td>{mat.payment_type_name}</td>
                 <td>{mat.remarks}</td>
                 <td>{mat.is_active ? 'Active' : 'Inactive'}</td>
                 <td>
@@ -129,7 +129,7 @@ return (
                   <Button
                     size="sm"
                     variant={mat.is_active ? 'danger' : 'success'}
-                    onClick={() => toggleMaterialStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
+                    onClick={() => togglePaymentMethodStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
                   >
                     {mat.is_active ? 'Disable' : 'Enable'}
                   </Button>
@@ -140,16 +140,16 @@ return (
         </Table>
                 <Modal show={showModal} onHide={() => setShowModal(false)} centered>
           <Modal.Header closeButton>
-            <Modal.Title>{editMaterial ? 'Edit' : 'Add'} Material</Modal.Title>
+            <Modal.Title>{editPaymentMethod ? 'Edit' : 'Add'} PaymentMethod</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
               <Form.Group className="mb-3">
-                <Form.Label>Material Name</Form.Label>
+                <Form.Label>PaymentMethod Name</Form.Label>
                 <Form.Control
                   type="text"
-                  value={form.material_name}
-                  onChange={(e) => setForm({ ...form, material_name: e.target.value })}
+                  value={form.payment_type_name}
+                  onChange={(e) => setForm({ ...form, payment_type_name: e.target.value })}
                   required
                 />
               </Form.Group>
@@ -167,7 +167,7 @@ return (
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
             <Button variant="primary" onClick={handleSave}>
-              {editMaterial ? 'Update' : 'Create'}
+              {editPaymentMethod ? 'Update' : 'Create'}
             </Button>
           </Modal.Footer>
         </Modal>
@@ -179,4 +179,4 @@ return (
 
 }
 
-export default MaterialPage;
+export default PaymentMethodPage;
