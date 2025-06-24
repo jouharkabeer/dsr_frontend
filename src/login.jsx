@@ -13,7 +13,7 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://127.0.0.1:8000/user/login/', {
+      const res = await axios.post('https://dsr-backend-rimy.onrender.com/user/login/', {
         username,
         password,
       });

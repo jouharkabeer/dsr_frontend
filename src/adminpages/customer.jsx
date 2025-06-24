@@ -14,7 +14,7 @@ function CustomerPage() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:8000/master/view_allCustomers/', {
+      const res = await axios.get('https://dsr-backend-rimy.onrender.com/master/view_allCustomers/', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
@@ -47,8 +47,8 @@ function CustomerPage() {
 
   const handleSave = async () => {
     const url = editCustomer
-      ? `http://127.0.0.1:8000/master/update_Customer/${editCustomer.id}/`
-      : 'http://127.0.0.1:8000/master/create_Customer/';
+      ? `https://dsr-backend-rimy.onrender.com/master/update_Customer/${editCustomer.id}/`
+      : 'https://dsr-backend-rimy.onrender.com/master/create_Customer/';
     const method = editCustomer ? 'put' : 'post';
     try {
       await axios({
@@ -72,7 +72,7 @@ function CustomerPage() {
 
   const toggleCustomerStatus = async (id, action) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/master/${action}_Customer/${id}/`, {
+      await axios.delete(`https://dsr-backend-rimy.onrender.com/master/${action}_Customer/${id}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },

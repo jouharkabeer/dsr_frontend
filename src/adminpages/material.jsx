@@ -15,7 +15,7 @@ function MaterialPage() {
 
   const fetchMaterials = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:8000/master/view_allMaterials/', {
+      const res = await axios.get('https://dsr-backend-rimy.onrender.com/master/view_allMaterials/', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
@@ -47,8 +47,8 @@ function MaterialPage() {
 
   const handleSave = async () => {
     const url = editMaterial
-      ? `http://127.0.0.1:8000/master/update_Material/${editMaterial.id}/`
-      : 'http://127.0.0.1:8000/master/create_Material/';
+      ? `https://dsr-backend-rimy.onrender.com/master/update_Material/${editMaterial.id}/`
+      : 'https://dsr-backend-rimy.onrender.com/master/create_Material/';
     const method = editMaterial ? 'put' : 'post';
     try {
       await axios({
@@ -72,7 +72,7 @@ function MaterialPage() {
 
   const toggleMaterialStatus = async (id, action) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/master/${action}_Material/${id}/`, {
+      await axios.delete(`https://dsr-backend-rimy.onrender.com/master/${action}_Material/${id}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
@@ -277,7 +277,7 @@ export default MaterialPage;
 //   const fetchMaterials = async () => {
 //     setLoading(true);
 //     try {
-//       const res = await axios.get('http://127.0.0.1:8000/master/view_allMaterials/', {
+//       const res = await axios.get('https://dsr-backend-rimy.onrender.com/master/view_allMaterials/', {
 //         headers: {
 //           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
 //         },
@@ -310,8 +310,8 @@ export default MaterialPage;
 
 //   const handleSave = async () => {
 //     const url = editMaterial
-//       ? `http://127.0.0.1:8000/master/update_Material/${editMaterial.id}/`
-//       : 'http://127.0.0.1:8000/master/create_Material/';
+//       ? `https://dsr-backend-rimy.onrender.com/master/update_Material/${editMaterial.id}/`
+//       : 'https://dsr-backend-rimy.onrender.com/master/create_Material/';
 //     const method = editMaterial ? 'put' : 'post';
 //     try {
 //       await axios({
@@ -336,7 +336,7 @@ export default MaterialPage;
 
 //   const toggleMaterialStatus = async (id, action) => {
 //     try {
-//       await axios.get(`http://127.0.0.1:8000/master/${action}_Material/${id}/`, {
+//       await axios.get(`https://dsr-backend-rimy.onrender.com/master/${action}_Material/${id}/`, {
 //         headers: {
 //           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
 //         },
