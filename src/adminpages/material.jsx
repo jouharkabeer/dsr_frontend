@@ -48,7 +48,7 @@ function MaterialPage() {
   const handleSave = async () => {
     const url = editMaterial
       ? `${Api}/master/update_Material/${editMaterial.id}/`
-      : '${Api}/master/create_Material/';
+      : `${Api}/master/create_Material/`;
     const method = editMaterial ? 'put' : 'post';
     try {
       await axios({

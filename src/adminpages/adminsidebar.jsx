@@ -27,6 +27,15 @@ function AdminSidebar() {
         <Nav.Link as={Link} to="/admin/usertype" active={isActive('/admin/usertype')}>
           User Type
         </Nav.Link>
+        <Nav.Link as={Link} to="/admin/branch" active={isActive('/admin/branch')}>
+          Branch
+        </Nav.Link>
+        <Nav.Link as={Link} to="/admin/region" active={isActive('/admin/region')}>
+          Region
+        </Nav.Link>
+        <Nav.Link as={Link} to="/admin/prospect" active={isActive('/admin/prospect')}>
+          Prospect
+        </Nav.Link>
         {/* Add more options here */}
       </Nav>
     </div>
