@@ -34,11 +34,20 @@
   color: #333;
   text-decoration: none;
   transition: all 0.2s ease;
+    border-bottom-right-radius: 15px;
+  border-top-right-radius: 15px;
 }
 
 .sidebar-subitem-active {
-  background-color: #007bff;
+  background-color: #007bff !important;
   color: white !important;
   font-weight: bold;
   border-radius: 4px;
+  border-bottom-right-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+
+.min-sidebar-notCollapsed{
+  min-width: 200px !important;
 }

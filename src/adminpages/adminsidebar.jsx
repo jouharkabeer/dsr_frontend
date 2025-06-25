@@ -170,6 +170,7 @@ function AdminSidebar() {
   useEffect(() => {
     if (
       location.pathname.startsWith('/admin/material') ||
+      location.pathname.startsWith('/admin/materialcategory') ||
       location.pathname.startsWith('/admin/customer') ||
       location.pathname.startsWith('/admin/branch') ||
       location.pathname.startsWith('/admin/region') ||
@@ -197,10 +198,10 @@ function AdminSidebar() {
   };
 
   const isActive = (path) => location.pathname === path;
-
+  console.log(location.pathname)
   return (
     <div
-      className={`bg-sidebar border-end d-flex flex-column ${isCollapsed ? 'p-2' : 'p-3'}`}
+      className={`bg-sidebar border-end d-flex flex-column ${isCollapsed ? 'p-2 min-sidebar-Collapsed' : 'p-3 min-sidebar-notCollapsed'}`}
       style={{
         width: isCollapsed ? '70px' : '250px',
         height: '100vh',
@@ -239,6 +240,13 @@ function AdminSidebar() {
           </Nav.Link>
           {openSection === 'master' && !isCollapsed && (
             <div className="ms-3">
+              <Nav.Link
+                as={Link}
+                to="/admin/materialcategory"
+                className={`sidebar-subitem ${isActive('/admin/materialcategory') ? 'sidebar-subitem-active' : 'sidebar-subitem-activedf'}`}
+              >
+                Material Category
+              </Nav.Link>
               <Nav.Link
                 as={Link}
                 to="/admin/material"

@@ -5,6 +5,7 @@ import Login from './login';
 
 import AdminDashboard from './adminpages/dashboard';
 import MaterialPage from './adminpages/material';
+import MaterialCategoryPage from './adminpages/MaterialCategory';
 import SalesmanDashboard from './salesmanpages/dashboard';
 import SalesPage from './salesmanpages/sales';
 import CustomerPage from './adminpages/customer';
@@ -23,7 +24,8 @@ function App() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/material" element={<MaterialPage />} />
+      <Route path="/admin/materialcategory/" element={<MaterialCategoryPage />} />
+      <Route path="/admin/material/" element={<MaterialPage />} />
       <Route path="/admin/customer/" element={<CustomerPage/>} />
       <Route path="/admin/userpage/" element={<UserPage/>} />
       <Route path="/admin/usertype/" element={<UserTypePage/>} />
