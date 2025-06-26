@@ -11,7 +11,9 @@ function MaterialPage() {
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editMaterial, setEditMaterial] = useState(null);
-  const [form, setForm] = useState({ material_name: '', remarks: '' });
+  const [form, setForm] = useState({ material_name: '', remarks: '', material_category : ''});
+  const [materialCatagories, setMaterialCatagories] = useState([]);
+
 
   const fetchMaterials = async () => {
     try {
@@ -26,22 +28,40 @@ function MaterialPage() {
     }
   };
 
+  const fetchMaterialCatagories = async () => {
+  try {
+    const res = await axios.get(`${Api}/master/view_activeMaterialCategory/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    setMaterialCatagories(res.data);
+    console.log(materialCatagories)
+  } catch (err) {
+    console.error('Failed to fetch user types:', err);
+  }
+};
+
   useEffect(() => {
     fetchMaterials();
+    fetchMaterialCatagories();
   }, []);
+
+console.log(materialCatagories)
 
   const filteredMaterials = materials.filter((mat) => {
     if (filter === 'active') return mat.is_active;
     if (filter === 'inactive') return !mat.is_active;
     return true;
   });
-
+console.log(filteredMaterials)
   const handleShowModal = (material = null) => {
     setEditMaterial(material);
     setForm(material ? {
       material_name: material.material_name,
+      material_category : material.material_category,
       remarks: material.remarks || '',
-    } : { material_name: '', remarks: '' });
+    } : { material_name: '', material_category: '', remarks: '' });
     setShowModal(true);
   };
 
@@ -57,6 +77,7 @@ function MaterialPage() {
         data: {
           material_name: form.material_name,
           remarks: form.remarks,
+          material_category : form.material_category,
           is_active : true
         },
         headers: {
@@ -106,6 +127,7 @@ return (
           <thead className="">
             <tr>
               <th>Name</th>
+              <th>Category</th>
               <th>Remarks</th>
               <th>Status</th>
               <th>Actions</th>
@@ -115,6 +137,7 @@ return (
             {filteredMaterials.map((mat) => (
               <tr key={mat.id}>
                 <td>{mat.material_name}</td>
+                <td>{mat.category_name}</td>
                 <td>{mat.remarks}</td>
                 <td>{mat.is_active ? 'Active' : 'Inactive'}</td>
                 <td>
@@ -152,6 +175,19 @@ return (
                   onChange={(e) => setForm({ ...form, material_name: e.target.value })}
                   required
                 />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Category</Form.Label>
+                <Form.Select
+                  value={form.material_category}
+                  onChange={(e) => setForm({ ...form, material_category: e.target.value })}
+                  required
+                >
+                  <option value="">Select category</option>
+                  {materialCatagories.map((type) => (
+                    <option key={type.id} value={type.id}>{type.material_catagory_name}</option>
+                  ))}
+                </Form.Select>
               </Form.Group>
               <Form.Group>
                 <Form.Label>Remarks</Form.Label>
