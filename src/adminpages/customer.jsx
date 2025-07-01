@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col,
+  Alert, Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col,
 } from 'react-bootstrap';
 import axios from 'axios';
 import AdminSidebar from './adminsidebar';
 import { Api } from '../api';
+import TopNavbar from '../components/TopNavbar';
 
 function CustomerPage() {
   const [customers, setCustomers] = useState([]);
@@ -12,6 +13,8 @@ function CustomerPage() {
   const [showModal, setShowModal] = useState(false);
   const [editCustomer, setEditCustomer] = useState(null);
   const [form, setForm] = useState({ customer_name: '', remarks: '', address: '' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState('');
 
   const fetchCustomers = async () => {
     try {
@@ -35,7 +38,10 @@ function CustomerPage() {
     if (filter === 'active') return mat.is_active;
     if (filter === 'inactive') return !mat.is_active;
     return true;
-  });
+  })
+      .filter((mat) =>
+      mat.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   const handleShowModal = (customer = null) => {
     setEditCustomer(customer);
@@ -43,10 +49,17 @@ function CustomerPage() {
       customer_name: customer.customer_name,
       remarks: customer.remarks, address: customer.address || '',
     } : { customer_name: '', remarks: '', address: ''});
+    setError('');
     setShowModal(true);
   };
 
   const handleSave = async () => {
+
+    const trimmed = form.customer_name.trim();
+    if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
+      setError('Customer name must be at least 3 characters and not all numbers.');
+      return;
+    }
     const url = editCustomer
       ? `${Api}/master/update_Customer/${editCustomer.id}/`
       : `${Api}/master/create_Customer/`;
@@ -86,7 +99,9 @@ function CustomerPage() {
   };
 
   return (
-    <div className="d-flex">
+  <div className="d-flex flex-column" style={{ height: '100vh' }}>
+    <TopNavbar />
+    <div className="d-flex flex-grow-1">
       <AdminSidebar />
       <div className="p-4 flex-grow-1">
         <Row className="mb-3 align-items-center">
@@ -95,7 +110,14 @@ function CustomerPage() {
             <Button onClick={() => handleShowModal()} variant="primary">+ Add Customer</Button>
           </Col>
         </Row>
-
+          <Form.Control
+            type="text"
+            placeholder="Search by Material name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="mb-3"
+            style={{ maxWidth: '300px' }}
+          />
         <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
           <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
           <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
@@ -146,6 +168,7 @@ function CustomerPage() {
           <Modal.Header closeButton>
             <Modal.Title>{editCustomer ? 'Edit' : 'Add'} Customer</Modal.Title>
           </Modal.Header>
+            {error && <Alert variant="danger">{error}</Alert>}
           <Modal.Body>
             <Form>
               <Form.Group className="mb-3">
@@ -186,6 +209,7 @@ function CustomerPage() {
         </Modal>
       </div>
     </div>
+  </div>
   );
 }
 

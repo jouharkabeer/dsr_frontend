@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col,
+  Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col, Alert,
 } from 'react-bootstrap';
 import axios from 'axios';
 import AdminSidebar from './adminsidebar';
@@ -13,6 +13,8 @@ function MaterialPage() {
   const [editMaterial, setEditMaterial] = useState(null);
   const [form, setForm] = useState({ material_name: '', remarks: '', material_category : ''});
   const [materialCatagories, setMaterialCatagories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState('');
 
 
   const fetchMaterials = async () => {
@@ -53,7 +55,10 @@ console.log(materialCatagories)
     if (filter === 'active') return mat.is_active;
     if (filter === 'inactive') return !mat.is_active;
     return true;
-  });
+  })
+      .filter((mat) =>
+      mat.material_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 console.log(filteredMaterials)
   const handleShowModal = (material = null) => {
     setEditMaterial(material);
@@ -62,10 +67,18 @@ console.log(filteredMaterials)
       material_category : material.material_category,
       remarks: material.remarks || '',
     } : { material_name: '', material_category: '', remarks: '' });
+    setError('');
     setShowModal(true);
   };
 
   const handleSave = async () => {
+
+    const trimmed = form.material_name.trim();
+    if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
+      setError('Material name must be at least 3 characters and not all numbers.');
+      return;
+    }
+    console.log(error)
     const url = editMaterial
       ? `${Api}/master/update_Material/${editMaterial.id}/`
       : `${Api}/master/create_Material/`;
@@ -116,7 +129,14 @@ return (
             <Button onClick={() => handleShowModal()} variant="primary">+ Add Material</Button>
           </Col>
         </Row>
-
+          <Form.Control
+            type="text"
+            placeholder="Search by Material name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="mb-3"
+            style={{ maxWidth: '300px' }}
+          />
         <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
           <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
           <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
@@ -165,6 +185,7 @@ return (
           <Modal.Header closeButton>
             <Modal.Title>{editMaterial ? 'Edit' : 'Add'} Material</Modal.Title>
           </Modal.Header>
+              {error && <Alert variant="danger">{error}</Alert>}
           <Modal.Body>
             <Form>
               <Form.Group className="mb-3">

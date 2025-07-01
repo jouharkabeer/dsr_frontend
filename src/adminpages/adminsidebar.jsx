@@ -198,7 +198,6 @@ function AdminSidebar() {
   };
 
   const isActive = (path) => location.pathname === path;
-  console.log(location.pathname)
   return (
     <div
       className={`bg-sidebar border-end d-flex flex-column ${isCollapsed ? 'p-2 min-sidebar-Collapsed' : 'p-3 min-sidebar-notCollapsed'}`}

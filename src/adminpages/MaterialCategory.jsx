@@ -106,7 +106,7 @@ function MaterialCategoryPage() {
         <AdminSidebar />
         <div className="p-4 flex-grow-1 overflow-auto" style={{ maxHeight: '100%', backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
-            <Col><h3>MaterialCategoryes</h3></Col>
+            <Col><h3>Material Categories</h3></Col>
             <Col className="text-end">
               <Button onClick={() => handleShowModal()} variant="primary">+ Add MaterialCategory</Button>
             </Col>
@@ -114,7 +114,7 @@ function MaterialCategoryPage() {
 
           <Form.Control
             type="text"
-            placeholder="Search by materialCategory name"
+            placeholder="Search by Material Category name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="mb-3"
