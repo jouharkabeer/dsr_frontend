@@ -6,6 +6,9 @@ import axios from 'axios';
 import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
+import { BiShow } from "react-icons/bi";
+import { BiHide } from "react-icons/bi";
+import { MdOutlineEdit } from "react-icons/md";
 
 function UserPage() {
   const [users, setUsers] = useState([]);
@@ -155,7 +158,7 @@ function UserPage() {
             <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
           </ToggleButtonGroup>
 
-          <Table bordered hover responsive className="bg-white shadow-sm">
+          <Table bordered hover responsive className="bg-white shadow-sm tablecss">
             <thead className="table-dark">
               <tr>
                 <th>Full Name</th>
@@ -175,7 +178,7 @@ function UserPage() {
                   <td>{user.user_type_name}</td>
                   <td>{user.is_active ? 'Active' : 'Inactive'}</td>
                   <td>
-                    <Button size="sm" variant="warning" onClick={() => handleShowModal(user)} className="me-2">Edit</Button>
+                    <Button size="sm" variant="warning" onClick={() => handleShowModal(user)} className="me-2"><MdOutlineEdit/></Button>
                     <Button
                       size="sm"
                       variant={user.is_active ? 'danger' : 'success'}
@@ -243,7 +246,7 @@ function UserPage() {
                           required
                         />
                         <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>
-                          {showPassword ? 'Hide' : 'Show'}
+                          {showPassword ? <BiHide/> : <BiShow/>}
                         </Button>
                       </InputGroup>
                     </Form.Group>

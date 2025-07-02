@@ -188,15 +188,6 @@ return (
               {error && <Alert variant="danger">{error}</Alert>}
           <Modal.Body>
             <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Material Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={form.material_name}
-                  onChange={(e) => setForm({ ...form, material_name: e.target.value })}
-                  required
-                />
-              </Form.Group>
               <Form.Group className="mb-2">
                 <Form.Label>Category</Form.Label>
                 <Form.Select
@@ -210,6 +201,16 @@ return (
                   ))}
                 </Form.Select>
               </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Material Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={form.material_name}
+                  onChange={(e) => setForm({ ...form, material_name: e.target.value })}
+                  required
+                />
+              </Form.Group>
+              
               <Form.Group>
                 <Form.Label>Remarks</Form.Label>
                 <Form.Control
