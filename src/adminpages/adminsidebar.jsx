@@ -1,161 +1,4 @@
 
-
-// import React, { useState, useEffect } from 'react';
-// import { Nav } from 'react-bootstrap';
-// import { Link, useLocation } from 'react-router-dom';
-// import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
-// import './sidebar.css'
-
-// function AdminSidebar() {
-//   const location = useLocation();
-//   const [isCollapsed, setIsCollapsed] = useState(false);
-//   const [openSection, setOpenSection] = useState('');
-
-// // Automatically open section based on current route
-// useEffect(() => {
-//   if (location.pathname.startsWith('/admin/material') ||
-//       location.pathname.startsWith('/admin/customer') ||
-//       location.pathname.startsWith('/admin/branch') ||
-//       location.pathname.startsWith('/admin/region') ||
-//       location.pathname.startsWith('/admin/prospect') ||
-//       location.pathname.startsWith('/admin/callstatus') ||
-//       location.pathname.startsWith('/admin/ordertype') ||
-//       location.pathname.startsWith('/admin/paymentmethod')) {
-//     setOpenSection('master');
-//   } else if (
-//     location.pathname.startsWith('/admin/userpage') ||
-//     location.pathname.startsWith('/admin/usertype')
-//   ) {
-//     setOpenSection('user');
-//   } else if (
-//     location.pathname.startsWith('/admin/sales')
-//   ) {
-//     setOpenSection('sales');
-//   } else {
-//     setOpenSection('');
-//   }
-// }, [location.pathname]);
-
-//   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
-
-//   const toggleSection = (section) => {
-//     setOpenSection(openSection === section ? '' : section);
-//   };
-
-//   const isActive = (path) => location.pathname === path;
-
-//   return (
-//     <div
-//       className={`bg-sidebar border-end d-flex flex-column ${isCollapsed ? 'p-2' : 'p-3'}`}
-//       style={{
-//         width: isCollapsed ? '70px' : '250px',
-//         height: '100vh',
-//         transition: 'width 0.3s',
-//       }}
-//     >
-//       {/* Logo + Toggle */}
-//       <div className="d-flex align-items-center justify-content-between mb-4">
-//         {!isCollapsed && <h5 className="mb-0">DSR Admin</h5>}
-//         <Menu role="button" size={24} onClick={toggleSidebar} />
-//       </div>
-
-//       <Nav className="flex-column gap-1">
-//         {/* Dashboard */}
-//         <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"} 
-//           as={Link}
-//           to="/admin/dashboard"
-//           active={isActive('/admin/dashboard')}
-//         >
-//           {!isCollapsed && 'Dashboard'}
-//         </Nav.Link>
-
-//         {/* Master Data */}
-//         <div>
-//           <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"} onClick={() => toggleSection('master')}>
-//             {!isCollapsed && (
-//               <>
-//                 Master Data{' '}
-//                 {openSection === 'master' ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-//               </>
-//             )}
-//           </Nav.Link>
-//           {openSection === 'master' && !isCollapsed && (
-//             <div className="ms-3">
-//               <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  as={Link} to="/admin/material" active={isActive('/admin/material')}>
-//                 Material
-//               </Nav.Link>
-//               <Nav.Link className={ !isCollapsed ? "sidebar-item" : "sidebar-item-collapsed" }  as={Link} to="/admin/customer" active={isActive('/admin/customer')}>
-//                 Customer
-//               </Nav.Link>
-//               <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  as={Link} to="/admin/branch" active={isActive('/admin/branch')}>
-//                 Branch
-//               </Nav.Link>
-//               <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  as={Link} to="/admin/region" active={isActive('/admin/region')}>
-//                 Region
-//               </Nav.Link>
-//               <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  as={Link} to="/admin/prospect" active={isActive('/admin/prospect')}>
-//                 Prospect
-//               </Nav.Link>
-//               <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  as={Link} to="/admin/callstatus" active={isActive('/admin/callstatus')}>
-//                 Call Status
-//               </Nav.Link>
-//               <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  as={Link} to="/admin/ordertype" active={isActive('/admin/ordertype')}>
-//                 Order Types
-//               </Nav.Link>
-//               <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  as={Link} to="/admin/paymentmethod" active={isActive('/admin/paymentmethod')}>
-//                 Payment Methods
-//               </Nav.Link>
-//             </div>
-//           )}
-//         </div>
-
-//         {/* Users */}
-//         <div>
-//           <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  onClick={() => toggleSection('user')}>
-//             {!isCollapsed && (
-//               <>
-//                 Users{' '}
-//                 {openSection === 'user' ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-//               </>
-//             )}
-//           </Nav.Link>
-//           {openSection === 'user' && !isCollapsed && (
-//             <div className="ms-3">
-//               <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  as={Link} to="/admin/userpage" active={isActive('/admin/userpage')}>
-//                 User
-//               </Nav.Link>
-//               <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  as={Link} to="/admin/usertype" active={isActive('/admin/usertype')}>
-//                 User Type
-//               </Nav.Link>
-//             </div>
-//           )}
-//         </div>
-
-//         {/* Sales */}
-//         <div>
-//           <Nav.Link className={!isCollapsed ? "sidebar-item" : "sidebar-item-collapsed"}  onClick={() => toggleSection('sales')}>
-//             {!isCollapsed && (
-//               <>
-//                 Sales{' '}
-//                 {openSection === 'sales' ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-//               </>
-//             )}
-//           </Nav.Link>
-//           {openSection === 'sales' && !isCollapsed && (
-//             <div className="ms-3">
-//               <span className="text-muted ms-2">No pages yet</span>
-//             </div>
-//           )}
-//         </div>
-//       </Nav>
-//     </div>
-//   );
-// }
-
-// export default AdminSidebar;
-
-
-
 import React, { useState, useEffect } from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
@@ -172,6 +15,8 @@ function AdminSidebar() {
       location.pathname.startsWith('/admin/material') ||
       location.pathname.startsWith('/admin/materialcategory') ||
       location.pathname.startsWith('/admin/hardwarematerialcategory') ||
+      location.pathname.startsWith('/admin/hardwarematerial') ||
+      location.pathname.startsWith('/admin/timbermaterialcategory') ||
       location.pathname.startsWith('/admin/hardwarematerial') ||
       location.pathname.startsWith('/admin/customer') ||
       location.pathname.startsWith('/admin/branch') ||
@@ -268,6 +113,20 @@ function AdminSidebar() {
                 className={`sidebar-subitem ${isActive('/admin/hardwarematerial') ? 'sidebar-subitem-active' : ''}`}
               >
                Hardware Material
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/admin/timbermaterialcategory"
+                className={`sidebar-subitem ${isActive('/admin/timbermaterialcategory') ? 'sidebar-subitem-active' : 'sidebar-subitem-activedf'}`}
+              >
+               Timber Material Category
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/admin/timbermaterial"
+                className={`sidebar-subitem ${isActive('/admin/timbermaterial') ? 'sidebar-subitem-active' : ''}`}
+              >
+               Timber Material
               </Nav.Link>
               <Nav.Link
                 as={Link}

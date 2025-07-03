@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col,
-} from 'react-bootstrap';
-import Select from 'react-select';
-import axios from 'axios';
-import AdminSidebar from './adminsidebar';
-import TopNavbar from '../components/TopNavbar';
-import { Api } from '../api';
-
+// import React, { useEffect, useState } from 'react';
+// import {
+//   Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col,
+// } from 'react-bootstrap';
+// import Select from 'react-select';
+// import axios from 'axios';
+// import AdminSidebar from './adminsidebar';
+// import TopNavbar from '../components/TopNavbar';
+// import { Api } from '../api';
 
 // function SalesPage() {
 //   const [sales, setSales] = useState([]);
@@ -69,7 +68,7 @@ import { Api } from '../api';
 //     });
 //     setOptions(newOptions);
 //   };
-// console.log(options)
+
 //   const fetchSales = async () => {
 //     const url =
 //       filter === 'active'
@@ -88,36 +87,41 @@ import { Api } from '../api';
 //   }, [filter]);
 
 //   const handleShowModal = (salesItem = null) => {
-//     setEditSales(salesItem);
-//     setForm(salesItem
-//       ? {
-//           ...salesItem,
-//           material: salesItem.material.map((mat) => ({ value: mat.id, label: mat.material_name })),
-//         }
-//       : {
-//           material: [],
-//           customer: '',
-//           salesman: localStorage.getItem('user_id'),
-//           call_status: '',
-//           prospect: '',
-//           order_status: '',
-//           region: '',
-//           payment_method: '',
-//           expected_payment_amount: '',
-//           expected_payment_date: '',
-//           payment_recieved: '',
-//           final_due_date: '',
-//           quotation_provided: false,
-//           quotation_value: '',
-//           order_value: '',
-//           remarks: '',
-//         });
-//     setShowModal(true);
-//   };
+//   setEditSales(salesItem);
+
+//   setForm(salesItem
+//     ? {
+//         ...salesItem,
+//         material: salesItem.material?.map((id) => {
+//           const found = options.material.find((mat) => mat.id === id);
+//           return found ? { value: found.id, label: found.material_name } : null;
+//         }).filter(Boolean) || [],
+//       }
+//     : {
+//         material: [],
+//         customer: '',
+//         salesman: localStorage.getItem('user_id'),
+//         call_status: '',
+//         prospect: '',
+//         order_status: '',
+//         region: '',
+//         payment_method: '',
+//         expected_payment_amount: '',
+//         expected_payment_date: '',
+//         payment_recieved: '',
+//         final_due_date: '',
+//         quotation_provided: false,
+//         quotation_value: '',
+//         order_value: '',
+//         remarks: '',
+//       });
+
+//   setShowModal(true);
+// };
 
 //   const handleSave = async () => {
 //     const url = editSales
-//       ? `${Api}/sales/update_SalesWeb/`
+//       ? `${Api}/sales/update_SalesWeb/${editSales.id}/`
 //       : `${Api}/sales/create_SalesWeb/`;
 //     const method = editSales ? 'put' : 'post';
 
@@ -141,7 +145,7 @@ import { Api } from '../api';
 //       console.error('Failed to save sales record:', err);
 //     }
 //   };
-
+// console.log(sales)
 //   const toggleSalesStatus = async (id, action) => {
 //     try {
 //       await axios.delete(`${Api}/sales/${action}_SalesWeb/${id}/`, {
@@ -181,6 +185,7 @@ import { Api } from '../api';
 //                 <th>Materials</th>
 //                 <th>Call Status</th>
 //                 <th>Prospect</th>
+//                 <th>Order Status</th>
 //                 <th>Order Value</th>
 //                 <th>Status</th>
 //                 <th>Actions</th>
@@ -192,7 +197,8 @@ import { Api } from '../api';
 //                   <td>{item.customer_name}</td>
 //                   <td>{item.material_name}</td>
 //                   <td>{item.call_status_name}</td>
-//                   <td>{item.prospect_name}</td>
+//                   <td><div style={{textAlign: 'center', backgroundColor : item.prospect_bg, color : item.prospect_text, borderRadius: '10px'}}>{item.prospect_name}</div></td>
+//                   <td><div style={{textAlign: 'center', backgroundColor : item.order_bg, color : item.order_text, borderRadius: '10px'}}>{item.order_status_name}</div></td>
 //                   <td>{item.order_value}</td>
 //                   <td>{item.is_active ? 'Active' : 'Inactive'}</td>
 //                   <td>
@@ -233,29 +239,30 @@ import { Api } from '../api';
 //                     onChange={(selected) => setForm({ ...form, material: selected })}
 //                   />
 //                 </Form.Group>
-//                 {[
-//                   ['customer', 'Customer'],
-//                   ['call_status', 'Call Status'],
-//                   ['prospect', 'Prospect'],
-//                   ['order_status', 'Order Status'],
-//                   ['region', 'Region'],
-//                   ['payment_method', 'Payment Method'],
-//                 ].map(([field, label]) => (
-//                   <Form.Group className="mb-2" key={field}>
-//                     <Form.Label>{label}</Form.Label>
-//                     <Form.Select
-//                       value={form[field]}
-//                       onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-//                     >
-//                       <option value="">Select {label}</option>
-//                       {options[field]?.map((item) => (
-//                         <option value={item.id} key={item.id}>{item[`${field}_name`] || item.name}</option>
-//                      ))}
-                     
 
-//                     </Form.Select>
-//                   </Form.Group>
-//                 ))}
+                // {[
+                //   ['customer', 'Customer', 'customer_name'],
+                //   ['call_status', 'Call Status', 'call_status_name'],
+                //   ['prospect', 'Prospect', 'prospect_name'],
+                //   ['order_status', 'Order Status', 'order_type_name'],
+                //   ['region', 'Region', 'region_name'],
+                //   ['payment_method', 'Payment Method', 'payment_type_name'],
+                // ].map(([field, label, nameKey]) => (
+                //   <Form.Group className="mb-2" key={field}>
+                //     <Form.Label>{label}</Form.Label>
+                //     <Form.Select
+                //       value={form[field]}
+                //       onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+                //     >
+                //       <option value="">Select {label}</option>
+                //       {options[field]?.map((item) => (
+                //         <option value={item.id} key={item.id}>
+                //           {item[nameKey] || item.name}
+                //         </option>
+                //       ))}
+                //     </Form.Select>
+                //   </Form.Group>
+                // ))}
 
 //                 <Row className="mb-2">
 //                   <Col>
@@ -286,16 +293,16 @@ import { Api } from '../api';
 //                     />
 //                   </Col>
 //                   <Col>
-//                     <Form.Label>Final Due Days</Form.Label>
+//                     <Form.Label>Due Date</Form.Label>
 //                     <Form.Control
-//                       type="number"
+//                       type="date"
 //                       value={form.final_due_date || ''}
 //                       onChange={(e) => setForm({ ...form, final_due_date: e.target.value })}
 //                     />
 //                   </Col>
 //                 </Row>
 
-//                 <Row className="mb-2">
+//                 <Form.Group as={Row} className="mb-3">
 //                   <Col>
 //                     <Form.Check
 //                       type="checkbox"
@@ -304,23 +311,28 @@ import { Api } from '../api';
 //                       onChange={(e) => setForm({ ...form, quotation_provided: e.target.checked })}
 //                     />
 //                   </Col>
-//                   <Col>
-//                     <Form.Label>Quotation Value</Form.Label>
-//                     <Form.Control
-//                       type="number"
-//                       value={form.quotation_value || ''}
-//                       onChange={(e) => setForm({ ...form, quotation_value: e.target.value })}
-//                     />
-//                   </Col>
-//                   <Col>
-//                     <Form.Label>Order Value</Form.Label>
-//                     <Form.Control
-//                       type="number"
-//                       value={form.order_value || ''}
-//                       onChange={(e) => setForm({ ...form, order_value: e.target.value })}
-//                     />
-//                   </Col>
-//                 </Row>
+//                 </Form.Group>
+
+//                 {form.quotation_provided && (
+//                   <Row className="mb-2">
+//                     <Col>
+//                       <Form.Label>Quotation Value</Form.Label>
+//                       <Form.Control
+//                         type="number"
+//                         value={form.quotation_value || ''}
+//                         onChange={(e) => setForm({ ...form, quotation_value: e.target.value })}
+//                       />
+//                     </Col>
+//                     <Col>
+//                       <Form.Label>Order Value</Form.Label>
+//                       <Form.Control
+//                         type="number"
+//                         value={form.order_value || ''}
+//                         onChange={(e) => setForm({ ...form, order_value: e.target.value })}
+//                       />
+//                     </Col>
+//                   </Row>
+//                 )}
 
 //                 <Form.Group>
 //                   <Form.Label>Remarks</Form.Label>
@@ -349,14 +361,24 @@ import { Api } from '../api';
 // export default SalesPage;
 
 
-// ... [imports remain unchanged]
+
+// Updated SalesPage.jsx
+import React, { useEffect, useState } from 'react';
+import {
+  Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col,
+} from 'react-bootstrap';
+import Select from 'react-select';
+import axios from 'axios';
+import AdminSidebar from './adminsidebar';
+import TopNavbar from '../components/TopNavbar';
+import { Api } from '../api';
+
 function SalesPage() {
   const [sales, setSales] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editSales, setEditSales] = useState(null);
   const [form, setForm] = useState({
-    material: [],
     customer: '',
     salesman: localStorage.getItem('user_id'),
     call_status: '',
@@ -375,7 +397,6 @@ function SalesPage() {
   });
 
   const [options, setOptions] = useState({
-    material: [],
     customer: [],
     salesman: [localStorage.getItem('user_id')],
     call_status: [],
@@ -383,17 +404,30 @@ function SalesPage() {
     order_status: [],
     region: [],
     payment_method: [],
+    timber_categories: [],
+    hardware_categories: [],
   });
+
+  const [isTimber, setIsTimber] = useState(false);
+  const [isHardware, setIsHardware] = useState(false);
+  const [timberCategories, setTimberCategories] = useState([]);
+  const [timberMaterials, setTimberMaterials] = useState([]);
+  const [selectedTimberMaterials, setSelectedTimberMaterials] = useState([]);
+
+  const [hardwareCategories, setHardwareCategories] = useState([]);
+  const [hardwareMaterials, setHardwareMaterials] = useState([]);
+  const [selectedHardwareMaterials, setSelectedHardwareMaterials] = useState([]);
 
   const fetchOptions = async () => {
     const endpoints = {
-      material: `${Api}/master/view_activeMaterial/`,
       customer: `${Api}/master/view_activeCustomer/`,
       call_status: `${Api}/master/view_activeCallStatus/`,
       prospect: `${Api}/master/view_activeProspect/`,
       order_status: `${Api}/master/view_activeOrderStatusType/`,
       region: `${Api}/master/view_activeRegion/`,
       payment_method: `${Api}/master/view_activePaymentMethod/`,
+      timber_categories: `${Api}/master/view_activeTimberMaterialCategory/`,
+      hardware_categories: `${Api}/master/view_activeHardWareMaterialCategory/`,
     };
 
     const fetchAll = Object.entries(endpoints).map(async ([key, url]) => {
@@ -428,69 +462,12 @@ function SalesPage() {
     fetchOptions();
   }, [filter]);
 
-  // const handleShowModal = (salesItem = null) => {
-  //   setEditSales(salesItem);
-  //   setForm(salesItem
-  //     ? {
-  //         ...salesItem,
-  //         material: salesItem.material.map((mat) => ({ value: mat.id, label: mat.material_name })),
-  //       }
-  //     : {
-  //         material: [],
-  //         customer: '',
-  //         salesman: localStorage.getItem('user_id'),
-  //         call_status: '',
-  //         prospect: '',
-  //         order_status: '',
-  //         region: '',
-  //         payment_method: '',
-  //         expected_payment_amount: '',
-  //         expected_payment_date: '',
-  //         payment_recieved: '',
-  //         final_due_date: '',
-  //         quotation_provided: false,
-  //         quotation_value: '',
-  //         order_value: '',
-  //         remarks: '',
-  //       });
-  //   setShowModal(true);
-  // };
-
-
-  const handleShowModal = (salesItem = null) => {
-  setEditSales(salesItem);
-
-  setForm(salesItem
-    ? {
-        ...salesItem,
-        material: salesItem.material?.map((id) => {
-          const found = options.material.find((mat) => mat.id === id);
-          return found ? { value: found.id, label: found.material_name } : null;
-        }).filter(Boolean) || [],
-      }
-    : {
-        material: [],
-        customer: '',
-        salesman: localStorage.getItem('user_id'),
-        call_status: '',
-        prospect: '',
-        order_status: '',
-        region: '',
-        payment_method: '',
-        expected_payment_amount: '',
-        expected_payment_date: '',
-        payment_recieved: '',
-        final_due_date: '',
-        quotation_provided: false,
-        quotation_value: '',
-        order_value: '',
-        remarks: '',
-      });
-
-  setShowModal(true);
-};
-
   const handleSave = async () => {
+    if (!isTimber && !isHardware) {
+      alert("Select at least Timber or Hardware.");
+      return;
+    }
+
     const url = editSales
       ? `${Api}/sales/update_SalesWeb/${editSales.id}/`
       : `${Api}/sales/create_SalesWeb/`;
@@ -498,7 +475,8 @@ function SalesPage() {
 
     const payload = {
       ...form,
-      material: form.material.map((m) => m.value),
+      timbermaterials: selectedTimberMaterials.map((m) => m.value),
+      hardwarematerials: selectedHardwareMaterials.map((m) => m.value),
     };
 
     try {
@@ -516,19 +494,6 @@ function SalesPage() {
       console.error('Failed to save sales record:', err);
     }
   };
-console.log(sales)
-  const toggleSalesStatus = async (id, action) => {
-    try {
-      await axios.delete(`${Api}/sales/${action}_SalesWeb/${id}/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      fetchSales();
-    } catch (err) {
-      console.error(`Failed to ${action} SalesWeb:`, err);
-    }
-  };
 
   return (
     <div className="d-flex flex-column" style={{ height: '100vh' }}>
@@ -539,7 +504,7 @@ console.log(sales)
           <Row className="mb-3 align-items-center">
             <Col><h3>Sales</h3></Col>
             <Col className="text-end">
-              <Button onClick={() => handleShowModal()} variant="primary">+ Add Sales</Button>
+              <Button onClick={() => setShowModal(true)} variant="primary">+ Add Sales</Button>
             </Col>
           </Row>
 
@@ -553,10 +518,6 @@ console.log(sales)
             <thead className="table-dark">
               <tr>
                 <th>Customer</th>
-                <th>Materials</th>
-                <th>Call Status</th>
-                <th>Prospect</th>
-                <th>Order Status</th>
                 <th>Order Value</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -566,27 +527,16 @@ console.log(sales)
               {sales.map((item) => (
                 <tr key={item.id}>
                   <td>{item.customer_name}</td>
-                  <td>{item.material_name}</td>
-                  <td>{item.call_status_name}</td>
-                  <td><div style={{textAlign: 'center', backgroundColor : item.prospect_bg, color : item.prospect_text, borderRadius: '10px'}}>{item.prospect_name}</div></td>
-                  <td><div style={{textAlign: 'center', backgroundColor : item.order_bg, color : item.order_text, borderRadius: '10px'}}>{item.order_status_name}</div></td>
                   <td>{item.order_value}</td>
                   <td>{item.is_active ? 'Active' : 'Inactive'}</td>
                   <td>
                     <Button
                       size="sm"
                       variant="warning"
-                      onClick={() => handleShowModal(item)}
                       className="me-2"
+                      onClick={() => setEditSales(item) || setShowModal(true)}
                     >
                       Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={item.is_active ? 'danger' : 'success'}
-                      onClick={() => toggleSalesStatus(item.id, item.is_active ? 'disable' : 'enable')}
-                    >
-                      {item.is_active ? 'Disable' : 'Enable'}
                     </Button>
                   </td>
                 </tr>
@@ -594,23 +544,116 @@ console.log(sales)
             </tbody>
           </Table>
 
-          {/* Modal */}
           <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
             <Modal.Header closeButton>
               <Modal.Title>{editSales ? 'Edit Sales' : 'Add Sales'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form>
-                <Form.Group className="mb-3">
-                  <Form.Label>Materials</Form.Label>
-                  <Select
-                    isMulti
-                    options={options.material.map((mat) => ({ value: mat.id, label: mat.material_name }))}
-                    value={form.material}
-                    onChange={(selected) => setForm({ ...form, material: selected })}
-                  />
+                <Form.Group className="mb-2">
+                  <Form.Label>Customer</Form.Label>
+                  <Form.Select
+                    value={form.customer}
+                    onChange={(e) => setForm({ ...form, customer: e.target.value })}
+                  >
+                    <option value="">Select Customer</option>
+                    {options.customer?.map((item) => (
+                      <option key={item.id} value={item.id}>{item.customer_name}</option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
 
+                <Form.Check
+                  type="checkbox"
+                  label="Is Timber Required?"
+                  checked={isTimber}
+                  onChange={(e) => {
+                    setIsTimber(e.target.checked);
+                    if (!e.target.checked) {
+                      setTimberCategories([]);
+                      setSelectedTimberMaterials([]);
+                    }
+                  }}
+                  className="mb-3"
+                />
+
+                {isTimber && (
+                  <>
+                    <Form.Group className="mb-2">
+                      <Form.Label>Timber Categories</Form.Label>
+                      <Select
+                        isMulti
+                        options={options.timber_categories.map((cat) => ({ value: cat.id, label: cat.timber_material_catagory_name }))}
+                        value={timberCategories}
+                        onChange={async (selected) => {
+                          setTimberCategories(selected);
+                          const res = await axios.post(`${Api}/master/filter_timber_materials/`, {
+                            category_ids: selected.map((c) => c.value),
+                          }, {
+                            headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
+                          });
+                          setTimberMaterials(res.data.map((mat) => ({ value: mat.id, label: mat.timber_material_name })));
+                        }}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                      <Form.Label>Timber Materials</Form.Label>
+                      <Select
+                        isMulti
+                        options={timberMaterials}
+                        value={selectedTimberMaterials}
+                        onChange={setSelectedTimberMaterials}
+                      />
+                    </Form.Group>
+                  </>
+                )}
+
+                <Form.Check
+                  type="checkbox"
+                  label="Is Hardware Required?"
+                  checked={isHardware}
+                  onChange={(e) => {
+                    setIsHardware(e.target.checked);
+                    if (!e.target.checked) {
+                      setHardwareCategories([]);
+                      setSelectedHardwareMaterials([]);
+                    }
+                  }}
+                  className="mb-3"
+                />
+
+                {isHardware && (
+                  <>
+                    <Form.Group className="mb-2">
+                      <Form.Label>Hardware Categories</Form.Label>
+                      <Select
+                        isMulti
+                        options={options.hardware_categories.map((cat) => ({ value: cat.id, label: cat.hardware_material_catagory_name }))}
+                        value={hardwareCategories}
+                        onChange={async (selected) => {
+                          setHardwareCategories(selected);
+                          const res = await axios.post(`${Api}/master/filter_hardware_materials/`, {
+                            category_ids: selected.map((c) => c.value),
+                          }, {
+                            headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
+                          });
+                          setHardwareMaterials(res.data.map((mat) => ({ value: mat.id, label: mat.hardware_material_name })));
+                        }}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                      <Form.Label>Hardware Materials</Form.Label>
+                      <Select
+                        isMulti
+                        options={hardwareMaterials}
+                        value={selectedHardwareMaterials}
+                        onChange={setSelectedHardwareMaterials}
+                      />
+                    </Form.Group>
+                  </>
+                )}
                 {[
                   ['customer', 'Customer', 'customer_name'],
                   ['call_status', 'Call Status', 'call_status_name'],
@@ -635,77 +678,17 @@ console.log(sales)
                   </Form.Group>
                 ))}
 
-                <Row className="mb-2">
-                  <Col>
-                    <Form.Label>Expected Payment Amount</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={form.expected_payment_amount || ''}
-                      onChange={(e) => setForm({ ...form, expected_payment_amount: e.target.value })}
-                    />
-                  </Col>
-                  <Col>
-                    <Form.Label>Expected Payment Date</Form.Label>
-                    <Form.Control
-                      type="date"
-                      value={form.expected_payment_date || ''}
-                      onChange={(e) => setForm({ ...form, expected_payment_date: e.target.value })}
-                    />
-                  </Col>
-                </Row>
-
-                <Row className="mb-2">
-                  <Col>
-                    <Form.Label>Payment Received</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={form.payment_recieved || ''}
-                      onChange={(e) => setForm({ ...form, payment_recieved: e.target.value })}
-                    />
-                  </Col>
-                  <Col>
-                    <Form.Label>Due Date</Form.Label>
-                    <Form.Control
-                      type="date"
-                      value={form.final_due_date || ''}
-                      onChange={(e) => setForm({ ...form, final_due_date: e.target.value })}
-                    />
-                  </Col>
-                </Row>
-
-                <Form.Group as={Row} className="mb-3">
-                  <Col>
-                    <Form.Check
-                      type="checkbox"
-                      label="Quotation Provided"
-                      checked={form.quotation_provided}
-                      onChange={(e) => setForm({ ...form, quotation_provided: e.target.checked })}
-                    />
-                  </Col>
+                {/* Additional Form Fields Below This Point */}
+                <Form.Group className="mb-2">
+                  <Form.Label>Order Value</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={form.order_value || ''}
+                    onChange={(e) => setForm({ ...form, order_value: e.target.value })}
+                  />
                 </Form.Group>
 
-                {form.quotation_provided && (
-                  <Row className="mb-2">
-                    <Col>
-                      <Form.Label>Quotation Value</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={form.quotation_value || ''}
-                        onChange={(e) => setForm({ ...form, quotation_value: e.target.value })}
-                      />
-                    </Col>
-                    <Col>
-                      <Form.Label>Order Value</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={form.order_value || ''}
-                        onChange={(e) => setForm({ ...form, order_value: e.target.value })}
-                      />
-                    </Col>
-                  </Row>
-                )}
-
-                <Form.Group>
+                <Form.Group className="mb-2">
                   <Form.Label>Remarks</Form.Label>
                   <Form.Control
                     as="textarea"
@@ -718,9 +701,7 @@ console.log(sales)
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-              <Button variant="primary" onClick={handleSave}>
-                {editSales ? 'Update' : 'Create'}
-              </Button>
+              <Button variant="primary" onClick={handleSave}>{editSales ? 'Update' : 'Create'}</Button>
             </Modal.Footer>
           </Modal>
         </div>
