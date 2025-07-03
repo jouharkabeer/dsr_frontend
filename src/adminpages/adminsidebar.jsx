@@ -171,6 +171,8 @@ function AdminSidebar() {
     if (
       location.pathname.startsWith('/admin/material') ||
       location.pathname.startsWith('/admin/materialcategory') ||
+      location.pathname.startsWith('/admin/hardwarematerialcategory') ||
+      location.pathname.startsWith('/admin/hardwarematerial') ||
       location.pathname.startsWith('/admin/customer') ||
       location.pathname.startsWith('/admin/branch') ||
       location.pathname.startsWith('/admin/region') ||
@@ -255,6 +257,20 @@ function AdminSidebar() {
               </Nav.Link>
               <Nav.Link
                 as={Link}
+                to="/admin/hardwarematerialcategory"
+                className={`sidebar-subitem ${isActive('/admin/hardwarematerialcategory') ? 'sidebar-subitem-active' : 'sidebar-subitem-activedf'}`}
+              >
+               Hardware Material Category
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/admin/hardwarematerial"
+                className={`sidebar-subitem ${isActive('/admin/hardwarematerial') ? 'sidebar-subitem-active' : ''}`}
+              >
+               Hardware Material
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
                 to="/admin/customer"
                 className={`sidebar-subitem ${isActive('/admin/customer') ? 'sidebar-subitem-active' : ''}`}
               >
@@ -335,6 +351,13 @@ function AdminSidebar() {
               >
                 User Type
               </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/skeloton/"
+                className={`sidebar-subitem ${isActive('/skeloton') ? 'sidebar-subitem-active' : ''}`}
+              >
+                skeloton
+              </Nav.Link>
             </div>
           )}
         </div>
@@ -360,6 +383,7 @@ function AdminSidebar() {
               >
                 Sales
               </Nav.Link>
+              
           )}
         </div>
       </Nav>

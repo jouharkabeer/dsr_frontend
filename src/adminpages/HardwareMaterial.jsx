@@ -7,93 +7,97 @@ import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
 
-function MaterialPage() {
-  const [materials, setMaterials] = useState([]);
+function HardWareMaterialPage() {
+  const [hardwarematerials, setHardWareMaterials] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
-  const [editMaterial, setEditMaterial] = useState(null);
-  const [form, setForm] = useState({ material_name: '', remarks: '', material_category : ''});
-  const [materialCatagories, setMaterialCatagories] = useState([]);
+  const [editHardWareMaterial, setEditHardWareMaterial] = useState(null);
+  const [form, setForm] = useState({ hardwarematerial_name: '', remarks: '', hardware_material_catagory_name : ''});
+  const [hardwarematerialCatagories, setHardWareMaterialCatagories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
   const [loading , setLoading] = useState(true)
 
+console.log(localStorage.getItem('access_token'))
 
-  const fetchMaterials = async () => {
+  const fetchHardWareMaterials = async () => {
     try {
-      const res = await axios.get(`${Api}/master/view_allMaterials/`, {
+      const res = await axios.get(`${Api}/master/view_allHardWareMaterials/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
-      setMaterials(res.data);
+      setHardWareMaterials(res.data);
     } catch (err) {
-      console.error('Failed to fetch materials:', err);
+      console.error('Failed to fetch hardwarematerials:', err);
     }
   };
 
-  const fetchMaterialCatagories = async () => {
+  const fetchHardWareMaterialCatagories = async () => {
   try {
-    const res = await axios.get(`${Api}/master/view_activeMaterialCategory/`, {
+    const res = await axios.get(`${Api}/master/view_activeHardWareMaterialCategory/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       },
     });
-    setMaterialCatagories(res.data);
-    console.log(materialCatagories)
+    setHardWareMaterialCatagories(res.data);
+    console.log(hardwarematerialCatagories)
   } catch (err) {
     console.error('Failed to fetch user types:', err);
   }
 };
 
   useEffect(() => {
-    fetchMaterials();
-    fetchMaterialCatagories();
+    fetchHardWareMaterials();
+    fetchHardWareMaterialCatagories();
     setLoading(false)
+    console.log(hardwarematerials)
   }, []);
 
-console.log(materialCatagories)
-
-  const filteredMaterials = materials.filter((mat) => {
+console.log(hardwarematerials)
+console.log(filter)
+  const filteredHardWareMaterials = hardwarematerials.filter((mat) => {
     if (filter === 'active') return mat.is_active;
     if (filter === 'inactive') return !mat.is_active;
     return true;
   })
+
       .filter((mat) =>
-      mat.material_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      mat.hardware_material_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-console.log(filteredMaterials)
-  const handleShowModal = (material = null) => {
-    setEditMaterial(material);
-    setForm(material ? {
-      material_name: material.material_name,
-      material_category : material.material_category,
-      remarks: material.remarks || '',
-    } : { material_name: '', material_category: '', remarks: '' });
+console.log(filteredHardWareMaterials)
+  const handleShowModal = (hardwarematerial = null) => {
+    setEditHardWareMaterial(hardwarematerial);
+    setForm(hardwarematerial ? {
+      hardwarematerial_name: hardwarematerial.hardwarematerial_name,
+      hardware_material_catagory_name : hardwarematerial.hardware_material_catagory_name,
+      remarks: hardwarematerial.remarks || '',
+    } : { hardwarematerial_name: '', hardware_material_catagory_name: '', remarks: '' });
     setError('');
     setShowModal(true);
   };
 
   const handleSave = async () => {
 
-    const trimmed = form.material_name.trim();
+    const trimmed = form.hardwarematerial_name.trim();
     if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
-      setError('Material name must be at least 3 characters and not all numbers.');
+      setError('HardWareMaterial name must be at least 3 characters and not all numbers.');
       return;
     }
     console.log(error)
-    const url = editMaterial
-      ? `${Api}/master/update_Material/${editMaterial.id}/`
-      : `${Api}/master/create_Material/`;
-    const method = editMaterial ? 'put' : 'post';
+    console.log(form)
+    const url = editHardWareMaterial
+      ? `${Api}/master/update_HardWareMaterial/${editHardWareMaterial.id}/`
+      : `${Api}/master/create_HardWareMaterial/`;
+    const method = editHardWareMaterial ? 'put' : 'post';
     try {
       await axios({
         method,
         url,
         data: {
-          material_name: form.material_name,
+          hardware_material_name: form.hardwarematerial_name,
           remarks: form.remarks,
-          material_category : form.material_category,
+          hardware_material_category : form.hardware_material_catagory_name,
           is_active : true
         },
         headers: {
@@ -101,22 +105,22 @@ console.log(filteredMaterials)
         },
       });
       setShowModal(false);
-      fetchMaterials();
+      fetchHardWareMaterials();
     } catch (err) {
-      console.error('Failed to save material:', err);
+      console.error('Failed to save hardwarematerial:', err);
     }
   };
 
-  const toggleMaterialStatus = async (id, action) => {
+  const toggleHardWareMaterialStatus = async (id, action) => {
     try {
-      await axios.delete(`${Api}/master/${action}_Material/${id}/`, {
+      await axios.delete(`${Api}/master/${action}_HardWareMaterial/${id}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
-      fetchMaterials();
+      fetchHardWareMaterials();
     } catch (err) {
-      console.error(`Failed to ${action} material:`, err);
+      console.error(`Failed to ${action} hardwarematerial:`, err);
     }
   };
 
@@ -127,14 +131,14 @@ return (
       <AdminSidebar />
       <div className="p-4 flex-grow-1 overflow-auto" style={{ maxHeight: '100%', backgroundColor: '#f8f9fa' }}>
         <Row className="mb-3 align-items-center">
-          <Col><h3>Materials</h3></Col>
+          <Col><h3>HardWareMaterials</h3></Col>
           <Col className="text-end">
-            <Button onClick={() => handleShowModal()} variant="primary">+ Add Material</Button>
+            <Button onClick={() => handleShowModal()} variant="primary">+ Add HardWareMaterial</Button>
           </Col>
         </Row>
           <Form.Control
             type="text"
-            placeholder="Search by Material name"
+            placeholder="Search by HardWareMaterial name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="mb-3"
@@ -157,9 +161,9 @@ return (
             </tr>
           </thead>
           <tbody>
-            {filteredMaterials.map((mat) => (
+            {filteredHardWareMaterials.map((mat) => (
               <tr key={mat.id}>
-                <td>{mat.material_name}</td>
+                <td>{mat.hardware_material_name}</td>
                 <td>{mat.category_name}</td>
                 <td>{mat.remarks}</td>
                 <td>{mat.is_active ? 'Active' : 'Inactive'}</td>
@@ -175,7 +179,7 @@ return (
                   <Button
                     size="sm"
                     variant={mat.is_active ? 'danger' : 'success'}
-                    onClick={() => toggleMaterialStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
+                    onClick={() => toggleHardWareMaterialStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
                   >
                     {mat.is_active ? 'Disable' : 'Enable'}
                   </Button>
@@ -186,7 +190,7 @@ return (
         </Table>
                 <Modal show={showModal} onHide={() => setShowModal(false)} centered>
           <Modal.Header closeButton>
-            <Modal.Title>{editMaterial ? 'Edit' : 'Add'} Material</Modal.Title>
+            <Modal.Title>{editHardWareMaterial ? 'Edit' : 'Add'} HardWareMaterial</Modal.Title>
           </Modal.Header>
               {error && <Alert variant="danger">{error}</Alert>}
           <Modal.Body>
@@ -194,22 +198,22 @@ return (
               <Form.Group className="mb-2">
                 <Form.Label>Category</Form.Label>
                 <Form.Select
-                  value={form.material_category}
-                  onChange={(e) => setForm({ ...form, material_category: e.target.value })}
+                  value={form.hardware_material_catagory_name}
+                  onChange={(e) => setForm({ ...form, hardware_material_catagory_name: e.target.value })}
                   required
                 >
                   <option value="">Select category</option>
-                  {materialCatagories.map((type) => (
-                    <option key={type.id} value={type.id}>{type.material_catagory_name}</option>
+                  {hardwarematerialCatagories.map((type) => (
+                    <option key={type.id} value={type.id}>{type.hardware_material_catagory_name}</option>
                   ))}
                 </Form.Select>
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Material Name</Form.Label>
+                <Form.Label>HardWareMaterial Name</Form.Label>
                 <Form.Control
                   type="text"
-                  value={form.material_name}
-                  onChange={(e) => setForm({ ...form, material_name: e.target.value })}
+                  value={form.hardwarematerial_name}
+                  onChange={(e) => setForm({ ...form, hardwarematerial_name: e.target.value })}
                   required
                 />
               </Form.Group>
@@ -228,7 +232,7 @@ return (
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
             <Button variant="primary" onClick={handleSave}>
-              {editMaterial ? 'Update' : 'Create'}
+              {editHardWareMaterial ? 'Update' : 'Create'}
             </Button>
           </Modal.Footer>
         </Modal>
@@ -241,4 +245,4 @@ return (
 
 }
 
-export default MaterialPage;
+export default HardWareMaterialPage;
