@@ -1,11 +1,232 @@
+// import React, { useEffect, useState } from 'react';
+// import {
+//   Alert, Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col,
+// } from 'react-bootstrap';
+// import axios from 'axios';
+// import AdminSidebar from './adminsidebar';
+// import { Api } from '../api';
+// import TopNavbar from '../components/TopNavbar';
+
+// function CustomerPage() {
+//   const [customers, setCustomers] = useState([]);
+//   const [filter, setFilter] = useState('all');
+//   const [showModal, setShowModal] = useState(false);
+//   const [editCustomer, setEditCustomer] = useState(null);
+//   const [form, setForm] = useState({ customer_name: '', remarks: '', address: '' });
+//   const [searchTerm, setSearchTerm] = useState('');
+//   const [error, setError] = useState('');
+
+//   const fetchCustomers = async () => {
+//     try {
+//       const res = await axios.get(`${Api}/master/view_allCustomers/`, {
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+//         },
+//       });
+//       setCustomers(res.data);
+//       console.log(customers)
+//     } catch (err) {
+//       console.error('Failed to fetch Customers:', err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchCustomers();
+//   }, []);
+
+//   const filteredCustomers = customers.filter((mat) => {
+//     if (filter === 'active') return mat.is_active;
+//     if (filter === 'inactive') return !mat.is_active;
+//     return true;
+//   })
+//       .filter((mat) =>
+//       mat.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
+//     );
+
+//   const handleShowModal = (customer = null) => {
+//     setEditCustomer(customer);
+//     setForm(customer ? {
+//       customer_name: customer.customer_name,
+//       remarks: customer.remarks, address: customer.address || '',
+//     } : { customer_name: '', remarks: '', address: ''});
+//     setError('');
+//     setShowModal(true);
+//   };
+
+//   const handleSave = async () => {
+
+//     const trimmed = form.customer_name.trim();
+//     if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
+//       setError('Customer name must be at least 3 characters and not all numbers.');
+//       return;
+//     }
+//     const url = editCustomer
+//       ? `${Api}/master/update_Customer/${editCustomer.id}/`
+//       : `${Api}/master/create_Customer/`;
+//     const method = editCustomer ? 'put' : 'post';
+//     try {
+//       await axios({
+//         method,
+//         url,
+//         data: {
+//           customer_name: form.customer_name,
+//           remarks: form.remarks,
+//           address: form.address,
+//           is_active : true
+//         },
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+//         },
+//       });
+//       setShowModal(false);
+//       fetchCustomers();
+//     } catch (err) {
+//       console.error('Failed to save Customer:', err);
+//     }
+//   };
+
+//   const toggleCustomerStatus = async (id, action) => {
+//     try {
+//       await axios.delete(`${Api}/master/${action}_Customer/${id}/`, {
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+//         },
+//       });
+//       fetchCustomers();
+//     } catch (err) {
+//       console.error(`Failed to ${action} Customer:`, err);
+//     }
+//   };
+
+//   return (
+//   <div className="d-flex flex-column" style={{ height: '100vh' }}>
+//     <TopNavbar />
+//     <div className="d-flex flex-grow-1">
+//       <AdminSidebar />
+//       <div className="p-4 flex-grow-1">
+//         <Row className="mb-3 align-items-center">
+//           <Col><h3>Customers</h3></Col>
+//           <Col className="text-end">
+//             <Button onClick={() => handleShowModal()} variant="primary">+ Add Customer</Button>
+//           </Col>
+//         </Row>
+//           <Form.Control
+//             type="text"
+//             placeholder="Search by Material name"
+//             value={searchTerm}
+//             onChange={(e) => setSearchTerm(e.target.value)}
+//             className="mb-3"
+//             style={{ maxWidth: '300px' }}
+//           />
+//         <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
+//           <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
+//           <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
+//           <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
+//         </ToggleButtonGroup>
+
+//         <Table bordered hover responsive>
+//           <thead className="table-dark">
+//             <tr>
+//               <th>Name</th>
+//               <th>Address</th>
+//               <th>Remarks</th>
+//               <th>Status</th>
+//               <th>Actions</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             {filteredCustomers.map((mat) => (
+//               <tr key={mat.id}>
+//                 <td>{mat.customer_name}</td>
+//                 <td>{mat.address}</td>
+//                 <td>{mat.remarks}</td>
+//                 <td>{mat.is_active ? 'Active' : 'Inactive'}</td>
+//                 <td>
+//                   <Button
+//                     size="sm"
+//                     variant="warning"
+//                     onClick={() => handleShowModal(mat)}
+//                     className="me-2"
+//                   >
+//                     Edit
+//                   </Button>
+//                   <Button
+//                     size="sm"
+//                     variant={mat.is_active ? 'danger' : 'success'}
+//                     onClick={() => toggleCustomerStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
+//                   >
+//                     {mat.is_active ? 'Disable' : 'Enable'}
+//                   </Button>
+//                 </td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </Table>
+
+//         {/* Add/Edit Modal */}
+//         <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+//           <Modal.Header closeButton>
+//             <Modal.Title>{editCustomer ? 'Edit' : 'Add'} Customer</Modal.Title>
+//           </Modal.Header>
+//             {error && <Alert variant="danger">{error}</Alert>}
+//           <Modal.Body>
+//             <Form>
+//               <Form.Group className="mb-3">
+//                 <Form.Label>Customer Name</Form.Label>
+//                 <Form.Control
+//                   type="text"
+//                   value={form.customer_name}
+//                   onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
+//                   required
+//                 />
+//               </Form.Group>
+//                             <Form.Group>
+//                 <Form.Label>Address</Form.Label>
+//                 <Form.Control
+//                   as="textarea"
+//                   rows={3}
+//                   value={form.address}
+//                   onChange={(e) => setForm({ ...form, address: e.target.value })}
+//                 />
+//               </Form.Group>
+//               <Form.Group>
+//                 <Form.Label>Remarks</Form.Label>
+//                 <Form.Control
+//                   as="textarea"
+//                   rows={3}
+//                   value={form.remarks}
+//                   onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+//                 />
+//               </Form.Group>
+//             </Form>
+//           </Modal.Body>
+//           <Modal.Footer>
+//             <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+//             <Button variant="primary" onClick={handleSave}>
+//               {editCustomer ? 'Update' : 'Create'}
+//             </Button>
+//           </Modal.Footer>
+//         </Modal>
+//       </div>
+//     </div>
+//   </div>
+//   );
+// }
+
+// export default CustomerPage;
+
+
+
 import React, { useEffect, useState } from 'react';
 import {
-  Alert, Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col,
+  Button, Modal, Form, Row, Col, Alert,
 } from 'react-bootstrap';
 import axios from 'axios';
 import AdminSidebar from './adminsidebar';
 import { Api } from '../api';
 import TopNavbar from '../components/TopNavbar';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 
 function CustomerPage() {
   const [customers, setCustomers] = useState([]);
@@ -24,9 +245,8 @@ function CustomerPage() {
         },
       });
       setCustomers(res.data);
-      console.log(customers)
     } catch (err) {
-      console.error('Failed to fetch Customers:', err);
+      console.error('Failed to fetch customers:', err);
     }
   };
 
@@ -34,36 +254,39 @@ function CustomerPage() {
     fetchCustomers();
   }, []);
 
-  const filteredCustomers = customers.filter((mat) => {
-    if (filter === 'active') return mat.is_active;
-    if (filter === 'inactive') return !mat.is_active;
-    return true;
-  })
-      .filter((mat) =>
-      mat.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCustomers = customers
+    .filter((item) => {
+      if (filter === 'active') return item.is_active;
+      if (filter === 'inactive') return !item.is_active;
+      return true;
+    })
+    .filter((item) =>
+      item.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
   const handleShowModal = (customer = null) => {
     setEditCustomer(customer);
     setForm(customer ? {
       customer_name: customer.customer_name,
-      remarks: customer.remarks, address: customer.address || '',
-    } : { customer_name: '', remarks: '', address: ''});
+      remarks: customer.remarks || '',
+      address: customer.address || '',
+    } : { customer_name: '', remarks: '', address: '' });
     setError('');
     setShowModal(true);
   };
 
   const handleSave = async () => {
-
     const trimmed = form.customer_name.trim();
     if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
       setError('Customer name must be at least 3 characters and not all numbers.');
       return;
     }
+
     const url = editCustomer
       ? `${Api}/master/update_Customer/${editCustomer.id}/`
       : `${Api}/master/create_Customer/`;
     const method = editCustomer ? 'put' : 'post';
+
     try {
       await axios({
         method,
@@ -72,7 +295,7 @@ function CustomerPage() {
           customer_name: form.customer_name,
           remarks: form.remarks,
           address: form.address,
-          is_active : true
+          is_active: true,
         },
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
@@ -81,7 +304,7 @@ function CustomerPage() {
       setShowModal(false);
       fetchCustomers();
     } catch (err) {
-      console.error('Failed to save Customer:', err);
+      console.error('Failed to save customer:', err);
     }
   };
 
@@ -94,122 +317,149 @@ function CustomerPage() {
       });
       fetchCustomers();
     } catch (err) {
-      console.error(`Failed to ${action} Customer:`, err);
+      console.error(`Failed to ${action} customer:`, err);
     }
   };
 
+  const columns = [
+    { field: 'customer_name', headerName: 'Name', flex: 1 },
+    { field: 'address', headerName: 'Address', flex: 2 },
+    { field: 'remarks', headerName: 'Remarks', flex: 2 },
+    {
+      field: 'is_active',
+      headerName: 'Status',
+      flex: 1,
+      renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      flex: 1,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <>
+          <Button
+            size="sm"
+            variant="warning"
+            className="me-2"
+            onClick={() => handleShowModal(params.row)}
+          >
+            Edit
+          </Button>
+          <Button
+            size="sm"
+            variant={params.row.is_active ? 'danger' : 'success'}
+            onClick={() => toggleCustomerStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
+          >
+            {params.row.is_active ? 'Disable' : 'Enable'}
+          </Button>
+        </>
+      ),
+    },
+  ];
+
   return (
-  <div className="d-flex flex-column" style={{ height: '100vh' }}>
-    <TopNavbar />
-    <div className="d-flex flex-grow-1">
-      <AdminSidebar />
-      <div className="p-4 flex-grow-1">
-        <Row className="mb-3 align-items-center">
-          <Col><h3>Customers</h3></Col>
-          <Col className="text-end">
-            <Button onClick={() => handleShowModal()} variant="primary">+ Add Customer</Button>
-          </Col>
-        </Row>
+    <div className="d-flex flex-column" style={{ height: '100vh' }}>
+      <TopNavbar />
+      <div className="d-flex flex-grow-1">
+        <AdminSidebar />
+        <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
+          <Row className="mb-3 align-items-center">
+            <Col><h3>Customers</h3></Col>
+            <Col className="text-end">
+              <Button onClick={() => handleShowModal()} variant="primary">+ Add Customer</Button>
+            </Col>
+          </Row>
+
+          {/* Search */}
           <Form.Control
             type="text"
-            placeholder="Search by Material name"
+            placeholder="Search by customer name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="mb-3"
             style={{ maxWidth: '300px' }}
           />
-        <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
-          <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
-          <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
-          <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
-        </ToggleButtonGroup>
 
-        <Table bordered hover responsive>
-          <thead className="table-dark">
-            <tr>
-              <th>Name</th>
-              <th>Address</th>
-              <th>Remarks</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCustomers.map((mat) => (
-              <tr key={mat.id}>
-                <td>{mat.customer_name}</td>
-                <td>{mat.address}</td>
-                <td>{mat.remarks}</td>
-                <td>{mat.is_active ? 'Active' : 'Inactive'}</td>
-                <td>
-                  <Button
-                    size="sm"
-                    variant="warning"
-                    onClick={() => handleShowModal(mat)}
-                    className="me-2"
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={mat.is_active ? 'danger' : 'success'}
-                    onClick={() => toggleCustomerStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
-                  >
-                    {mat.is_active ? 'Disable' : 'Enable'}
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+          {/* Filter Toggle */}
+          <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
+            <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
+            <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
+            <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
+          </ToggleButtonGroup>
 
-        {/* Add/Edit Modal */}
-        <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>{editCustomer ? 'Edit' : 'Add'} Customer</Modal.Title>
-          </Modal.Header>
-            {error && <Alert variant="danger">{error}</Alert>}
-          <Modal.Body>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Customer Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={form.customer_name}
-                  onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
-                  required
-                />
-              </Form.Group>
-                            <Form.Group>
-                <Form.Label>Address</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  value={form.address}
-                  onChange={(e) => setForm({ ...form, address: e.target.value })}
-                />
-              </Form.Group>
-              <Form.Group>
-                <Form.Label>Remarks</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  value={form.remarks}
-                  onChange={(e) => setForm({ ...form, remarks: e.target.value })}
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-            <Button variant="primary" onClick={handleSave}>
-              {editCustomer ? 'Update' : 'Create'}
-            </Button>
-          </Modal.Footer>
-        </Modal>
+          {/* DataGrid Table */}
+          <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
+            <DataGrid
+              rows={filteredCustomers}
+              columns={columns}
+              getRowId={(row) => row.id}
+              initialState={{
+                pagination: { paginationModel: { pageSize: 10 } }
+              }}
+              pageSizeOptions={[5, 10, 25]}
+              checkboxSelection
+              disableRowSelectionOnClick
+              disableColumnMenu
+              disableDensitySelector
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                  quickFilterProps: { debounceMs: 300 },
+                },
+              }}
+            />
+          </div>
+
+          {/* Modal */}
+          <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>{editCustomer ? 'Edit' : 'Add'} Customer</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {error && <Alert variant="danger">{error}</Alert>}
+              <Form>
+                <Form.Group className="mb-3">
+                  <Form.Label>Customer Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={form.customer_name}
+                    onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Address</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={2}
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Remarks</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={2}
+                    value={form.remarks}
+                    onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+                  />
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+              <Button variant="primary" onClick={handleSave}>
+                {editCustomer ? 'Update' : 'Create'}
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </div>
       </div>
     </div>
-  </div>
   );
 }
 

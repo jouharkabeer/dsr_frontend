@@ -212,8 +212,8 @@ function AdminSidebar() {
               </Nav.Link>
               <Nav.Link
                 as={Link}
-                to="/skeloton/"
-                className={`sidebar-subitem ${isActive('/skeloton') ? 'sidebar-subitem-active' : ''}`}
+                to="/tablecheck/"
+                className={`sidebar-subitem ${isActive('/tablecheck') ? 'sidebar-subitem-active' : ''}`}
               >
                 skeloton
               </Nav.Link>

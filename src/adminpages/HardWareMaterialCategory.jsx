@@ -1,71 +1,277 @@
 
+// import React, { useEffect, useState } from 'react';
+// import {
+//   Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col, Alert,
+// } from 'react-bootstrap';
+// import axios from 'axios';
+// import AdminSidebar from './adminsidebar';
+// import TopNavbar from '../components/TopNavbar';
+// import { Api } from '../api';
+
+// function HardWareMaterialCategoryPage() {
+//   const [hardWareMaterialCategorys, setHardWareMaterialCategorys] = useState([]);
+//   const [filter, setFilter] = useState('all');
+//   const [showModal, setShowModal] = useState(false);
+//   const [editHardWareMaterialCategory, setEditHardWareMaterialCategory] = useState(null);
+//   const [form, setForm] = useState({ hardware_material_catagory_name: '', remarks: '' });
+//   const [searchTerm, setSearchTerm] = useState('');
+//   const [error, setError] = useState('');
+
+//   const fetchHardWareMaterialCategorys = async () => {
+//     try {
+//       const res = await axios.get(`${Api}/master/view_allHardWareMaterialCategorys/`, {
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+//         },
+//       });
+//       setHardWareMaterialCategorys(res.data);
+//     } catch (err) {
+//       console.error('Failed to fetch hardWareMaterialCategoryes:', err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchHardWareMaterialCategorys();
+//   }, []);
+
+//   const filteredHardWareMaterialCategorys = hardWareMaterialCategorys
+//     .filter((mat) => {
+//       if (filter === 'active') return mat.is_active;
+//       if (filter === 'inactive') return !mat.is_active;
+//       return true;
+//     })
+//     .filter((mat) =>
+//       mat.hardware_material_catagory_name?.toLowerCase().includes(searchTerm.toLowerCase())
+//     );
+
+//   const handleShowModal = (hardWareMaterialCategory = null) => {
+//     setEditHardWareMaterialCategory(hardWareMaterialCategory);
+//     setForm(hardWareMaterialCategory ? {
+//       hardware_material_catagory_name: hardWareMaterialCategory.hardware_material_catagory_name,
+//       remarks: hardWareMaterialCategory.remarks || '',
+//     } : { hardware_material_catagory_name: '', remarks: '' });
+//     setError('');
+//     setShowModal(true);
+//   };
+
+//   const handleSave = async () => {
+//     // Validation
+//     const trimmed = form.hardware_material_catagory_name.trim();
+//     if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
+//       setError('HardWareMaterialCategory name must be at least 3 characters and not all numbers.');
+//       return;
+//     }
+
+//     const url = editHardWareMaterialCategory
+//       ? `${Api}/master/update_HardWareMaterialCategory/${editHardWareMaterialCategory.id}/`
+//       : `${Api}/master/create_HardWareMaterialCategory/`;
+//     const method = editHardWareMaterialCategory ? 'put' : 'post';
+//     try {
+//       await axios({
+//         method,
+//         url,
+//         data: {
+//           hardware_material_catagory_name: form.hardware_material_catagory_name,
+//           remarks: form.remarks,
+//           is_active: true
+//         },
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+//         },
+//       });
+//       setShowModal(false);
+//       fetchHardWareMaterialCategorys();
+//     } catch (err) {
+//       console.error('Failed to save hardWareMaterialCategory:', err);
+//     }
+//   };
+
+//   const toggleHardWareMaterialCategoryStatus = async (id, action) => {
+//     try {
+//       await axios.delete(`${Api}/master/${action}_HardWareMaterialCategory/${id}/`, {
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+//         },
+//       });
+//       fetchHardWareMaterialCategorys();
+//     } catch (err) {
+//       console.error(`Failed to ${action} hardWareMaterialCategory:`, err);
+//     }
+//   };
+
+//   return (
+//     <div className="d-flex flex-column" style={{ height: '100vh' }}>
+//       <TopNavbar />
+//       <div className="d-flex flex-grow-1">
+//         <AdminSidebar />
+//         <div className="p-4 flex-grow-1 overflow-auto" style={{ maxHeight: '100%', backgroundColor: '#f8f9fa' }}>
+//           <Row className="mb-3 align-items-center">
+//             <Col><h3>Material Categories</h3></Col>
+//             <Col className="text-end">
+//               <Button onClick={() => handleShowModal()} variant="primary">+ Add HardWareMaterialCategory</Button>
+//             </Col>
+//           </Row>
+
+//           <Form.Control
+//             type="text"
+//             placeholder="Search by Material Category name"
+//             value={searchTerm}
+//             onChange={(e) => setSearchTerm(e.target.value)}
+//             className="mb-3"
+//             style={{ maxWidth: '300px' }}
+//           />
+
+//           <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
+//             <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
+//             <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
+//             <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
+//           </ToggleButtonGroup>
+
+//           <Table bordered hover responsive className="bg-white shadow-sm">
+//             <thead className="table-dark">
+//               <tr>
+//                 <th>Name</th>
+//                 <th>Remarks</th>
+//                 <th>Status</th>
+//                 <th>Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {filteredHardWareMaterialCategorys.map((mat) => (
+//                 <tr key={mat.id}>
+//                   <td>{mat.hardware_material_catagory_name}</td>
+//                   <td>{mat.remarks}</td>
+//                   <td>{mat.is_active ? 'Active' : 'Inactive'}</td>
+//                   <td>
+//                     <Button
+//                       size="sm"
+//                       variant="warning"
+//                       onClick={() => handleShowModal(mat)}
+//                       className="me-2"
+//                     >
+//                       Edit
+//                     </Button>
+//                     <Button
+//                       size="sm"
+//                       variant={mat.is_active ? 'danger' : 'success'}
+//                       onClick={() => toggleHardWareMaterialCategoryStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
+//                     >
+//                       {mat.is_active ? 'Disable' : 'Enable'}
+//                     </Button>
+//                   </td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </Table>
+
+//           {/* Modal */}
+//           <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+//             <Modal.Header closeButton>
+//               <Modal.Title>{editHardWareMaterialCategory ? 'Edit' : 'Add'} HardWareMaterialCategory</Modal.Title>
+//             </Modal.Header>
+//             <Modal.Body>
+//               {error && <Alert variant="danger">{error}</Alert>}
+//               <Form>
+//                 <Form.Group className="mb-3">
+//                   <Form.Label>HardWareMaterialCategory Name</Form.Label>
+//                   <Form.Control
+//                     type="text"
+//                     value={form.hardware_material_catagory_name}
+//                     onChange={(e) => setForm({ ...form, hardware_material_catagory_name: e.target.value })}
+//                     required
+//                   />
+//                 </Form.Group>
+//                 <Form.Group>
+//                   <Form.Label>Remarks</Form.Label>
+//                   <Form.Control
+//                     as="textarea"
+//                     rows={3}
+//                     value={form.remarks}
+//                     onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+//                   />
+//                 </Form.Group>
+//               </Form>
+//             </Modal.Body>
+//             <Modal.Footer>
+//               <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+//               <Button variant="primary" onClick={handleSave}>
+//                 {editHardWareMaterialCategory ? 'Update' : 'Create'}
+//               </Button>
+//             </Modal.Footer>
+//           </Modal>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default HardWareMaterialCategoryPage;
+
 import React, { useEffect, useState } from 'react';
 import {
-  Button, Table, Modal, Form, ToggleButtonGroup, ToggleButton, Row, Col, Alert,
+  Button, Modal, Form, Row, Col, Alert,
 } from 'react-bootstrap';
 import axios from 'axios';
 import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 
 function HardWareMaterialCategoryPage() {
-  const [hardWareMaterialCategorys, setHardWareMaterialCategorys] = useState([]);
+  const [data, setData] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
-  const [editHardWareMaterialCategory, setEditHardWareMaterialCategory] = useState(null);
+  const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({ hardware_material_catagory_name: '', remarks: '' });
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
 
-  const fetchHardWareMaterialCategorys = async () => {
+  const fetchData = async () => {
     try {
       const res = await axios.get(`${Api}/master/view_allHardWareMaterialCategorys/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
-      setHardWareMaterialCategorys(res.data);
+      setData(res.data);
     } catch (err) {
-      console.error('Failed to fetch hardWareMaterialCategoryes:', err);
+      console.error('Failed to fetch categories:', err);
     }
   };
 
-  useEffect(() => {
-    fetchHardWareMaterialCategorys();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
-  const filteredHardWareMaterialCategorys = hardWareMaterialCategorys
-    .filter((mat) => {
-      if (filter === 'active') return mat.is_active;
-      if (filter === 'inactive') return !mat.is_active;
+  const filteredData = data
+    .filter((item) => {
+      if (filter === 'active') return item.is_active;
+      if (filter === 'inactive') return !item.is_active;
       return true;
     })
-    .filter((mat) =>
-      mat.hardware_material_catagory_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter((item) =>
+      item.hardware_material_catagory_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  const handleShowModal = (hardWareMaterialCategory = null) => {
-    setEditHardWareMaterialCategory(hardWareMaterialCategory);
-    setForm(hardWareMaterialCategory ? {
-      hardware_material_catagory_name: hardWareMaterialCategory.hardware_material_catagory_name,
-      remarks: hardWareMaterialCategory.remarks || '',
+  const handleShowModal = (item = null) => {
+    setEditItem(item);
+    setForm(item ? {
+      hardware_material_catagory_name: item.hardware_material_catagory_name,
+      remarks: item.remarks || '',
     } : { hardware_material_catagory_name: '', remarks: '' });
     setError('');
     setShowModal(true);
   };
 
   const handleSave = async () => {
-    // Validation
     const trimmed = form.hardware_material_catagory_name.trim();
     if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
-      setError('HardWareMaterialCategory name must be at least 3 characters and not all numbers.');
+      setError('Name must be at least 3 characters and not all numbers.');
       return;
     }
 
-    const url = editHardWareMaterialCategory
-      ? `${Api}/master/update_HardWareMaterialCategory/${editHardWareMaterialCategory.id}/`
+    const url = editItem
+      ? `${Api}/master/update_HardWareMaterialCategory/${editItem.id}/`
       : `${Api}/master/create_HardWareMaterialCategory/`;
-    const method = editHardWareMaterialCategory ? 'put' : 'post';
+    const method = editItem ? 'put' : 'post';
+
     try {
       await axios({
         method,
@@ -75,46 +281,78 @@ function HardWareMaterialCategoryPage() {
           remarks: form.remarks,
           is_active: true
         },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
       setShowModal(false);
-      fetchHardWareMaterialCategorys();
+      fetchData();
     } catch (err) {
-      console.error('Failed to save hardWareMaterialCategory:', err);
+      console.error('Failed to save:', err);
     }
   };
 
-  const toggleHardWareMaterialCategoryStatus = async (id, action) => {
+  const toggleStatus = async (id, action) => {
     try {
       await axios.delete(`${Api}/master/${action}_HardWareMaterialCategory/${id}/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
-      fetchHardWareMaterialCategorys();
+      fetchData();
     } catch (err) {
-      console.error(`Failed to ${action} hardWareMaterialCategory:`, err);
+      console.error(`Failed to ${action} item:`, err);
     }
   };
+
+  const columns = [
+    { field: 'hardware_material_catagory_name', headerName: 'Name', flex: 1 },
+    { field: 'remarks', headerName: 'Remarks', flex: 2 },
+    {
+      field: 'is_active',
+      headerName: 'Status',
+      flex: 1,
+      renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      flex: 1,
+      sortable: false,
+      renderCell: (params) => (
+        <>
+          <Button
+            size="sm"
+            variant="warning"
+            className="me-2"
+            onClick={() => handleShowModal(params.row)}
+          >
+            Edit
+          </Button>
+          <Button
+            size="sm"
+            variant={params.row.is_active ? 'danger' : 'success'}
+            onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
+          >
+            {params.row.is_active ? 'Disable' : 'Enable'}
+          </Button>
+        </>
+      ),
+    },
+  ];
 
   return (
     <div className="d-flex flex-column" style={{ height: '100vh' }}>
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
-        <div className="p-4 flex-grow-1 overflow-auto" style={{ maxHeight: '100%', backgroundColor: '#f8f9fa' }}>
+        <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
-            <Col><h3>Material Categories</h3></Col>
+            <Col><h3>Hardware Material Categories</h3></Col>
             <Col className="text-end">
-              <Button onClick={() => handleShowModal()} variant="primary">+ Add HardWareMaterialCategory</Button>
+              <Button onClick={() => handleShowModal()} variant="primary">+ Add</Button>
             </Col>
           </Row>
 
           <Form.Control
             type="text"
-            placeholder="Search by Material Category name"
+            placeholder="Search by name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="mb-3"
@@ -127,53 +365,36 @@ function HardWareMaterialCategoryPage() {
             <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
           </ToggleButtonGroup>
 
-          <Table bordered hover responsive className="bg-white shadow-sm">
-            <thead className="table-dark">
-              <tr>
-                <th>Name</th>
-                <th>Remarks</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredHardWareMaterialCategorys.map((mat) => (
-                <tr key={mat.id}>
-                  <td>{mat.hardware_material_catagory_name}</td>
-                  <td>{mat.remarks}</td>
-                  <td>{mat.is_active ? 'Active' : 'Inactive'}</td>
-                  <td>
-                    <Button
-                      size="sm"
-                      variant="warning"
-                      onClick={() => handleShowModal(mat)}
-                      className="me-2"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={mat.is_active ? 'danger' : 'success'}
-                      onClick={() => toggleHardWareMaterialCategoryStatus(mat.id, mat.is_active ? 'disable' : 'enable')}
-                    >
-                      {mat.is_active ? 'Disable' : 'Enable'}
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
+            <DataGrid
+              rows={filteredData}
+              columns={columns}
+              getRowId={(row) => row.id}
+              initialState={{
+                pagination: { paginationModel: { pageSize: 10 } }
+              }}
+              pageSizeOptions={[5, 10, 25]}
+              checkboxSelection
+              disableRowSelectionOnClick
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                  quickFilterProps: { debounceMs: 300 },
+                },
+              }}
+            />
+          </div>
 
-          {/* Modal */}
           <Modal show={showModal} onHide={() => setShowModal(false)} centered>
             <Modal.Header closeButton>
-              <Modal.Title>{editHardWareMaterialCategory ? 'Edit' : 'Add'} HardWareMaterialCategory</Modal.Title>
+              <Modal.Title>{editItem ? 'Edit' : 'Add'} Category</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               {error && <Alert variant="danger">{error}</Alert>}
               <Form>
                 <Form.Group className="mb-3">
-                  <Form.Label>HardWareMaterialCategory Name</Form.Label>
+                  <Form.Label>Category Name</Form.Label>
                   <Form.Control
                     type="text"
                     value={form.hardware_material_catagory_name}
@@ -195,7 +416,7 @@ function HardWareMaterialCategoryPage() {
             <Modal.Footer>
               <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
               <Button variant="primary" onClick={handleSave}>
-                {editHardWareMaterialCategory ? 'Update' : 'Create'}
+                {editItem ? 'Update' : 'Create'}
               </Button>
             </Modal.Footer>
           </Modal>
