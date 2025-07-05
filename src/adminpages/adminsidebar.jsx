@@ -88,24 +88,10 @@ function AdminSidebar() {
             <div className="ms-3">
               <Nav.Link
                 as={Link}
-                to="/admin/materialcategory"
-                className={`sidebar-subitem ${isActive('/admin/materialcategory') ? 'sidebar-subitem-active' : 'sidebar-subitem-activedf'}`}
-              >
-                Material Category
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/admin/material"
-                className={`sidebar-subitem ${isActive('/admin/material') ? 'sidebar-subitem-active' : ''}`}
-              >
-                Material
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
                 to="/admin/hardwarematerialcategory"
                 className={`sidebar-subitem ${isActive('/admin/hardwarematerialcategory') ? 'sidebar-subitem-active' : 'sidebar-subitem-activedf'}`}
               >
-               Hardware Material Category
+               Hardware Category
               </Nav.Link>
               <Nav.Link
                 as={Link}
@@ -119,7 +105,7 @@ function AdminSidebar() {
                 to="/admin/timbermaterialcategory"
                 className={`sidebar-subitem ${isActive('/admin/timbermaterialcategory') ? 'sidebar-subitem-active' : 'sidebar-subitem-activedf'}`}
               >
-               Timber Material Category
+               Timber Category
               </Nav.Link>
               <Nav.Link
                 as={Link}

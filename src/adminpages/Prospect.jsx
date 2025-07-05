@@ -417,7 +417,7 @@ function ProspectPage() {
           </ToggleButtonGroup>
 
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
-            <DataGrid
+            {/* <DataGrid
               rows={filteredProspects}
               columns={columns}
               getRowId={(row) => row.id}
@@ -434,7 +434,28 @@ function ProspectPage() {
                   quickFilterProps: { debounceMs: 300 },
                 },
               }}
-            />
+            /> */}
+                        <DataGrid
+                          rows={filteredProspects}
+                          columns={columns}
+                          getRowId={(row) => row.id}
+                          initialState={{
+                            pagination: {
+                              paginationModel: { pageSize: 10 },
+                            },
+                          }}
+                          pageSizeOptions={[5, 10, 25]}
+                          checkboxSelection
+                          disableRowSelectionOnClick
+                          disableColumnMenu
+                          disableDensitySelector
+                          showToolbar
+                          slotProps={{
+                            toolbar: {
+                              quickFilterProps: { debounceMs: 500 },
+                            },
+                          }}
+                        />
           </div>
 
           <Modal show={showModal} onHide={() => setShowModal(false)} centered>
