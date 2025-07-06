@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Form, Button, Card } from 'react-bootstrap';
 import { Api } from './api';
+import logo from './assets/logo.png'
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -40,7 +41,7 @@ function Login() {
       <Card style={{ width: '100%', maxWidth: '400px' }} className="p-4 shadow">
         <Card.Body>
           <div className="text-center mb-4">
-            <img src="/logo.png" alt="Company Logo" width="120" />
+            <img src={logo} alt="Company Logo" width="120" />
           </div>
           <Form onSubmit={handleLogin}>
             <Form.Group controlId="username" className="mb-3">

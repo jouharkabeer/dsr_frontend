@@ -64,7 +64,7 @@ function AdminSidebar() {
 
         {/* Dashboard */}
         <Nav.Link
-          className={`sidebar-item ${isActive('/admin/dashboard') ? 'sidebar-subitem-active' : ''}`}
+          className={`sidebar-item ${isActive('/admin/dashboard') ? 'sidebar-main-active' : ''}`}
           as={Link}
           to="/admin/dashboard"
         >

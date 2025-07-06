@@ -2,6 +2,7 @@
 import React from 'react';
 import { Navbar, Container, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png'
 
 function TopNavbar() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ function TopNavbar() {
   return (
     <Navbar bg="dark" variant="dark" className="px-4">
       <Container fluid>
-        <Navbar.Brand>🔧 Sales Admin Panel</Navbar.Brand>
+        <Navbar.Brand><img src={logo} alt='logo' width='100px'/></Navbar.Brand>
         <Button variant="outline-light" onClick={handleLogout}>Logout</Button>
       </Container>
     </Navbar>
