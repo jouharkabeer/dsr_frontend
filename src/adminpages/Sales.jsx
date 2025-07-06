@@ -858,11 +858,79 @@ console.log(sales)
     { field: 'order_value', headerName: 'Order Value', flex: 1 },
     { field: 'hardware_material_name', headerName: 'Timber Materials', flex: 1 },
     { field: 'timber_material_name', headerName: 'Hardware Materials', flex: 1 },
-    {
-      field: 'is_active',
-      headerName: 'Status',
-      flex: 1,
-      renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
+{
+  field: 'prospect_name',
+  headerName: 'Prospect',
+  flex: 1,
+  renderCell: (params) => (
+    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '13%'}}>
+      <div
+        style={{
+          backgroundColor: params.row.prospect_bg || '#eee',
+          color: params.row.prospect_text || '#000',
+          padding: '4px 12px',
+          borderRadius: '999px',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: '0.85rem',
+          lineHeight: '1.2',
+          display: 'inline-block',
+          minWidth: '60px',
+        }}
+      >
+        {params.value}
+      </div>
+    </div>
+  )
+},
+{
+  field: 'order_status_name',
+  headerName: 'Order Status',
+  flex: 1,
+  renderCell: (params) => (
+    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '13%'}}>
+      <div
+        style={{
+          backgroundColor: params.row.order_bg || '#eee',
+          color: params.row.order_text || '#000',
+          padding: '4px 12px',
+          borderRadius: '999px',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: '0.85rem',
+          lineHeight: '1.2',
+          display: 'inline-block',
+          minWidth: '60px',
+        }}
+      >
+        {params.value}
+      </div>
+    </div>
+  )
+},
+{
+  field: 'call_status_name',
+  headerName: 'Call Status',
+  flex: 1,
+},
+        {
+      field: "is_active",
+      headerName: "Status",
+      renderCell: (params) => (
+        <div style={{ color: params.value ? "green" : "red" }}>
+          <span
+            style={{
+              color: params.value ? "green" : "red",
+              padding: "5px",
+              borderRadius: "10px",
+            }}
+          >
+            {params.value ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+      ),
+      valueFormatter: (params) => (params.value ? "Active" : "Inactive"),
+      valueOptions: ["Active", "Inactive"],
     },
     {
       field: 'actions',
