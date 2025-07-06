@@ -18,12 +18,10 @@ import PaymentMethodPage from './adminpages/PaymentMethod';
 import CallStatusPage from './adminpages/CallStatus';
 import OrderStatusTypePage from './adminpages/OrderStatusType';
 import SalesPageAdmin from './adminpages/Sales';
-import Skeletonpage from './adminpages/SkelotonTable';
 import HardWareMaterialCategoryPage from './adminpages/HardWareMaterialCategory';
 import HardWareMaterialPage from './adminpages/HardwareMaterial';
 import TimberMaterialPage from './adminpages/TimberMaterials';
 import TimberMaterialCategoryPage from './adminpages/TimberMaterialCategory';
-import TableCheck from './adminpages/tablecheck';
 
 function App() {
   return (
@@ -42,13 +40,12 @@ function App() {
       <Route path="/admin/callstatus/" element={<CallStatusPage/>} />
       <Route path="/admin/ordertype/" element={<OrderStatusTypePage/>} />
       <Route path="/sales/salespage/" element={<SalesPageAdmin/>} />
-      <Route path="/skeloton/" element={<Skeletonpage/>} />
+
 
       <Route path="/admin/hardwarematerialcategory/" element={<HardWareMaterialCategoryPage />} />
       <Route path="/admin/hardwarematerial/" element={<HardWareMaterialPage />} />      
       <Route path="/admin/timbermaterialcategory/" element={<TimberMaterialCategoryPage />} />
-      <Route path="/admin/timbermaterial/" element={<TimberMaterialPage />} />      
-      <Route path="/tablecheck/" element={<TableCheck />} />      
+      <Route path="/admin/timbermaterial/" element={<TimberMaterialPage />} />        
 
       <Route path="/salesman/dashboard" element={<SalesmanDashboard />} />
       <Route path="/salesman/sales" element={<SalesPage />} />

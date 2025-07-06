@@ -736,6 +736,11 @@ import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
 import { DataGrid } from '@mui/x-data-grid';
+import { IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+
 
 function SalesPage() {
   const [sales, setSales] = useState([]);
@@ -843,6 +848,17 @@ console.log(sales)
     }
   };
 
+  const toggleStatus = async (id, action) => {
+    try {
+      await axios.delete(`${Api}/master/${action}_HardWareMaterialCategory/${id}/`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
+      });
+      fetchSales();
+    } catch (err) {
+      console.error(`Failed to ${action} item:`, err);
+    }
+  };
+
   const filteredSales = sales
   .filter((mat) => {
       if (filter === 'active') return mat.is_active;
@@ -936,19 +952,19 @@ console.log(sales)
       field: 'actions',
       headerName: 'Actions',
       flex: 1,
+      sortable: false,
       renderCell: (params) => (
-        <Button
-          size="sm"
-          variant="warning"
-          onClick={() => {
-            setEditSales(params.row);
-            setShowModal(true);
-          }}
-        >
-          Edit
-        </Button>
-      ),
-    },
+        <>
+          <IconButton color="warning" onClick={() => handleShowModal(params.row)}><EditIcon /></IconButton>
+          <IconButton
+            color={params.row.is_active ? 'error' : 'success'}
+            onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
+          >
+            {params.row.is_active ? <ToggleOffIcon /> : <ToggleOnIcon />}
+          </IconButton>
+        </>
+      )
+    }
   ];
 
   return (
@@ -960,45 +976,36 @@ console.log(sales)
           <Row className="mb-3 align-items-center">
             <Col><h3>Sales</h3></Col>
             <Col className="text-end">
-              <Button onClick={() => { setEditSales(null); setShowModal(true); }} variant="primary">+ Add Sales</Button>
+              <Button onClick={() => { setEditSales(null); setShowModal(true); }} variant="primary">+ Add</Button>
             </Col>
           </Row>
 
-          <Row className="mb-3">
-            <Col md={3}>
-              <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter}>
-                <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
-                <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
-                <ToggleButton id="inactive" value="inactive" variant="outline-success">InActive</ToggleButton>
-              </ToggleButtonGroup>
-            </Col>
-            <Col md={4}>
-              <Form.Control
-                placeholder="Search by Customer..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </Col>
-          </Row>
-
+          <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
+            <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
+            <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
+            <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
+          </ToggleButtonGroup>
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
-            <DataGrid
-              rows={filteredSales}
-              columns={columns}
-              getRowId={(row) => row.id}
-              pageSizeOptions={[5, 10, 20]}
-              checkboxSelection
-              disableRowSelectionOnClick
-              initialState={{
-                pagination: {
-                  paginationModel: { pageSize: 10 },
-                },
-              }}
-              slotProps={{
-                toolbar: {
-                  quickFilterProps: { debounceMs: 300 },
-                },
-              }}
+<DataGrid
+  rows={filteredSales}
+  columns={columns}
+  getRowId={(row) => row.id}
+  initialState={{
+    pagination: {
+      paginationModel: { pageSize: 10 },
+    },
+  }}
+  pageSizeOptions={[5, 10, 25]}
+  checkboxSelection
+  disableRowSelectionOnClick
+  disableColumnMenu
+  disableDensitySelector
+  showToolbar // ✅ NEW: enables full toolbar (search, export, columns)
+  slotProps={{
+    toolbar: {
+      quickFilterProps: { debounceMs: 500 },
+    },
+  }}
             />
           </div>
           <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">

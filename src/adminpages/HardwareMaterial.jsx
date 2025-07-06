@@ -7,6 +7,11 @@ import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
 import { DataGrid} from '@mui/x-data-grid';
+import { IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 
 function HardWareMaterialPage() {
   const [hardwarematerials, setHardWareMaterials] = useState([]);
@@ -65,7 +70,16 @@ function HardWareMaterialPage() {
     setError('');
     setShowModal(true);
   };
-
+  const toggleStatus = async (id, action) => {
+    try {
+      await axios.delete(`${Api}/master/${action}_HardWareMaterial/${id}/`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
+      });
+      fetchHardWareMaterials();
+    } catch (err) {
+      console.error(`Failed to ${action} item:`, err);
+    }
+  };
   const handleSave = async () => {
     const trimmed = form.hardwarematerial_name.trim();
     if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
@@ -127,27 +141,18 @@ function HardWareMaterialPage() {
       headerName: 'Actions',
       flex: 1,
       sortable: false,
-      filterable: false,
       renderCell: (params) => (
         <>
-          <Button
-            size="sm"
-            variant="warning"
-            className="me-2"
-            onClick={() => handleShowModal(params.row)}
+          <IconButton color="warning" onClick={() => handleShowModal(params.row)}><EditIcon /></IconButton>
+          <IconButton
+            color={params.row.is_active ? 'error' : 'success'}
+            onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
           >
-            Edit
-          </Button>
-          <Button
-            size="sm"
-            variant={params.row.is_active ? 'danger' : 'success'}
-            onClick={() => toggleHardWareMaterialStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
-          >
-            {params.row.is_active ? 'Disable' : 'Enable'}
-          </Button>
+            {params.row.is_active ? <ToggleOffIcon /> : <ToggleOnIcon />}
+          </IconButton>
         </>
-      ),
-    },
+      )
+    }
   ];
 
   return (
@@ -159,21 +164,15 @@ function HardWareMaterialPage() {
           <Row className="mb-3 align-items-center">
             <Col><h3>Hardware Materials</h3></Col>
             <Col className="text-end">
-              <Button onClick={() => handleShowModal()} variant="primary">+ Add Hardware Material</Button>
+              <Button onClick={() => handleShowModal()} variant="primary">+ Add</Button>
             </Col>
           </Row>
 
-          <div className="mb-3">
-            <Form.Select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              style={{ maxWidth: '200px' }}
-            >
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </Form.Select>
-          </div>
+          <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
+            <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
+            <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
+            <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
+          </ToggleButtonGroup>
 
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
 <DataGrid

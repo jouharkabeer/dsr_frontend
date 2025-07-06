@@ -369,13 +369,18 @@
 
 import React, { useEffect, useState } from 'react';
 import {
-  Button, Modal, Form, Row, Col, Alert,
+  Button, Modal, Form, Row, Col, Alert, ToggleButtonGroup, ToggleButton
 } from 'react-bootstrap';
 import axios from 'axios';
 import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
 import { DataGrid } from '@mui/x-data-grid';
+import { IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+
 
 function UserTypePage() {
   const [userTypes, setUserTypes] = useState([]);
@@ -450,7 +455,7 @@ function UserTypePage() {
     }
   };
 
-  const toggleUserTypeStatus = async (id, action) => {
+  const toggleStatus = async (id, action) => {
     try {
       await axios.delete(`${Api}/user/${action}_UserType/${id}/`, {
         headers: {
@@ -477,29 +482,18 @@ function UserTypePage() {
       headerName: 'Actions',
       flex: 1,
       sortable: false,
-      filterable: false,
       renderCell: (params) => (
         <>
-          <Button
-            size="sm"
-            variant="warning"
-            className="me-2"
-            onClick={() => handleShowModal(params.row)}
+          <IconButton color="warning" onClick={() => handleShowModal(params.row)}><EditIcon /></IconButton>
+          <IconButton
+            color={params.row.is_active ? 'error' : 'success'}
+            onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
           >
-            Edit
-          </Button>
-          <Button
-            size="sm"
-            variant={params.row.is_active ? 'danger' : 'success'}
-            onClick={() =>
-              toggleUserTypeStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')
-            }
-          >
-            {params.row.is_active ? 'Disable' : 'Enable'}
-          </Button>
+            {params.row.is_active ? <ToggleOffIcon /> : <ToggleOnIcon />}
+          </IconButton>
         </>
-      ),
-    },
+      )
+    }
   ];
 
   return (
@@ -511,21 +505,15 @@ function UserTypePage() {
           <Row className="mb-3 align-items-center">
             <Col><h3>User Types</h3></Col>
             <Col className="text-end">
-              <Button onClick={() => handleShowModal()} variant="primary">+ Add User Type</Button>
+              <Button onClick={() => handleShowModal()} variant="primary">+ Add</Button>
             </Col>
           </Row>
 
-          <div className="mb-3">
-            <Form.Select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              style={{ maxWidth: '200px' }}
-            >
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </Form.Select>
-          </div>
+          <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
+            <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
+            <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
+            <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
+          </ToggleButtonGroup>
 
           <div style={{ height: 500, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
             <DataGrid

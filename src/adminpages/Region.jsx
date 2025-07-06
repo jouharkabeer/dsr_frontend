@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button, Modal, Form, Row, Col, Alert,
+  Button, Modal, Form, Row, Col, Alert, ToggleButtonGroup, ToggleButton
 } from 'react-bootstrap';
 import axios from 'axios';
 import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
 import { DataGrid } from '@mui/x-data-grid';
+import { IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 
 function RegionPage() {
   const [regiones, setRegiones] = useState([]);
@@ -80,7 +84,7 @@ function RegionPage() {
     }
   };
 
-  const toggleRegionStatus = async (id, action) => {
+  const toggleStatus = async (id, action) => {
     try {
       await axios.delete(`${Api}/master/${action}_Region/${id}/`, {
         headers: {
@@ -107,27 +111,18 @@ function RegionPage() {
       headerName: 'Actions',
       flex: 1,
       sortable: false,
-      filterable: false,
       renderCell: (params) => (
         <>
-          <Button
-            size="sm"
-            variant="warning"
-            className="me-2"
-            onClick={() => handleShowModal(params.row)}
+          <IconButton color="warning" onClick={() => handleShowModal(params.row)}><EditIcon /></IconButton>
+          <IconButton
+            color={params.row.is_active ? 'error' : 'success'}
+            onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
           >
-            Edit
-          </Button>
-          <Button
-            size="sm"
-            variant={params.row.is_active ? 'danger' : 'success'}
-            onClick={() => toggleRegionStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
-          >
-            {params.row.is_active ? 'Disable' : 'Enable'}
-          </Button>
+            {params.row.is_active ? <ToggleOffIcon /> : <ToggleOnIcon />}
+          </IconButton>
         </>
-      ),
-    },
+      )
+    }
   ];
 
   return (
@@ -137,22 +132,17 @@ function RegionPage() {
         <AdminSidebar />
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
-            <Col><h3>Regiones</h3></Col>
+            <Col><h3>Regions</h3></Col>
             <Col className="text-end">
-              <Button onClick={() => handleShowModal()} variant="primary">+ Add Region</Button>
+              <Button onClick={() => handleShowModal()} variant="primary">+ Add</Button>
             </Col>
           </Row>
 
-          <Form.Select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            style={{ maxWidth: '200px' }}
-            className="mb-3"
-          >
-            <option value="all">All</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </Form.Select>
+          <ToggleButtonGroup type="radio" name="filter" value={filter} onChange={setFilter} className="mb-3">
+            <ToggleButton id="all" value="all" variant="outline-secondary">All</ToggleButton>
+            <ToggleButton id="active" value="active" variant="outline-success">Active</ToggleButton>
+            <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
+          </ToggleButtonGroup>
 
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
             <DataGrid

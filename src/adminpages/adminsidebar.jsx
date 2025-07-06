@@ -17,7 +17,7 @@ function AdminSidebar() {
       location.pathname.startsWith('/admin/hardwarematerialcategory') ||
       location.pathname.startsWith('/admin/hardwarematerial') ||
       location.pathname.startsWith('/admin/timbermaterialcategory') ||
-      location.pathname.startsWith('/admin/hardwarematerial') ||
+      location.pathname.startsWith('/admin/timbermaterial') ||
       location.pathname.startsWith('/admin/customer') ||
       location.pathname.startsWith('/admin/branch') ||
       location.pathname.startsWith('/admin/region') ||
@@ -195,13 +195,6 @@ function AdminSidebar() {
                 className={`sidebar-subitem ${isActive('/admin/usertype') ? 'sidebar-subitem-active' : ''}`}
               >
                 User Type
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/tablecheck/"
-                className={`sidebar-subitem ${isActive('/tablecheck') ? 'sidebar-subitem-active' : ''}`}
-              >
-                skeloton
               </Nav.Link>
             </div>
           )}
