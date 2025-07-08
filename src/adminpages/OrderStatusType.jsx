@@ -325,11 +325,11 @@ function OrderStatusTypePage() {
   };
 
   const columns = [
-    { field: 'order_type_name', headerName: 'Name', flex: 1 },
+    { field: 'order_type_name', headerName: 'Name', width : 150 },
     {
       field: 'text_color',
       headerName: 'Text Color',
-      flex: 1,
+      width : 150,
       renderCell: (params) => (
         <span style={{ color: params.value }}>{params.value}</span>
       )
@@ -337,7 +337,7 @@ function OrderStatusTypePage() {
     {
       field: 'text_bg',
       headerName: 'Background',
-      flex: 1,
+      width : 150,
       renderCell: (params) => (
         <span style={{
           backgroundColor: params.value,
@@ -350,13 +350,13 @@ function OrderStatusTypePage() {
     {
       field: 'is_active',
       headerName: 'Status',
-      flex: 1,
+      width : 150,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive')
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      flex: 1,
+      width : 150,
       sortable: false,
       renderCell: (params) => (
         <>

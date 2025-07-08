@@ -151,25 +151,25 @@ const userid = localStorage.getItem('user_id')
 console.log(users)
   const columns = [
 {
-  field: 'name',
+  field: 'namefull',
   headerName: 'Full Name',
-  flex: 1,
+  width : 150,
 
 },
 
-    { field: 'username', headerName: 'Username', flex: 1 },
-    { field: 'email', headerName: 'Email', flex: 1 },
-    { field: 'user_type_name', headerName: 'User Type', flex: 1 },
+    { field: 'username', headerName: 'Username', width : 150 },
+    { field: 'email', headerName: 'Email', width : 150 },
+    { field: 'user_type_name', headerName: 'User Type', width : 150 },
     {
       field: 'is_active',
       headerName: 'Status',
-      flex: 1,
+      width : 150,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      flex: 1,
+      width : 150,
       sortable: false,
       renderCell: (params) => (
         <>

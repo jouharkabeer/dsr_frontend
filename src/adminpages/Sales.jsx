@@ -22,19 +22,19 @@ function SalesPage() {
   const [editSales, setEditSales] = useState(null);
   const [form, setForm] = useState({
     customer: '',
-    salesman: localStorage.getItem('user_id'),
+    salesman: '',
     call_status: '',
     prospect: '',
-    order_status: '',
-    payment_method: '',
-    expected_payment_amount: '',
-    expected_payment_date: '',
-    payment_recieved: '',
-    final_due_date: '',
+    order_status: null,
+    payment_method: null,
+    expected_payment_amount: null,
+    expected_payment_date: null,
+    payment_recieved: null,
+    final_due_date: null,
     quotation_provided: false,
-    quotation_value: '',
-    order_value: '',
-    remarks: '',
+    quotation_value: null,
+    order_value: null,
+    remarks: null,
   });
 
   const [options, setOptions] = useState({
@@ -54,6 +54,7 @@ function SalesPage() {
 
   const fetchOptions = async () => {
     const endpoints = {
+      salesman: `${Api}/user/view_activeSalesman/`,
       customer: `${Api}/master/view_activeCustomer/`,
       call_status: `${Api}/master/view_activeCallStatus/`,
       prospect: `${Api}/master/view_activeProspect/`,
@@ -73,6 +74,7 @@ function SalesPage() {
     results.forEach(([key, data]) => { newOptions[key] = data; });
     setOptions(newOptions);
   };
+    console.log(options)
 
   const fetchSales = async () => {
     const url = filter === 'active'
@@ -83,7 +85,7 @@ function SalesPage() {
     });
     setSales(res.data);
   };
-console.log(sales)
+
   useEffect(() => {
     fetchSales();
     fetchOptions();
@@ -99,7 +101,7 @@ console.log(sales)
       ? `${Api}/sales/update_SalesWeb/${editSales.id}/`
       : `${Api}/sales/create_SalesWeb/`;
     const method = editSales ? 'put' : 'post';
-
+console.log(form)
     const payload = {
       ...form,
       timbermaterials: selectedTimberMaterials.map((m) => m.value),
@@ -113,16 +115,46 @@ console.log(sales)
         data: payload,
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
-      setShowModal(false);
+      setShowModal(false)
+      formreset();
       fetchSales();
     } catch (err) {
       console.error('Failed to save sales record:', err);
     }
   };
 
+  const formreset = async => {
+    // setForm(null)
+     setForm({
+      customer: '',
+      salesman: '',
+      call_status: '',
+      prospect: '',
+      order_status: null,
+      payment_method: null,
+      expected_payment_amount: null,
+      expected_payment_date: null,
+      payment_recieved: null,
+      final_due_date: null,
+      quotation_provided: false,
+      quotation_value: null,
+      order_value: null,
+      remarks: null,
+    });
+    setIsTimber(false);
+    setIsHardware(false);
+    setTimberCategories([]);
+    setHardwareCategories([]);
+    setSelectedTimberMaterials([]);
+    setSelectedHardwareMaterials([]);
+    setTimberMaterials([]);
+    setHardwareMaterials([]);
+  }
+
   const toggleStatus = async (id, action) => {
     try {
-      await axios.delete(`${Api}/master/${action}_HardWareMaterialCategory/${id}/`, {
+      console.log(id)
+      await axios.delete(`${Api}/sales/${action}_SalesWeb/${id}/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
       fetchSales();
@@ -132,44 +164,60 @@ console.log(sales)
   };
 const handleShowModal = (row) => {
   setEditSales(row);
-
+console.log(row)
   setForm({
     customer: row.customer || '',
-    salesman: row.salesman || localStorage.getItem('user_id'),
+    salesman: row.salesman || '',
     call_status: row.call_status || '',
     prospect: row.prospect || '',
     order_status: row.order_status || '',
     payment_method: row.payment_method || '',
     expected_payment_amount: row.expected_payment_amount || '',
-    expected_payment_date: row.expected_payment_date || '',
-    payment_recieved: row.payment_recieved || '',
-    final_due_date: row.final_due_date || '',
+    expected_payment_date: row.expected_payment_date || null,
+    payment_recieved: row.payment_recieved || null,
+    final_due_date: row.final_due_date || null,
     quotation_provided: row.quotation_provided || false,
     quotation_value: row.quotation_value || '',
     order_value: row.order_value || '',
     remarks: row.remarks || '',
   });
 
-  setSelectedTimberMaterials(
-    (row.timbermaterials || []).map((mat) => ({
-      value: mat.id,
-      label: mat.timber_material_name,
-    }))
-  );
+// For Timber Materials
+if (row.timbermaterials && row.timber_material_name) {
+  const timberValues = row.timbermaterials.map((id, index) => ({
+    value: id,
+    label: row.timber_material_name[index] || 'Timber Material',
+  }));
+  setSelectedTimberMaterials(timberValues);
+  setTimberMaterials(timberValues); // Also set options for dropdown
+  setIsTimber(timberValues.length > 0);
+} else {
+  setSelectedTimberMaterials([]);
+  setTimberMaterials([]);
+  setIsTimber(false);
+}
 
-  setSelectedHardwareMaterials(
-    (row.hardwarematerials || []).map((mat) => ({
-      value: mat.id,
-      label: mat.hardware_material_name,
-    }))
-  );
+// For Hardware Materials
+if (row.hardwarematerials && row.hardware_material_name) {
+  const hardwareValues = row.hardwarematerials.map((id, index) => ({
+    value: id,
+    label: row.hardware_material_name[index] || 'Hardware Material',
+  }));
+  setSelectedHardwareMaterials(hardwareValues);
+  setHardwareMaterials(hardwareValues); // Also set options for dropdown
+  setIsHardware(hardwareValues.length > 0);
+} else {
+  setSelectedHardwareMaterials([]);
+  setHardwareMaterials([]);
+  setIsHardware(false);
+}
 
   setIsTimber((row.timbermaterials || []).length > 0);
   setIsHardware((row.hardwarematerials || []).length > 0);
 
   setShowModal(true);
 };
-
+console.log(sales)
   const filteredSales = sales
   .filter((mat) => {
       if (filter === 'active') return mat.is_active;
@@ -181,14 +229,15 @@ const handleShowModal = (row) => {
   );
 
   const columns = [
-    { field: 'customer_name', headerName: 'Customer', flex: 1 },
-    { field: 'order_value', headerName: 'Order Value', flex: 1 },
-    { field: 'hardware_material_name', headerName: 'Timber Materials', flex: 1 },
-    { field: 'timber_material_name', headerName: 'Hardware Materials', flex: 1 },
+    { field: 'customer_name', headerName: 'Customer', width : 150 },
+    { field: 'salesman_name', headerName: 'Salesman', width : 150 },
+    { field: 'order_value', headerName: 'Order Value', width : 150 },
+    { field: 'timber_material_name', headerName: 'Timber Materials', width : 150 },
+    { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150 },
 {
   field: 'prospect_name',
   headerName: 'Prospect',
-  flex: 1,
+  width : 150,
   renderCell: (params) => (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '13%'}}>
       <div
@@ -213,7 +262,7 @@ const handleShowModal = (row) => {
 {
   field: 'order_status_name',
   headerName: 'Order Status',
-  flex: 1,
+  width : 150,
   renderCell: (params) => (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '13%'}}>
       <div
@@ -238,7 +287,7 @@ const handleShowModal = (row) => {
 {
   field: 'call_status_name',
   headerName: 'Call Status',
-  flex: 1,
+  width : 150,
 },
         {
       field: "is_active",
@@ -262,7 +311,7 @@ const handleShowModal = (row) => {
     {
       field: 'actions',
       headerName: 'Actions',
-      flex: 1,
+      width : 150,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -287,7 +336,7 @@ const handleShowModal = (row) => {
           <Row className="mb-3 align-items-center">
             <Col><h3>Sales</h3></Col>
             <Col className="text-end">
-              <Button onClick={() => { setEditSales(null); setShowModal(true); }} variant="primary">+ Add</Button>
+              <Button onClick={() => { setEditSales(null); setShowModal(true); formreset()}} variant="primary">+ Add</Button>
             </Col>
           </Row>
 
@@ -325,6 +374,18 @@ const handleShowModal = (row) => {
             </Modal.Header>
             <Modal.Body>
               <Form>
+              <Form.Group className="mb-2">
+                  <Form.Label>salesman</Form.Label>
+                  <Form.Select
+                    value={form.salesman}
+                    onChange={(e) => setForm({ ...form, salesman: e.target.value })}
+                  >
+                    <option value="">Select Salesman</option>
+                    {options.salesman?.map((item) => (
+                      <option key={item.id} value={item.id}>{item.namefull}</option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
                 <Form.Group className="mb-2">
                   <Form.Label>Customer</Form.Label>
                   <Form.Select
