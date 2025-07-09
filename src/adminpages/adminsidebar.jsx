@@ -32,7 +32,8 @@ function AdminSidebar() {
       location.pathname.startsWith('/admin/usertype')
     ) {
       setOpenSection('user');
-    } else if (location.pathname.startsWith('/admin/sales')) {
+    } else if (location.pathname.startsWith('/admin/sales') ||
+  location.pathname.startsWith('/admin/salesmeet') ) {
       setOpenSection('sales');
     } else {
       setOpenSection('');
@@ -214,6 +215,7 @@ function AdminSidebar() {
             )}
           </Nav.Link>
           {openSection === 'sales' && !isCollapsed && (
+            <div className="ms-3">
              <Nav.Link
                 as={Link}
                 to="/sales/salespage"
@@ -221,7 +223,14 @@ function AdminSidebar() {
               >
                 Sales
               </Nav.Link>
-              
+              <Nav.Link
+                as={Link}
+                to="/sales/salesmeet"
+                className={`sidebar-subitem ${isActive('/sales/salesmeet') ? 'sidebar-subitem-active' : ''}`}
+              >
+                Sales Meet
+              </Nav.Link>
+            </div>  
           )}
         </div>
       </Nav>

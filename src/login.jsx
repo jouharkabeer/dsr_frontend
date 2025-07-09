@@ -18,11 +18,12 @@ function Login() {
         username,
         password,
       });
-      const { access, refresh, usertype, user_id } = res.data;
+      const { access, refresh, usertype, user_id, login_name } = res.data;
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
       localStorage.setItem('user_type', usertype);
       localStorage.setItem('user_id', user_id);
+      localStorage.setItem('login_name', login_name);
 
       if (usertype === 'Super Admin') {
         navigate('/admin/dashboard');

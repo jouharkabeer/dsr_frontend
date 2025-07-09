@@ -22,6 +22,7 @@ import HardWareMaterialCategoryPage from './adminpages/HardWareMaterialCategory'
 import HardWareMaterialPage from './adminpages/HardwareMaterial';
 import TimberMaterialPage from './adminpages/TimberMaterials';
 import TimberMaterialCategoryPage from './adminpages/TimberMaterialCategory';
+import SalesMeet from './adminpages/SalesMeet';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
       <Route path="/admin/callstatus/" element={<CallStatusPage/>} />
       <Route path="/admin/ordertype/" element={<OrderStatusTypePage/>} />
       <Route path="/sales/salespage/" element={<SalesPageAdmin/>} />
+      <Route path="/sales/salesmeet/" element={<SalesMeet/>} />
 
 
       <Route path="/admin/hardwarematerialcategory/" element={<HardWareMaterialCategoryPage />} />
