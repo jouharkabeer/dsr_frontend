@@ -4,13 +4,13 @@ import logo from '../assets/logo.png';
 
 function TopNavbar() {
   const navigate = useNavigate();
-  const username = localStorage.getItem('username') || 'User';
-  const firstLetter = username.charAt(0).toUpperCase();
+  const login_name = localStorage.getItem('login_name') || 'User';
+  const firstLetter = login_name.charAt(0).toUpperCase();
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    localStorage.removeItem('username');
+    localStorage.removeItem('login_name');
     navigate('/');
   };
 
@@ -23,27 +23,26 @@ function TopNavbar() {
 
         <Dropdown align="end">
           <Dropdown.Toggle
-            variant="light"
-            id="dropdown-user"
+            as="div"
             style={{
               borderRadius: '50%',
               width: '40px',
               height: '40px',
-              padding: 0,
               textAlign: 'center',
               fontSize: '18px',
               fontWeight: 'bold',
               lineHeight: '40px',
               backgroundColor: '#6c757d',
               color: '#fff',
-              border: 'none'
+              cursor: 'pointer',
+              userSelect: 'none'
             }}
           >
             {firstLetter}
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
-            <Dropdown.Header>{username}</Dropdown.Header>
+            <Dropdown.Header>{login_name}</Dropdown.Header>
             <Dropdown.Divider />
             <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
           </Dropdown.Menu>

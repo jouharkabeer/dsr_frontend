@@ -18,6 +18,7 @@ function Login() {
         username,
         password,
       });
+      console.log(res.data)
       const { access, refresh, usertype, user_id, login_name } = res.data;
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
