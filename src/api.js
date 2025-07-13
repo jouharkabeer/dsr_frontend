@@ -1,4 +1,8 @@
-// export const Api = 'https://lumberworld-backend.onrender.com'
-export const Api = 'https://dsr-backend-rimy.onrender.com/'
-// export const Api = 'https://dsrbackend-production.up.railway.app'
-// export const Api = 'http://localhost:8000'
+  const api1 = 'https://lumberworld-backend.onrender.com'
+  const api2 = 'https://dsr-backend-rimy.onrender.com'
+  const api3 = 'http://localhost:8000'
+
+
+
+
+export const Api = api1

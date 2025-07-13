@@ -230,6 +230,13 @@ function AdminSidebar() {
               >
                 Sales Meet
               </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/sales/report"
+                className={`sidebar-subitem ${isActive('/sales/report') ? 'sidebar-subitem-active' : ''}`}
+              >
+                Sales Report
+              </Nav.Link>
             </div>  
           )}
         </div>

@@ -7,9 +7,16 @@ import { Api } from './api';
 import logo from './assets/logo.png'
 
 function Login() {
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+
+  const handleApiChange = (newApi) => {
+    setApi(newApi);
+    console.log('Current API:', getApi());
+  };
+
 
   const handleLogin = async (e) => {
     e.preventDefault();

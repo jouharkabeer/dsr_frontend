@@ -23,6 +23,7 @@ import HardWareMaterialPage from './adminpages/HardwareMaterial';
 import TimberMaterialPage from './adminpages/TimberMaterials';
 import TimberMaterialCategoryPage from './adminpages/TimberMaterialCategory';
 import SalesMeet from './adminpages/SalesMeet';
+import DailySalesReport from './adminpages/Report';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
       <Route path="/admin/ordertype/" element={<OrderStatusTypePage/>} />
       <Route path="/sales/salespage/" element={<SalesPageAdmin/>} />
       <Route path="/sales/salesmeet/" element={<SalesMeet/>} />
+      <Route path="/sales/report/" element={<DailySalesReport/>} />
 
 
       <Route path="/admin/hardwarematerialcategory/" element={<HardWareMaterialCategoryPage />} />
