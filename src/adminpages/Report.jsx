@@ -18,7 +18,7 @@ function DailySalesReportPage() {
 
   const fetchSales = async () => {
     try {
-      const res = await axios.get(`${Api}/sales/view_allSalesMobiles/`, {
+      const res = await axios.get(`${Api}/sales/admin/report/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`
         }
@@ -106,7 +106,7 @@ const downloadPDF = () => {
 },
 
     { field: 'customer_name', headerName: 'Customer', flex: 1 },
-    { field: 'call_status_name', headerName: 'Fresh/Followup', flex: 1 },
+    { field: 'call_status', headerName: 'Fresh/Followup', flex: 1 },
 {
   field: 'materials',
   headerName: 'Materials',
