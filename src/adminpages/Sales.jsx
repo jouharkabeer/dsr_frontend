@@ -232,6 +232,8 @@ console.log(sales)
     { field: 'customer_name', headerName: 'Customer', width : 150 },
     { field: 'salesman_name', headerName: 'Salesman', width : 150 },
     { field: 'order_value', headerName: 'Order Value', width : 150 },
+    { field: 'payment_recieved', headerName: 'Payment Recived', width : 150 },
+    { field: 'due_amount', headerName: 'Due Amount', width : 150 },
     { field: 'timber_material_name', headerName: 'Timber Materials', width : 150 },
     { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150 },
 {
