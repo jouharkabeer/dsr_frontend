@@ -73,11 +73,11 @@ function SalesPage() {
     results.forEach(([key, data]) => { newOptions[key] = data; });
     setOptions(newOptions);
   };
-
+const user_id = localStorage.getItem('user_id')
   const fetchSales = async () => {
     const url = filter === 'active'
-      ? `${Api}/sales/view_activeSalesWeb/`
-      : `${Api}/sales/view_allSalesWebs/`;
+      ? `${Api}/sales/view_activeSalesWeb/bysalesman/${user_id}`
+      : `${Api}/sales/view_allSalesWebs/bysalesman/${user_id}`;
     const res = await axios.get(url, {
       headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
     });

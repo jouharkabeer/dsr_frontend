@@ -32,8 +32,11 @@ function AdminSidebar() {
       location.pathname.startsWith('/admin/usertype')
     ) {
       setOpenSection('user');
-    } else if (location.pathname.startsWith('/admin/sales') ||
-  location.pathname.startsWith('/admin/salesmeet') ) {
+    } else if (
+      location.pathname.startsWith('/sales/salespage') ||
+      location.pathname.startsWith('/sales/report') ||
+      location.pathname.startsWith('/sales/salesmeet') 
+    ) {
       setOpenSection('sales');
     } else {
       setOpenSection('');

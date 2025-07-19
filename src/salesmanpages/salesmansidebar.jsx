@@ -15,6 +15,9 @@ function SalesmanSidebar() {
         <Nav.Link as={Link} to="/salesman/dashboard" active={isActive('/salesman/dashboard')}>
           Dashboard
         </Nav.Link>
+        <Nav.Link as={Link} to="/salesman/customer" active={isActive('/salesman/customer')}>
+          Customer
+        </Nav.Link>
         <Nav.Link as={Link} to="/salesman/sales" active={isActive('/salesman/sales')}>
           Sales
         </Nav.Link>
