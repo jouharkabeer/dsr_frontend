@@ -12,6 +12,7 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
 
 function CustomerPage() {
   const [customers, setCustomers] = useState([]);
@@ -19,17 +20,19 @@ function CustomerPage() {
   const [showModal, setShowModal] = useState(false);
   const [editCustomer, setEditCustomer] = useState(null);
   const [form, setForm] = useState({ customer_name: '', remarks: '', address: '' });
-  const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true)
 
   const fetchCustomers = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_allCustomers/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setCustomers(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch customers:', err);
     }
@@ -45,9 +48,7 @@ function CustomerPage() {
       if (filter === 'inactive') return !item.is_active;
       return true;
     })
-    .filter((item) =>
-      item.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+
 
   const handleShowModal = (customer = null) => {
     setEditCustomer(customer);
@@ -107,19 +108,19 @@ function CustomerPage() {
   };
 
   const columns = [
-    { field: 'customer_name', headerName: 'Name', width : 150 },
+    { field: 'customer_name', headerName: 'Name', flex : 1, },
     { field: 'address', headerName: 'Address', flex: 2 },
     { field: 'remarks', headerName: 'Remarks', flex: 2 },
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -140,6 +141,7 @@ function CustomerPage() {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Customers</h3></Col>
@@ -224,7 +226,7 @@ function CustomerPage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div> }
       </div>
     </div>
   );

@@ -11,8 +11,11 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
 
 function ProspectPage() {
+
+  const [loading, setLoading] = useState(true);
   const [prospects, setProspects] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
@@ -27,12 +30,14 @@ function ProspectPage() {
 
   const fetchProspects = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_allProspects/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setProspects(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch prospects:', err);
     }
@@ -107,11 +112,11 @@ function ProspectPage() {
   };
 
   const columns = [
-    { field: 'prospect_name', headerName: 'Name', width : 150 },
+    { field: 'prospect_name', headerName: 'Name', flex : 1, },
     {
       field: 'text_color',
       headerName: 'Text Color',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (
         <span style={{ color: params.value }}>{params.value}</span>
       )
@@ -119,7 +124,7 @@ function ProspectPage() {
     {
       field: 'text_bg',
       headerName: 'Background',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (
         <span style={{
           backgroundColor: params.value,
@@ -132,13 +137,13 @@ function ProspectPage() {
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive')
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -159,6 +164,7 @@ function ProspectPage() {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Prospects</h3></Col>
@@ -252,7 +258,7 @@ function ProspectPage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div>}
       </div>
     </div>
   );

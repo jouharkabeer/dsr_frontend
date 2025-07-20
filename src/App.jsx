@@ -4,8 +4,6 @@ import { Routes, Route } from 'react-router-dom';
 import Login from './login';
 
 import AdminDashboard from './adminpages/dashboard';
-import MaterialPage from './adminpages/material';
-import MaterialCategoryPage from './adminpages/MaterialCategory';
 import SalesmanDashboard from './salesmanpages/dashboard';
 import SalesPage from './salesmanpages/sales';
 import CustomerPage from './adminpages/customer';
@@ -25,14 +23,13 @@ import TimberMaterialCategoryPage from './adminpages/TimberMaterialCategory';
 import SalesMeet from './adminpages/SalesMeet';
 import DailySalesReport from './adminpages/Report';
 import CustomerSalesPage from './salesmanpages/customer_for_sales';
+import Loader from './components/Loader';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/materialcategory/" element={<MaterialCategoryPage />} />
-      <Route path="/admin/material/" element={<MaterialPage />} />
       <Route path="/admin/customer/" element={<CustomerPage/>} />
       <Route path="/admin/userpage/" element={<UserPage/>} />
       <Route path="/admin/usertype/" element={<UserTypePage/>} />
@@ -55,6 +52,7 @@ function App() {
       <Route path="/salesman/dashboard" element={<SalesmanDashboard />} />
       <Route path="/salesman/customer" element={<CustomerSalesPage />} />
       <Route path="/salesman/sales" element={<SalesPage />} />
+      <Route path="/loader" element={<Loader />} />
     </Routes>
   );
 }

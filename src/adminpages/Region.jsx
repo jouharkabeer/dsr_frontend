@@ -11,6 +11,7 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
 
 function RegionPage() {
   const [regiones, setRegiones] = useState([]);
@@ -19,15 +20,19 @@ function RegionPage() {
   const [editRegion, setEditRegion] = useState(null);
   const [form, setForm] = useState({ region_name: '', remarks: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  
 
   const fetchRegiones = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_allRegions/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setRegiones(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch regiones:', err);
     }
@@ -98,18 +103,18 @@ function RegionPage() {
   };
 
   const columns = [
-    { field: 'region_name', headerName: 'Name', width : 150 },
+    { field: 'region_name', headerName: 'Name', flex : 1, },
     { field: 'remarks', headerName: 'Remarks', flex: 2 },
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -130,6 +135,7 @@ function RegionPage() {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Regions</h3></Col>
@@ -203,7 +209,7 @@ function RegionPage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div>}
       </div>
     </div>
   );

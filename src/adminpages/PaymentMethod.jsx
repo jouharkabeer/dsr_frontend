@@ -8,6 +8,11 @@ import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
 import { DataGrid } from '@mui/x-data-grid';
+import { IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
 
 function PaymentMethodPage() {
   const [paymentMethods, setPaymentMethods] = useState([]);
@@ -16,15 +21,19 @@ function PaymentMethodPage() {
   const [editPaymentMethod, setEditPaymentMethod] = useState(null);
   const [form, setForm] = useState({ payment_type_name: '', remarks: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  
 
   const fetchPaymentMethods = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_allPaymentMethods/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setPaymentMethods(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch paymentMethods:', err);
     }
@@ -96,41 +105,31 @@ function PaymentMethodPage() {
   };
 
   const columns = [
-    { field: 'payment_type_name', headerName: 'Name', width : 150 },
+    { field: 'payment_type_name', headerName: 'Name', flex : 1, },
     { field: 'remarks', headerName: 'Remarks', flex: 2 },
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
-          <Button
-            size="sm"
-            variant="warning"
-            className="me-2"
-            onClick={() => handleShowModal(params.row)}
+          <IconButton color="warning" onClick={() => handleShowModal(params.row)}><EditIcon /></IconButton>
+          <IconButton
+            color={params.row.is_active ? 'error' : 'success'}
+            onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
           >
-            Edit
-          </Button>
-          <Button
-            size="sm"
-            variant={params.row.is_active ? 'danger' : 'success'}
-            onClick={() =>
-              togglePaymentMethodStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')
-            }
-          >
-            {params.row.is_active ? 'Disable' : 'Enable'}
-          </Button>
+            {params.row.is_active ? <ToggleOffIcon /> : <ToggleOnIcon />}
+          </IconButton>
         </>
-      ),
-    },
+      )
+    }
   ];
 
   return (
@@ -138,6 +137,7 @@ function PaymentMethodPage() {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> : 
         <div
           className="p-4 flex-grow-1 overflow-auto"
           style={{ backgroundColor: '#f8f9fa' }}
@@ -224,7 +224,7 @@ function PaymentMethodPage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div>}
       </div>
     </div>
   );

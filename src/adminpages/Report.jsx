@@ -9,15 +9,18 @@ import AdminSidebar from './adminsidebar';
 import { DataGrid } from '@mui/x-data-grid';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import Loader from '../components/Loader';
 
 function DailySalesReportPage() {
   const [salesData, setSalesData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [dateFilter, setDateFilter] = useState('');
   const [customerFilter, setCustomerFilter] = useState('');
+  const [loading, setLoading] = useState(true)
 
-  const fetchSales = async () => {
+  const fetchReport = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/sales/admin/report/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`
@@ -25,13 +28,14 @@ function DailySalesReportPage() {
       });
       setSalesData(res.data);
       setFilteredData(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch sales data:', err);
     }
   };
-console.log(salesData)
+
   useEffect(() => {
-    fetchSales();
+    fetchReport();
   }, []);
 
   const filterSales = () => {
@@ -78,7 +82,7 @@ const downloadPDF = () => {
 
   autoTable(doc, {
     head: [[
-      'S.No', 'Customer', 'Fresh/Followup', 'Materials',
+      'S.No', 'Customer', 'Fresh/Followup', 'Timber Materials','Hardware Materials',
       'Payment', 'Total O/S', 'Remarks', 'Time In', 'Time Out'
     ]],
     body: tableData,
@@ -93,7 +97,7 @@ const downloadPDF = () => {
     margin: { left: 14, right: 14 },
   });
 
-  doc.save('Daily_Sales_Report.pdf');
+  doc.save(`Daily_Report_${dateFilter}.pdf`);
 };
 
   const columns = [
@@ -102,49 +106,43 @@ const downloadPDF = () => {
   field: 'sno',
   headerName: 'S.No',
   width: 70,
-//   renderCell: (params) => params.api.getRowIndex(params.id) + 1
+  renderCell: (params) => params.api.getAllRowIds().indexOf(params.id)+1
 },
 
-    { field: 'customer_name', headerName: 'Customer', flex: 1 },
+    { field: 'customer_name', headerName: 'Customer', flex: 2 },
     { field: 'call_status', headerName: 'Fresh/Followup', flex: 1 },
-{
-  field: 'materials',
-  headerName: 'Materials',
-  flex: 2,
-  valueGetter: (params) => {
-    const timber = params?.row?.timber_material_name?.join(', ') || '';
-    const hardware = params?.row?.hardware_material_name?.join(', ') || '';
-    return [timber, hardware].filter(Boolean).join(', ') || '—';
-  },
-},
+
+
+    { field: 'timber_material_name', headerName: 'Timber Materials', flex : 2, },
+    { field: 'hardware_material_name', headerName: 'Hardware Materials', flex : 2, },
 
     {
       field: 'payment_recieved',
       headerName: 'Payment',
-      width: 100,
-      renderCell: (params) => (params.value ? 'Yes' : 'No')
+      flex : 1,
+      renderCell: (params) => (params.value ? '✅ Yes' : '❌ No'),
     },
     {
       field: 'order_value',
       headerName: 'Total O/S',
-      width: 120
-    },
-    {
-      field: 'remarks',
-      headerName: 'Remarks',
-      flex: 1
+      flex :1,
     },
     {
       field: 'time_in',
       headerName: 'Time In',
-      width: 120,
+      flex : 1,
       renderCell: (params) => params.value ? new Date(params.value).toLocaleTimeString() : ''
     },
     {
       field: 'time_out',
       headerName: 'Time Out',
-      width: 120,
+      flex : 1,
       renderCell: (params) => params.value ? new Date(params.value).toLocaleTimeString() : ''
+    },
+    {
+      field: 'remarks',
+      headerName: 'Outcome of the call',
+      flex: 1
     },
   ];
 
@@ -153,6 +151,7 @@ const downloadPDF = () => {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-end">
             <Col><h4>Daily Sales Report</h4></Col>
@@ -187,6 +186,7 @@ const downloadPDF = () => {
 
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
             <DataGrid
+            rowNumberDisplayMode="static"
               rows={filteredData}
               columns={columns}
               getRowId={(row) => row.id}
@@ -198,7 +198,7 @@ const downloadPDF = () => {
               disableColumnMenu
             />
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );

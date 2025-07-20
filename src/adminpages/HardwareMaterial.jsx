@@ -12,6 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import Loader from '../components/Loader';
 
 function HardWareMaterialPage() {
   const [hardwarematerials, setHardWareMaterials] = useState([]);
@@ -21,15 +22,18 @@ function HardWareMaterialPage() {
   const [form, setForm] = useState({ hardwarematerial_name: '', remarks: '', hardware_material_catagory_name: '' });
   const [hardwarematerialCatagories, setHardWareMaterialCatagories] = useState([]);
   const [error, setError] = useState('');
+  const [loaading, setLoading] = useState(true);
 
   const fetchHardWareMaterials = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_allHardWareMaterials/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setHardWareMaterials(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch hardware materials:', err);
     }
@@ -37,12 +41,14 @@ function HardWareMaterialPage() {
 
   const fetchHardWareMaterialCatagories = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_activeHardWareMaterialCategory/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setHardWareMaterialCatagories(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch categories:', err);
     }
@@ -113,33 +119,20 @@ function HardWareMaterialPage() {
     }
   };
 
-  const toggleHardWareMaterialStatus = async (id, action) => {
-    try {
-      await axios.delete(`${Api}/master/${action}_HardWareMaterial/${id}/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      fetchHardWareMaterials();
-    } catch (err) {
-      console.error(`Failed to ${action} hardware material:`, err);
-    }
-  };
-
   const columns = [
-    { field: 'hardware_material_name', headerName: 'Name', width : 150 },
-    { field: 'category_name', headerName: 'Category', width : 150 },
-    { field: 'remarks', headerName: 'Remarks', width : 150 },
+    { field: 'hardware_material_name', headerName: 'Name', flex : 150 },
+    { field: 'category_name', headerName: 'Category', flex : 250 },
+    { field: 'remarks', headerName: 'Remarks', flex : 150 },
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 150,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 150,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -160,6 +153,7 @@ function HardWareMaterialPage() {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loaading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ maxHeight: '100%', backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Hardware Materials</h3></Col>
@@ -247,7 +241,7 @@ function HardWareMaterialPage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div>}
       </div>
     </div>
   );

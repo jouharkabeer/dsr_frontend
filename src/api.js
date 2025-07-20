@@ -7,4 +7,3 @@
 
 
 export const Api = api1
-

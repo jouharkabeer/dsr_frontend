@@ -12,6 +12,7 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
 
 
 function SalesPage() {
@@ -48,11 +49,13 @@ function SalesPage() {
   const [selectedTimberMaterials, setSelectedTimberMaterials] = useState([]);
 
   const [isHardware, setIsHardware] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [hardwareCategories, setHardwareCategories] = useState([]);
   const [hardwareMaterials, setHardwareMaterials] = useState([]);
   const [selectedHardwareMaterials, setSelectedHardwareMaterials] = useState([]);
 
   const fetchOptions = async () => {
+    setLoading(true)
     const endpoints = {
       salesman: `${Api}/user/view_activeSalesman/`,
       customer: `${Api}/master/view_activeCustomer/`,
@@ -73,17 +76,18 @@ function SalesPage() {
     const newOptions = {};
     results.forEach(([key, data]) => { newOptions[key] = data; });
     setOptions(newOptions);
+    setLoading(false)
   };
-    console.log(options)
+    
 
   const fetchSales = async () => {
-    const url = filter === 'active'
-      ? `${Api}/sales/view_activeSalesWeb/`
-      : `${Api}/sales/view_allSalesWebs/`;
+    setLoading(true)
+    const url = `${Api}/sales/view_allSalesWebs/`;
     const res = await axios.get(url, {
       headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
     });
     setSales(res.data);
+    setLoading(false)
   };
 
   useEffect(() => {
@@ -92,11 +96,6 @@ function SalesPage() {
   }, [filter]);
 
   const handleSave = async () => {
-    if (!isTimber && !isHardware) {
-      alert("Select at least Timber or Hardware.");
-      return;
-    }
-
     const url = editSales
       ? `${Api}/sales/update_SalesWeb/${editSales.id}/`
       : `${Api}/sales/create_SalesWeb/`;
@@ -217,7 +216,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
 
   setShowModal(true);
 };
-console.log(sales)
+
   const filteredSales = sales
   .filter((mat) => {
       if (filter === 'active') return mat.is_active;
@@ -229,17 +228,17 @@ console.log(sales)
   );
 
   const columns = [
-    { field: 'customer_name', headerName: 'Customer', width : 150 },
-    { field: 'salesman_name', headerName: 'Salesman', width : 150 },
-    { field: 'order_value', headerName: 'Order Value', width : 150 },
-    { field: 'payment_recieved', headerName: 'Payment Recived', width : 150 },
-    { field: 'due_amount', headerName: 'Due Amount', width : 150 },
-    { field: 'timber_material_name', headerName: 'Timber Materials', width : 150 },
-    { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150 },
+    { field: 'customer_name', headerName: 'Customer', flex : 1, },
+    { field: 'salesman_name', headerName: 'Salesman', flex : 1, },
+    { field: 'order_value', headerName: 'Order Value', flex : 1, },
+    { field: 'payment_recieved', headerName: 'Payment Recived', flex : 1, },
+    { field: 'due_amount', headerName: 'Due Amount', flex : 1, },
+    { field: 'timber_material_name', headerName: 'Timber Materials', flex : 1, },
+    { field: 'hardware_material_name', headerName: 'Hardware Materials', flex : 1, },
 {
   field: 'prospect_name',
   headerName: 'Prospect',
-  width : 150,
+  flex : 1,
   renderCell: (params) => (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '13%'}}>
       <div
@@ -264,7 +263,7 @@ console.log(sales)
 {
   field: 'order_status_name',
   headerName: 'Order Status',
-  width : 150,
+  flex : 1,
   renderCell: (params) => (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '13%'}}>
       <div
@@ -289,7 +288,7 @@ console.log(sales)
 {
   field: 'call_status_name',
   headerName: 'Call Status',
-  width : 150,
+  flex : 1,
 },
         {
       field: "is_active",
@@ -313,7 +312,7 @@ console.log(sales)
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -334,6 +333,7 @@ console.log(sales)
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> :
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Sales</h3></Col>
@@ -557,7 +557,7 @@ console.log(sales)
               <Button variant="primary" onClick={handleSave}>{editSales ? 'Update' : 'Create'}</Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div>}
       </div>
     </div>
   );

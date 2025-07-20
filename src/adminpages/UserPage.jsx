@@ -12,6 +12,7 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
 
 
 function UserPage() {
@@ -21,6 +22,7 @@ function UserPage() {
   const [showModal, setShowModal] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true)
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     first_name: '',
@@ -34,12 +36,14 @@ function UserPage() {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/user/view_allUsers/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setUsers(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch users:', err);
     }
@@ -47,12 +51,14 @@ function UserPage() {
 
   const fetchUserTypes = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/user/view_activeUserType/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setUserTypes(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch user types:', err);
     }
@@ -153,23 +159,23 @@ console.log(users)
 {
   field: 'namefull',
   headerName: 'Full Name',
-  width : 150,
+  flex : 1,
 
 },
 
-    { field: 'username', headerName: 'Username', width : 150 },
-    { field: 'email', headerName: 'Email', width : 150 },
-    { field: 'user_type_name', headerName: 'User Type', width : 150 },
+    { field: 'username', headerName: 'Username', flex : 1, },
+    { field: 'email', headerName: 'Email', flex : 1, },
+    { field: 'user_type_name', headerName: 'User Type', flex : 1, },
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -190,6 +196,7 @@ console.log(users)
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> :
         <div className="p-4 flex-grow-1 overflow-auto" style={{ maxHeight: '100%', backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Users</h3></Col>
@@ -325,7 +332,7 @@ console.log(users)
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div>}
       </div>
     </div>
   );

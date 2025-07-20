@@ -1,29 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button, Modal, Form, Row, Col, Alert, ToggleButtonGroup, ToggleButton
+   Row, Col, ToggleButtonGroup, ToggleButton
 } from 'react-bootstrap';
 import axios from 'axios';
 import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
 import { DataGrid } from '@mui/x-data-grid';
-import { IconButton } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import ToggleOnIcon from '@mui/icons-material/ToggleOn';
-import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
+
 
 function SalesMeet() {
   const [salesmeet, setSalesMeet] = useState([]);
   const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
 
   const fetchSalesMeet = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/sales/view_allSalesMobiles/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setSalesMeet(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch regiones:', err);
     }
@@ -40,10 +41,10 @@ console.log(salesmeet)
   });
 
   const columns = [
-    { field: 'customer_name', headerName: 'Customer Name', width : 150 },
-    { field: 'salesman_name', headerName: 'salesman Name', width : 150 },
-    { field: 'timber_material_name', headerName: 'Timber Materials', width : 150 },
-    { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150 },
+    { field: 'customer_name', headerName: 'Customer Name', flex : 1, },
+    { field: 'salesman_name', headerName: 'salesman Name', flex : 1, },
+    { field: 'timber_material_name', headerName: 'Timber Materials', flex : 1, },
+    { field: 'hardware_material_name', headerName: 'Hardware Materials', flex : 1, },
     { field: 'remarks', headerName: 'Remarks', width:150 },
     {
       field: 'meeting_status',
@@ -75,6 +76,7 @@ console.log(salesmeet)
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> :
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Sales Meet</h3></Col>
@@ -109,7 +111,7 @@ console.log(salesmeet)
               }}
             />
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );

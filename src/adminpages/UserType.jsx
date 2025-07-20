@@ -380,6 +380,7 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
 
 
 function UserTypePage() {
@@ -389,15 +390,19 @@ function UserTypePage() {
   const [editUserType, setEditUserType] = useState(null);
   const [form, setForm] = useState({ userType_name: '', remarks: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true)
+
 
   const fetchUserTypes = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/user/view_allUserTypes/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setUserTypes(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch user types:', err);
     }
@@ -469,18 +474,18 @@ function UserTypePage() {
   };
 
   const columns = [
-    { field: 'name', headerName: 'User Type', width : 150 },
-    { field: 'remarks', headerName: 'Remarks', width : 150 },
+    { field: 'name', headerName: 'User Type', flex : 1, },
+    { field: 'remarks', headerName: 'Remarks', flex : 1, },
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -501,6 +506,7 @@ function UserTypePage() {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>User Types</h3></Col>
@@ -574,7 +580,7 @@ function UserTypePage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div>}
       </div>
     </div>
   );

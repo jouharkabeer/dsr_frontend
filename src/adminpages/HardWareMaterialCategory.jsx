@@ -12,11 +12,13 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
 
 function HardWareMaterialCategoryPage() {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({ hardware_material_catagory_name: '', remarks: '' });
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,10 +26,12 @@ function HardWareMaterialCategoryPage() {
 
   const fetchData = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_allHardWareMaterialCategorys/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
       setData(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch categories:', err);
     }
@@ -97,18 +101,18 @@ function HardWareMaterialCategoryPage() {
   };
 
   const columns = [
-    { field: 'hardware_material_catagory_name', headerName: 'Name', width : 150 },
+    { field: 'hardware_material_catagory_name', headerName: 'Name', flex : 1, },
     { field: 'remarks', headerName: 'Remarks', flex: 2 },
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -129,6 +133,7 @@ function HardWareMaterialCategoryPage() {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Hardware Categories</h3></Col>
@@ -201,7 +206,7 @@ function HardWareMaterialCategoryPage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div> }
       </div>
     </div>
   );

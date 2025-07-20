@@ -11,6 +11,7 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import Loader from '../components/Loader';
 
 
 function TimberMaterialPage() {
@@ -21,15 +22,18 @@ function TimberMaterialPage() {
   const [form, setForm] = useState({ timbermaterial_name: '', remarks: '', timber_material_catagory_name: '' });
   const [timbermaterialCatagories, setTimberMaterialCatagories] = useState([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true)
 
   const fetchTimberMaterials = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_allTimberMaterials/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setTimberMaterials(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch timber materials:', err);
     }
@@ -37,12 +41,14 @@ function TimberMaterialPage() {
 
   const fetchTimberMaterialCatagories = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_activeTimberMaterialCategory/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setTimberMaterialCatagories(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch categories:', err);
     }
@@ -118,19 +124,19 @@ function TimberMaterialPage() {
   };
 
   const columns = [
-    { field: 'timber_material_name', headerName: 'Name', width : 150 },
-    { field: 'category_name', headerName: 'Category', width : 150 },
-    { field: 'remarks', headerName: 'Remarks', width : 150 },
+    { field: 'timber_material_name', headerName: 'Name', flex : 1, },
+    { field: 'category_name', headerName: 'Category', flex : 1, },
+    { field: 'remarks', headerName: 'Remarks', flex : 1, },
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
@@ -151,6 +157,7 @@ function TimberMaterialPage() {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> :
         <div className="p-4 flex-grow-1 overflow-auto" style={{ maxHeight: '100%', backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Timber Materials</h3></Col>
@@ -238,7 +245,7 @@ function TimberMaterialPage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div>}
       </div>
     </div>
   );

@@ -12,11 +12,6 @@ function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleApiChange = (newApi) => {
-    setApi(newApi);
-    console.log('Current API:', getApi());
-  };
-
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,7 +20,7 @@ function Login() {
         username,
         password,
       });
-      console.log(res.data)
+
       const { access, refresh, usertype, user_id, login_name } = res.data;
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);

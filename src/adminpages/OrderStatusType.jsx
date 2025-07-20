@@ -7,11 +7,17 @@ import AdminSidebar from './adminsidebar';
 import TopNavbar from '../components/TopNavbar';
 import { Api } from '../api';
 import { DataGrid } from '@mui/x-data-grid';
+import Loader from '../components/Loader';
+import { IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 
 function OrderStatusTypePage() {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({
     order_type_name: '',
@@ -23,10 +29,12 @@ function OrderStatusTypePage() {
 
   const fetchData = async () => {
     try {
+      setLoading(true)
       const res = await axios.get(`${Api}/master/view_allOrderStatusTypes/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
       setData(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch:', err);
     }
@@ -103,11 +111,11 @@ function OrderStatusTypePage() {
   };
 
   const columns = [
-    { field: 'order_type_name', headerName: 'Name', width : 150 },
+    { field: 'order_type_name', headerName: 'Name', flex : 1, },
     {
       field: 'text_color',
       headerName: 'Text Color',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (
         <span style={{ color: params.value }}>{params.value}</span>
       )
@@ -115,7 +123,7 @@ function OrderStatusTypePage() {
     {
       field: 'text_bg',
       headerName: 'Background',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (
         <span style={{
           backgroundColor: params.value,
@@ -128,31 +136,23 @@ function OrderStatusTypePage() {
     {
       field: 'is_active',
       headerName: 'Status',
-      width : 150,
+      flex : 1,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive')
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
-          <Button
-            size="sm"
-            variant="warning"
-            className="me-2"
-            onClick={() => handleShowModal(params.row)}
-          >
-            Edit
-          </Button>
-          <Button
-            size="sm"
-            variant={params.row.is_active ? 'danger' : 'success'}
+          <IconButton color="warning" onClick={() => handleShowModal(params.row)}><EditIcon /></IconButton>
+          <IconButton
+            color={params.row.is_active ? 'error' : 'success'}
             onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
           >
-            {params.row.is_active ? 'Disable' : 'Enable'}
-          </Button>
+            {params.row.is_active ? <ToggleOffIcon /> : <ToggleOnIcon />}
+          </IconButton>
         </>
       )
     }
@@ -163,6 +163,7 @@ function OrderStatusTypePage() {
       <TopNavbar />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
+        {loading ? <Loader/> :
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Order Status Types</h3></Col>
@@ -251,7 +252,7 @@ function OrderStatusTypePage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div>}
       </div>
     </div>
   );

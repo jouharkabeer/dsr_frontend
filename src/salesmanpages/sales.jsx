@@ -227,14 +227,14 @@ if (row.hardwarematerials && row.hardware_material_name) {
   );
 
   const columns = [
-    { field: 'customer_name', headerName: 'Customer', width : 150 },
-    { field: 'order_value', headerName: 'Order Value', width : 150 },
-    { field: 'timber_material_name', headerName: 'Timber Materials', width : 150 },
-    { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150 },
+    { field: 'customer_name', headerName: 'Customer', flex : 1, },
+    { field: 'order_value', headerName: 'Order Value', flex : 1, },
+    { field: 'timber_material_name', headerName: 'Timber Materials', flex : 1, },
+    { field: 'hardware_material_name', headerName: 'Hardware Materials', flex : 1, },
 {
   field: 'prospect_name',
   headerName: 'Prospect',
-  width : 150,
+  flex : 1,
   renderCell: (params) => (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '13%'}}>
       <div
@@ -259,7 +259,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
 {
   field: 'order_status_name',
   headerName: 'Order Status',
-  width : 150,
+  flex : 1,
   renderCell: (params) => (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '13%'}}>
       <div
@@ -284,7 +284,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
 {
   field: 'call_status_name',
   headerName: 'Call Status',
-  width : 150,
+  flex : 1,
 },
         {
       field: "is_active",
@@ -308,7 +308,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
     {
       field: 'actions',
       headerName: 'Actions',
-      width : 150,
+      flex : 1,
       sortable: false,
       renderCell: (params) => (
         <>
