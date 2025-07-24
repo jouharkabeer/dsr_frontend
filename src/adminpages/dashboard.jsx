@@ -8,8 +8,10 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from 'recharts';
 import Loader from '../components/Loader';
+import { useNavigate } from 'react-router-dom';
 
 const COLORS = ['#f70707ff', '#06fa0aff'];
+const navigate = useNavigate();
 
 function AdminDashboard() {
   const [data, setData] = useState({
@@ -25,6 +27,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    Tokenvaliditychecker()
     setLoading(true)
     axios.get(`${Api}/user/dashboarddetails`)
       .then(res => setData(res.data))
@@ -42,6 +45,27 @@ function AdminDashboard() {
     })
     .catch(err => console.error(err));
   }, []);
+
+const Tokenvaliditychecker = async () => {
+  try {
+    const res = await axios.get(`${Api}/user/validity/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+
+    const data = res.data;
+    console.log(data);
+
+    if (data.message === 'its a valid token') {
+      // Do nothing (this replaces `pass`)
+    }
+  } catch (err) {
+    navigate('/'); // Redirect to login or home if token is invalid
+  }
+};
+
+
 
 
   const pieData = [
