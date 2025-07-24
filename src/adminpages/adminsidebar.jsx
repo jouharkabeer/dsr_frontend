@@ -132,13 +132,13 @@ function AdminSidebar() {
               >
                 Branch
               </Nav.Link>
-              <Nav.Link
+              {/* <Nav.Link
                 as={Link}
                 to="/admin/region"
                 className={`sidebar-subitem ${isActive('/admin/region') ? 'sidebar-subitem-active' : ''}`}
               >
                 Region
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link
                 as={Link}
                 to="/admin/prospect"
