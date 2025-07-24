@@ -1,16 +1,51 @@
 // src/login.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Form, Button, Card } from 'react-bootstrap';
 import { Api } from './api';
 import logo from './assets/logo.png'
+import Loader from './components/Loader';
 
 function Login() {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+const Tokenvaliditychecker = async () => {
+  try {
+    setLoading(true);
+    const res = await axios.get(`${Api}/user/validity/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+
+    const data = res.data; // ✅ Fix: use res.data instead of res.message
+    console.log(data)
+    if (data.message === 'its a valid token') { // ✅ Fix: comparison operator `===`, and correct string
+      const userrtype = localStorage.getItem('user_type');
+      if (userrtype === 'Super Admin') {
+        navigate('/admin/dashboard');
+      } else if (userrtype === 'Salesman') {
+        navigate('/salesman/dashboard');
+      } else {
+        alert('Unknown user type!');
+      }
+    }
+
+    setLoading(false); // ✅ Move out of if-else to ensure it always runs
+  } catch (err) {
+    // console.error('Token check failed:', err);
+    setLoading(false); // ✅ Also handle loading off in case of error
+  }
+};
+
+  useEffect(() => {
+    Tokenvaliditychecker();
+  }, []);
 
 
   const handleLogin = async (e) => {
@@ -27,7 +62,7 @@ function Login() {
       localStorage.setItem('user_type', usertype);
       localStorage.setItem('user_id', user_id);
       localStorage.setItem('login_name', login_name);
-
+console.log(access)
       if (usertype === 'Super Admin') {
         navigate('/admin/dashboard');
       } else if (usertype === 'Salesman') {
@@ -42,6 +77,7 @@ function Login() {
 
   return (
     <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+      {loading ? <Loader/> :
       <Card style={{ width: '100%', maxWidth: '400px' }} className="p-4 shadow">
         <Card.Body>
           <div className="text-center mb-4">
@@ -75,8 +111,8 @@ function Login() {
             </Button>
           </Form>
         </Card.Body>
-      </Card>
-    </Container>
+      </Card>}
+    </Container> 
   );
 }
 
