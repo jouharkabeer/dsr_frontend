@@ -12,12 +12,14 @@ import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
 
 function DailySalesReportPage() {
+  const newtoday =  new Date().toISOString().split('T')[0];
   const [salesData, setSalesData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [dateFilter, setDateFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState(newtoday);
   const [customerFilter, setCustomerFilter] = useState('');
   const [loading, setLoading] = useState(true)
-
+console.log(dateFilter)
+  
   const fetchReport = async () => {
     try {
       setLoading(true)
@@ -28,6 +30,7 @@ function DailySalesReportPage() {
       });
       setSalesData(res.data);
       setFilteredData(res.data);
+      console.log(filteredData)
       setLoading(false)
     } catch (err) {
       console.error('Failed to fetch sales data:', err);
@@ -53,37 +56,74 @@ function DailySalesReportPage() {
     setFilteredData(result);
   };
 
-const downloadPDF = () => {
-  const doc = new jsPDF();
 
+
+const downloadPDF = () => {
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit : 'mm',
+    format : 'a4'
+  });
+
+  // Helper to format time
+  const formatTime = (time) =>
+    time ? new Date(time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—';
+
+  const today = new Date().toISOString().split('T')[0];
+
+  // Header
   doc.setFontSize(14);
   doc.text('LUMBER WORLD BUILDING MATERIAL TRADING L.L.C', 14, 15);
   doc.setFontSize(12);
   doc.text('DAILY SALES REPORT', 14, 23);
-  doc.text(`Date: ${dateFilter || 'All'}`, 150, 23, { align: 'right' });
+  doc.text(`Date: ${dateFilter || today}`, 150, 23, { align: 'right' });
 
+  // Table data
   const tableData = filteredData.map((item, index) => {
     const timber = (item.timber_material_name || []).join(', ');
     const hardware = (item.hardware_material_name || []).join(', ');
-    const materials = [timber, hardware].filter(Boolean).join(', ');
+    const saleDateTime = new Date(item.created_at).toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+// Output: 24-Jul-2025, 02:35 PM
+
 
     return [
       index + 1,
       item.customer_name || '—',
-      item.call_status_name || '—',
-      materials || '—',
+      item.salesman_name || '_',
+      item.call_status || '—',
+      timber || '—',
+      hardware || '—',
+      saleDateTime || '—',
       item.payment_recieved ? 'Yes' : 'No',
       item.order_value || '0',
       item.remarks || '—',
-      item.time_in ? new Date(item.time_in).toLocaleTimeString() : '—',
-      item.time_out ? new Date(item.time_out).toLocaleTimeString() : '—'
+      formatTime(item.time_in),
+      formatTime(item.time_out),
     ];
   });
 
+  // Table
   autoTable(doc, {
     head: [[
-      'S.No', 'Customer', 'Fresh/Followup', 'Timber Materials','Hardware Materials',
-      'Payment', 'Total O/S', 'Remarks', 'Time In', 'Time Out'
+      'S.No',
+      'Customer',
+      'Sales Man',
+      'Fresh/Followup',
+      'Timber Materials',
+      'Hardware Materials',
+      'Date',
+      'Payment',
+      'Total O/S',
+      'Remarks',
+      'Time In',
+      'Time Out'
     ]],
     body: tableData,
     startY: 30,
@@ -97,8 +137,10 @@ const downloadPDF = () => {
     margin: { left: 14, right: 14 },
   });
 
-  doc.save(`Daily_Report_${dateFilter}.pdf`);
+  // Save
+  doc.save(`Daily_Report_${dateFilter || today}.pdf`);
 };
+
 
   const columns = [
     // { field: 'sno', headerName: 'S.No', width: 70, valueGetter: (params) => params.api.getRowIndex(params.id) + 1 },
@@ -110,6 +152,7 @@ const downloadPDF = () => {
 },
 
     { field: 'customer_name', headerName: 'Customer', flex: 2 },
+    { field: 'salesman_name', headerName: 'SalesMan', flex: 2 },
     { field: 'call_status', headerName: 'Fresh/Followup', flex: 1 },
 
 
@@ -127,6 +170,11 @@ const downloadPDF = () => {
       headerName: 'Total O/S',
       flex :1,
     },
+    {
+      field: 'created_at',
+      headerName : 'Sale Time',
+      flex: 2,
+    }, 
     {
       field: 'time_in',
       headerName: 'Time In',
