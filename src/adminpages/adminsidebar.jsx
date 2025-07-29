@@ -35,6 +35,7 @@ function AdminSidebar() {
     } else if (
       location.pathname.startsWith('/sales/salespage') ||
       location.pathname.startsWith('/sales/report') ||
+      location.pathname.startsWith('/sales/collectionreport') ||
       location.pathname.startsWith('/sales/salesmeet') 
     ) {
       setOpenSection('sales');
@@ -239,6 +240,13 @@ function AdminSidebar() {
                 className={`sidebar-subitem ${isActive('/sales/report') ? 'sidebar-subitem-active' : ''}`}
               >
                 Sales Report
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/sales/collectionreport"
+                className={`sidebar-subitem ${isActive('/sales/collectionreport') ? 'sidebar-subitem-active' : ''}`}
+              >
+                Collection Report
               </Nav.Link>
             </div>  
           )}

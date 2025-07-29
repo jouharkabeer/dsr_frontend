@@ -29,6 +29,7 @@ function SalesPage() {
     payment_method: null,
     expected_payment_amount: null,
     expected_payment_date: null,
+    next_meeting_date: null,
     payment_recieved: null,
     final_due_date: null,
     quotation_provided: false,
@@ -133,6 +134,7 @@ console.log(form)
       payment_method: null,
       expected_payment_amount: null,
       expected_payment_date: null,
+      next_meeting_date: null,
       payment_recieved: null,
       final_due_date: null,
       quotation_provided: false,
@@ -172,6 +174,7 @@ console.log(row)
     payment_method: row.payment_method || '',
     expected_payment_amount: row.expected_payment_amount || '',
     expected_payment_date: row.expected_payment_date || null,
+    next_meeting_date: row.next_meeting_date || null,
     payment_recieved: row.payment_recieved || null,
     final_due_date: row.final_due_date || null,
     quotation_provided: row.quotation_provided || false,
@@ -506,6 +509,12 @@ if (row.hardwarematerials && row.hardware_material_name) {
                     onChange={(e) => setForm({ ...form, order_value: e.target.value })}
                   />
                 </Form.Group>
+                <Form.Label>Appointment Date </Form.Label>
+                    <Form.Control
+                      type="date"
+                      value={form.next_meeting_date || ''}
+                      onChange={(e) => setForm({ ...form, next_meeting_date: e.target.value })}
+                    />
                     <Form.Label>Expected Payment Date</Form.Label>
                     <Form.Control
                       type="date"

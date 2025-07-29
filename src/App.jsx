@@ -24,6 +24,7 @@ import SalesMeet from './adminpages/SalesMeet';
 import DailySalesReport from './adminpages/Report';
 import CustomerSalesPage from './salesmanpages/customer_for_sales';
 import Loader from './components/Loader';
+import CollectionForcastReport from './adminpages/CollectionReport';
 
 function App() {
   return (
@@ -39,9 +40,12 @@ function App() {
       <Route path="/admin/paymentmethod/" element={<PaymentMethodPage/>} />
       <Route path="/admin/callstatus/" element={<CallStatusPage/>} />
       <Route path="/admin/ordertype/" element={<OrderStatusTypePage/>} />
+
+
       <Route path="/sales/salespage/" element={<SalesPageAdmin/>} />
       <Route path="/sales/salesmeet/" element={<SalesMeet/>} />
       <Route path="/sales/report/" element={<DailySalesReport/>} />
+      <Route path="/sales/collectionreport/" element={<CollectionForcastReport/>} />
 
 
       <Route path="/admin/hardwarematerialcategory/" element={<HardWareMaterialCategoryPage />} />

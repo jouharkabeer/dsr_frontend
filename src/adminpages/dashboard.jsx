@@ -11,7 +11,6 @@ import Loader from '../components/Loader';
 import { useNavigate } from 'react-router-dom';
 
 const COLORS = ['#f70707ff', '#06fa0aff'];
-const navigate = useNavigate();
 
 function AdminDashboard() {
   const [data, setData] = useState({
@@ -24,7 +23,9 @@ function AdminDashboard() {
     total_recived_value: 0,
   });
   const [chartData, setChartData] = useState([]);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     Tokenvaliditychecker()
