@@ -107,19 +107,19 @@ function CustomerSalesPage() {
   };
 
   const columns = [
-    { field: 'customer_name', headerName: 'Name', flex : 1, },
+    { field: 'customer_name', headerName: 'Name', width : 150,  },
     { field: 'address', headerName: 'Address', flex: 2 },
     { field: 'remarks', headerName: 'Remarks', flex: 2 },
     {
       field: 'is_active',
       headerName: 'Status',
-      flex : 1,
+      width : 150, 
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      flex : 1,
+      width : 150, 
       sortable: false,
       renderCell: (params) => (
         <>

@@ -41,10 +41,10 @@ console.log(salesmeet)
   });
 
   const columns = [
-    { field: 'customer_name', headerName: 'Customer Name', flex : 1, },
-    { field: 'salesman_name', headerName: 'salesman Name', flex : 1, },
-    { field: 'timber_material_name', headerName: 'Timber Materials', flex : 1, },
-    { field: 'hardware_material_name', headerName: 'Hardware Materials', flex : 1, },
+    { field: 'customer_name', headerName: 'Customer Name', width : 150,  },
+    { field: 'salesman_name', headerName: 'salesman Name', width : 150,  },
+    { field: 'timber_material_name', headerName: 'Timber Materials', width : 150,  },
+    { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150,  },
     { field: 'remarks', headerName: 'Remarks', width:150 },
     {
       field: 'meeting_status',

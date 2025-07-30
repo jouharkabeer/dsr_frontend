@@ -1,10 +1,15 @@
-// src/salesmanpages/salesmansidebar.jsx
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
+import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
+import './sidebar.css';
+
 
 function SalesmanSidebar() {
   const location = useLocation();
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [openSection, setOpenSection] = useState('');
 
   const isActive = (path) => location.pathname === path;
 

@@ -107,12 +107,12 @@ function TimberMaterialCategoryPage() {
   };
 
   const columns = [
-    { field: 'timber_material_catagory_name', headerName: 'Name', flex : 1, },
+    { field: 'timber_material_catagory_name', headerName: 'Name', width : 150,  },
     { field: 'remarks', headerName: 'Remarks', flex: 2 },
     {
       field: 'is_active',
       headerName: 'Status',
-      flex : 1,
+      width : 150, 
       renderCell: (params) => (
         <span>{params.row.is_active ? 'Active' : 'Inactive'}</span>
       )
@@ -120,7 +120,7 @@ function TimberMaterialCategoryPage() {
     {
       field: 'actions',
       headerName: 'Actions',
-      flex : 1,
+      width : 150, 
       sortable: false,
       renderCell: (params) => (
         <>

@@ -120,19 +120,19 @@ function HardWareMaterialPage() {
   };
 
   const columns = [
-    { field: 'hardware_material_name', headerName: 'Name', flex : 150 },
-    { field: 'category_name', headerName: 'Category', flex : 250 },
-    { field: 'remarks', headerName: 'Remarks', flex : 150 },
+    { field: 'hardware_material_name', headerName: 'Name', width : 150 },
+    { field: 'category_name', headerName: 'Category', width : 250 },
+    { field: 'remarks', headerName: 'Remarks', width : 150 },
     {
       field: 'is_active',
       headerName: 'Status',
-      flex : 150,
+      width : 150,
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      flex : 150,
+      width : 150,
       sortable: false,
       renderCell: (params) => (
         <>

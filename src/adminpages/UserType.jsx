@@ -474,18 +474,18 @@ function UserTypePage() {
   };
 
   const columns = [
-    { field: 'name', headerName: 'User Type', flex : 1, },
-    { field: 'remarks', headerName: 'Remarks', flex : 1, },
+    { field: 'name', headerName: 'User Type', width : 150,  },
+    { field: 'remarks', headerName: 'Remarks', width : 150,  },
     {
       field: 'is_active',
       headerName: 'Status',
-      flex : 1,
+      width : 150, 
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      flex : 1,
+      width : 150, 
       sortable: false,
       renderCell: (params) => (
         <>

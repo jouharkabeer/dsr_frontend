@@ -162,7 +162,7 @@ const downloadPDF = () => {
     {
       field: 'payment_recieved',
       headerName: 'Payment',
-      flex : 1,
+      width : 150, 
       renderCell: (params) => (params.value ? '✅ Yes' : '❌ No'),
     },
     {
@@ -178,13 +178,13 @@ const downloadPDF = () => {
     {
       field: 'time_in',
       headerName: 'Time In',
-      flex : 1,
+      width : 150, 
       renderCell: (params) => params.value ? new Date(params.value).toLocaleTimeString() : ''
     },
     {
       field: 'time_out',
       headerName: 'Time Out',
-      flex : 1,
+      width : 150, 
       renderCell: (params) => params.value ? new Date(params.value).toLocaleTimeString() : ''
     },
     {

@@ -103,18 +103,18 @@ function RegionPage() {
   };
 
   const columns = [
-    { field: 'region_name', headerName: 'Name', flex : 1, },
+    { field: 'region_name', headerName: 'Name', width : 150,  },
     { field: 'remarks', headerName: 'Remarks', flex: 2 },
     {
       field: 'is_active',
       headerName: 'Status',
-      flex : 1,
+      width : 150, 
       renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      flex : 1,
+      width : 150, 
       sortable: false,
       renderCell: (params) => (
         <>
