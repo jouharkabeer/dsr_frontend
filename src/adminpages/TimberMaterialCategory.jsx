@@ -12,6 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 function TimberMaterialCategoryPage() {
   const [timberMaterialCategorys, setTimberMaterialCategorys] = useState([]);
@@ -88,7 +89,9 @@ function TimberMaterialCategoryPage() {
       });
       setShowModal(false);
       fetchTimberMaterialCategorys();
+      showToast.success(`Sucessfully ${editTimberMaterialCategory ? 'Edited' : 'Created'} ${form.timber_material_catagory_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editTimberMaterialCategory ? 'Edit' : 'Create'}  ${form.timber_material_catagory_name}`)
       console.error('Failed to save category:', err);
     }
   };
@@ -101,7 +104,9 @@ function TimberMaterialCategoryPage() {
         },
       });
       fetchTimberMaterialCategorys();
+      showToast.success(`Sucessfully ${action}d ${form.timber_material_catagory_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${action} ${form.timber_material_catagory_name}`)
       console.error('Failed to toggle status:', err);
     }
   };

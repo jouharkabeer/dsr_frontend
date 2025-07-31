@@ -12,6 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify'; 
 
 function BranchPage() {
   const [branches, setBranches] = useState([]);
@@ -83,7 +84,9 @@ function BranchPage() {
       });
       setShowModal(false);
       fetchBranches();
+      showToast.success(`Sucessfully ${editBranch ? 'Edited' : 'Created'} ${form.branch_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editBranch ? 'Edit' : 'Create'}  ${form.branch_name}`)
       console.error('Failed to save branch:', err);
     }
   };
@@ -96,7 +99,9 @@ function BranchPage() {
         },
       });
       fetchBranches();
+      showToast.success(`Sucessfully ${action}d ${form.branch_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${action} ${form.branch_name}`)
       console.error(`Failed to ${action} branch:`, err);
     }
   };

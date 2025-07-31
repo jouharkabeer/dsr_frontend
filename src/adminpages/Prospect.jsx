@@ -12,6 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 function ProspectPage() {
 
@@ -93,7 +94,9 @@ function ProspectPage() {
       });
       setShowModal(false);
       fetchProspects();
+      showToast.success(`Sucessfully ${editProspect ? 'Edited' : 'Created'} ${form.prospect_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editProspect ? 'Edit' : 'Create'}  ${form.prospect_name}`)
       console.error('Failed to save prospect:', err);
     }
   };
@@ -106,7 +109,9 @@ function ProspectPage() {
         },
       });
       fetchProspects();
+      showToast.success(`Sucessfully ${action}d ${form.prospect_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${action} ${form.prospect_name}`)
       console.error(`Failed to ${action} prospect:`, err);
     }
   };

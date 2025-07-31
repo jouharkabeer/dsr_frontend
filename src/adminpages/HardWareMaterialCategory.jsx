@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 function HardWareMaterialCategoryPage() {
   const [data, setData] = useState([]);
@@ -84,7 +85,9 @@ function HardWareMaterialCategoryPage() {
       });
       setShowModal(false);
       fetchData();
+      showToast.success(`Sucessfully ${editItem ? 'Edited' : 'Created'} ${form.hardware_material_catagory_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editItem ? 'Edit' : 'Create'}  ${form.hardware_material_catagory_name}`)
       console.error('Failed to save:', err);
     }
   };
@@ -95,7 +98,9 @@ function HardWareMaterialCategoryPage() {
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
       fetchData();
+      showToast.success(`Sucessfully ${action}d ${form.hardware_material_catagory_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${action} ${form.hardware_material_catagory_name}`)
       console.error(`Failed to ${action} item:`, err);
     }
   };

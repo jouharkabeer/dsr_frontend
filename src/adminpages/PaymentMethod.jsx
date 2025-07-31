@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 function PaymentMethodPage() {
   const [paymentMethods, setPaymentMethods] = useState([]);
@@ -86,7 +87,9 @@ function PaymentMethodPage() {
       });
       setShowModal(false);
       fetchPaymentMethods();
+      showToast.success(`Sucessfully ${editPaymentMethod ? 'Edited' : 'Created'} ${form.payment_type_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editPaymentMethod ? 'Edit' : 'Create'}  ${form.payment_type_name}`)
       console.error('Failed to save paymentMethod:', err);
     }
   };
@@ -99,7 +102,9 @@ function PaymentMethodPage() {
         },
       });
       fetchPaymentMethods();
+      showToast.success(`Sucessfully ${action}d ${form.payment_type_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${action} ${form.payment_type_name}`)
       console.error(`Failed to ${action} paymentMethod:`, err);
     }
   };
@@ -123,7 +128,7 @@ function PaymentMethodPage() {
           <IconButton color="warning" onClick={() => handleShowModal(params.row)}><EditIcon /></IconButton>
           <IconButton
             color={params.row.is_active ? 'error' : 'success'}
-            onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
+            onClick={() => togglePaymentMethodStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
           >
             {params.row.is_active ? <ToggleOffIcon /> : <ToggleOnIcon />}
           </IconButton>

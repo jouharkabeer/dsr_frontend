@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 
 function SalesPage() {
@@ -118,7 +119,10 @@ console.log(form)
       setShowModal(false)
       formreset();
       fetchSales();
+      console.log(form.customer_name)
+      showToast.success(`Sucessfully ${editSales ? 'Edited' : 'Created'} Sale.`)
     } catch (err) {
+      showToast.error(`Failed to ${editSales ? 'Edit' : 'Create'} Sale.`)
       console.error('Failed to save sales record:', err);
     }
   };
@@ -159,10 +163,14 @@ console.log(form)
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
       fetchSales();
+      showToast.success(`Sucessfully ${action}d sales`)
     } catch (err) {
+      showToast.error(`Failed to ${action} sales`)
       console.error(`Failed to ${action} item:`, err);
     }
   };
+
+  
 const handleShowModal = (row) => {
   setEditSales(row);
 console.log(row)
@@ -545,7 +553,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                       value={form.final_due_date || ''}
                       onChange={(e) => setForm({ ...form, final_due_date: e.target.value })}
                     />
-                                        <Form.Label>Payment Received</Form.Label>
+                  <Form.Label>Payment Received</Form.Label>
                     <Form.Control
                       type="number"
                       value={form.payment_recieved || ''}

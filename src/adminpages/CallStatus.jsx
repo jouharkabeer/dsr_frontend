@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 function CallStatusPage() {
   const [callStatuses, setCallStatuses] = useState([]);
@@ -85,7 +86,9 @@ function CallStatusPage() {
       });
       setShowModal(false);
       fetchCallStatuses();
+      showToast.success(`Sucessfully ${editCallStatus ? 'Edited' : 'Created'} ${form.call_status_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editCallStatus ? 'Edit' : 'Create'}  ${form.call_status_name}`)
       console.error('Failed to save call status:', err);
     }
   };
@@ -98,7 +101,9 @@ function CallStatusPage() {
         },
       });
       fetchCallStatuses();
+      showToast.success(`Sucessfully ${action}d ${form.call_status_name}`)
     } catch (err) {
+      showToast.success(`Failed to ${action} ${form.call_status_name}`)
       console.error(`Failed to ${action} call status:`, err);
     }
   };

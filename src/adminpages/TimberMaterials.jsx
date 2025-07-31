@@ -12,6 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 
 function TimberMaterialPage() {
@@ -118,7 +119,9 @@ function TimberMaterialPage() {
         },
       });
       fetchTimberMaterials();
+      showToast.success(`Sucessfully ${editTimberMaterial ? 'Edited' : 'Created'} ${form.timbermaterial_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editTimberMaterial ? 'Edit' : 'Create'}  ${form.timbermaterial_name}`)
       console.error(`Failed to ${action} timber material:`, err);
     }
   };

@@ -25,9 +25,11 @@ import DailySalesReport from './adminpages/Report';
 import CustomerSalesPage from './salesmanpages/customer_for_sales';
 import Loader from './components/Loader';
 import CollectionForcastReport from './adminpages/CollectionReport';
+import ToastNotify from './components/ToastNotify';
 
 function App() {
   return (
+    <>
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
@@ -58,6 +60,8 @@ function App() {
       <Route path="/salesman/sales" element={<SalesPage />} />
       <Route path="/loader" element={<Loader />} />
     </Routes>
+    <ToastNotify/>
+    </>
   );
 }
 

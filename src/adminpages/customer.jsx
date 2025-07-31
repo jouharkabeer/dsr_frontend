@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { act, useEffect, useState } from 'react';
 import {
   Button, Modal, Form, Row, Col, Alert,
 } from 'react-bootstrap';
@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 function CustomerPage() {
   const [customers, setCustomers] = useState([]);
@@ -89,7 +90,9 @@ function CustomerPage() {
       });
       setShowModal(false);
       fetchCustomers();
+      showToast.success(`Sucessfully ${editCustomer ? 'Edited' : 'Created'} ${form.customer_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editCustomer ? 'Edit' : 'Create'}  ${form.customer_name}`)
       console.error('Failed to save customer:', err);
     }
   };
@@ -102,8 +105,11 @@ function CustomerPage() {
         },
       });
       fetchCustomers();
+      showToast.success(`Sucessfully ${action}d ${form.customer_name}`)
     } catch (err) {
       console.error(`Failed to ${action} customer:`, err);
+      showToast.error(`Failed to ${action} ${form.customer_name}`)
+
     }
   };
 

@@ -12,6 +12,7 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
+import { showToast } from '../components/ToastNotify';
 
 function OrderStatusTypePage() {
   const [data, setData] = useState([]);
@@ -92,7 +93,9 @@ function OrderStatusTypePage() {
       });
       setShowModal(false);
       fetchData();
+      showToast.success(`Sucessfully ${editItem ? 'Edited' : 'Created'} ${form.order_type_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editItem ? 'Edit' : 'Create'}  ${form.order_type_name}`)
       console.error('Failed to save:', err);
     }
   };
@@ -105,7 +108,9 @@ function OrderStatusTypePage() {
         },
       });
       fetchData();
+      showToast.success(`Sucessfully ${action}d ${form.order_type_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${action} ${form.order_type_name}`)
       console.error(`Failed to ${action}:`, err);
     }
   };

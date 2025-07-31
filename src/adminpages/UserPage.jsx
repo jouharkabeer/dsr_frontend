@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 
 function UserPage() {
@@ -132,11 +133,15 @@ function UserPage() {
       });
       setShowModal(false);
       fetchUsers();
+      showToast.success(`Sucessfully ${editUser ? 'Edited' : 'Created'} ${form.first_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editUser ? 'Edit' : 'Create'}  ${form.first_name}`)
       console.error('Failed to save user:', err);
     }
   };
 const userid = localStorage.getItem('user_id')
+
+
   const toggleStatus = async (id, action) => {
     if (id == userid){
       alert("you dont have the permission to disable you")
@@ -149,12 +154,14 @@ const userid = localStorage.getItem('user_id')
         },
       });
       fetchUsers();
+      showToast.success(`Sucessfully ${action}d ${form.first_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${action}  ${form.first_name}`)
       console.error(`Failed to ${action} user:`, err);
     }
   }
   };
-console.log(users)
+
   const columns = [
 {
   field: 'namefull',

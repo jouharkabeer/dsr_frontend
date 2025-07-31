@@ -13,6 +13,7 @@ import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 function HardWareMaterialPage() {
   const [hardwarematerials, setHardWareMaterials] = useState([]);
@@ -76,16 +77,23 @@ function HardWareMaterialPage() {
     setError('');
     setShowModal(true);
   };
+
+
+
   const toggleStatus = async (id, action) => {
     try {
       await axios.delete(`${Api}/master/${action}_HardWareMaterial/${id}/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
       fetchHardWareMaterials();
+      showToast.success(`Sucessfully ${action}d ${form.hardwarematerial_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${action} ${form.hardwarematerial_name}`)
       console.error(`Failed to ${action} item:`, err);
     }
   };
+
+
   const handleSave = async () => {
     const trimmed = form.hardwarematerial_name.trim();
     if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
@@ -114,7 +122,9 @@ function HardWareMaterialPage() {
       });
       setShowModal(false);
       fetchHardWareMaterials();
+      showToast.success(`Sucessfully ${editHardWareMaterial ? 'Edited' : 'Created'} ${form.hardwarematerial_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editHardWareMaterial ? 'Edit' : 'Create'}  ${form.hardwarematerial_name}`)
       console.error('Failed to save hardware material:', err);
     }
   };
