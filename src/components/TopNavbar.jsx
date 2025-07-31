@@ -64,6 +64,7 @@ function TopNavbar() {
   const navigate = useNavigate();
   const login_name = localStorage.getItem('login_name') || 'User';
   const firstLetter = login_name.charAt(0).toUpperCase();
+  const usertype = localStorage.getItem('user_type')
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -71,11 +72,21 @@ function TopNavbar() {
     localStorage.removeItem('login_name');
     navigate('/');
   };
+console.log(usertype)
+  const navigationdashboard = () => {
+    if (usertype === 'Super Admin') {
+        navigate('/admin/dashboard');
+      } else if (usertype === 'Salesman') {
+        navigate('/salesman/dashboard');
+      } else {
+        console.error('Unknown user type!');
+      }
+  }
 
   return (
     <Navbar bg="dark" variant="dark" className="px-4 py-2 shadow">
       <Container fluid className="d-flex justify-content-between align-items-center">
-        <div onClick={() => navigate('/admin/dashboard')} style={{ cursor: 'pointer' }}>
+        <div onClick={() => navigationdashboard()} style={{ cursor: 'pointer' }}>
           <img src={logo} alt="logo" style={{ height: '50px' }} />
         </div>
 
