@@ -19,6 +19,7 @@ import { showToast } from '../components/ToastNotify';
 function UserPage() {
   const [users, setUsers] = useState([]);
   const [userTypes, setUserTypes] = useState([]);
+  const [branches, setBranches] = useState([]);
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editUser, setEditUser] = useState(null);
@@ -33,6 +34,7 @@ function UserPage() {
     password: '',
     confirm_password: '',
     user_type: '',
+    branch: '',
   });
 
   const fetchUsers = async () => {
@@ -58,10 +60,17 @@ function UserPage() {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
+      const res2 = await axios.get(`${Api}/master/view_activeBranch/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      });
+      setBranches(res2.data);
+      console.log(res2.data)
       setUserTypes(res.data);
       setLoading(false)
     } catch (err) {
-      console.error('Failed to fetch user types:', err);
+      console.error('Failed to fetch datas:', err);
     }
   };
 
@@ -86,6 +95,7 @@ function UserPage() {
       password: '',
       confirm_password: '',
       user_type: user.user_type,
+      branch: user.branch
     } : {
       first_name: '',
       last_name: '',
@@ -94,23 +104,25 @@ function UserPage() {
       password: '',
       confirm_password: '',
       user_type: '',
+      branch: '',
     });
     setError('');
     setShowModal(true);
   };
+console.log(form)
 
   const handleSave = async () => {
     if (!editUser && form.password !== form.confirm_password) {
       setError('Passwords do not match.');
       return;
     }
-
     const payload = {
       first_name: form.first_name,
       last_name: form.last_name,
       email: form.email,
       username: form.username,
       user_type: form.user_type,
+      branch: form.branch,
     };
 
     if (!editUser) {
@@ -173,6 +185,7 @@ const userid = localStorage.getItem('user_id')
     { field: 'username', headerName: 'Username', width : 150,  },
     { field: 'email', headerName: 'Email', width : 150,  },
     { field: 'user_type_name', headerName: 'User Type', width : 150,  },
+    { field: 'branch_code', headerName: 'Branch', width : 150,  },
     {
       field: 'is_active',
       headerName: 'Status',
@@ -248,7 +261,9 @@ const userid = localStorage.getItem('user_id')
             </Modal.Header>
             <Modal.Body>
               {error && <Alert variant="danger">{error}</Alert>}
-              <Form>
+              {/* <Form>
+
+
                 <Form.Group className="mb-2">
                   <Form.Label>First Name</Form.Label>
                   <Form.Control
@@ -267,7 +282,6 @@ const userid = localStorage.getItem('user_id')
                     onChange={(e) => setForm({ ...form, last_name: e.target.value })}
                   />
                 </Form.Group>
-
                 <Form.Group className="mb-2">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
@@ -330,7 +344,128 @@ const userid = localStorage.getItem('user_id')
                     ))}
                   </Form.Select>
                 </Form.Group>
-              </Form>
+              </Form> */}
+
+              <Form>
+
+  {/* Row 1: First Name + Last Name */}
+  <Row className="mb-2">
+    <Col md={6}>
+      <Form.Group>
+        <Form.Control
+          type="text"
+          placeholder='First Name'
+          value={form.first_name}
+          onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+          required
+        />
+      </Form.Group>
+    </Col>
+    <Col md={6}>
+      <Form.Group>
+        <Form.Control
+          type="text"
+          placeholder='Last Name'
+          value={form.last_name}
+          onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+        />
+      </Form.Group>
+    </Col>
+  </Row>
+
+  {/* Row 2: Email + Username */}
+  <Row className="mb-2">
+    <Col md={6}>
+      <Form.Group>
+        <Form.Control
+          type="email"
+          placeholder='Email'
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          required
+        />
+      </Form.Group>
+    </Col>
+    <Col md={6}>
+      <Form.Group>
+        <Form.Control
+          type="text"
+          placeholder='Username'
+          value={form.username}
+          onChange={(e) => setForm({ ...form, username: e.target.value })}
+          required
+        />
+      </Form.Group>
+    </Col>
+  </Row>
+
+  {/* Row 3: Password + Confirm Password (only if !editUser) */}
+  {!editUser && (
+    <Row className="mb-2">
+      <Col md={6}>
+        <Form.Group>
+          <InputGroup>
+            <Form.Control
+            placeholder='Password'
+              type={showPassword ? 'text' : 'password'}
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+            />
+            <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <BiHide /> : <BiShow />}
+            </Button>
+          </InputGroup>
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group>
+          <Form.Control
+            placeholder='Confirm Password'
+            type={showPassword ? 'text' : 'password'}
+            value={form.confirm_password}
+            onChange={(e) => setForm({ ...form, confirm_password: e.target.value })}
+            required
+          />
+        </Form.Group>
+      </Col>
+    </Row>
+  )}
+
+  {/* Row 4: User Type + Branch */}
+  <Row className="mb-2">
+    <Col md={6}>
+      <Form.Group>
+        <Form.Select
+          value={form.user_type}
+          onChange={(e) => setForm({ ...form, user_type: e.target.value })}
+          required
+        >
+          <option value="">Select User Type</option>
+          {userTypes.map((type) => (
+            <option key={type.id} value={type.id}>{type.name}</option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+    </Col>
+
+    <Col md={6}>
+      <Form.Group>
+        <Form.Select
+          value={form.branch}
+          onChange={(e) => setForm({ ...form, branch: e.target.value })}
+          required
+        >
+          <option value="">Select Branch</option>
+          {branches.map((branch) => (
+            <option key={branch.id} value={branch.id}>{branch.branch_code}</option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+    </Col>
+  </Row>
+
+</Form>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>

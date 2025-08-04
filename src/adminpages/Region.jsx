@@ -104,7 +104,7 @@ function RegionPage() {
 
   const columns = [
     { field: 'region_name', headerName: 'Name', width : 150,  },
-    { field: 'remarks', headerName: 'Remarks', flex: 2 },
+    { field: 'remarks', headerName: 'Remarks', width : 150,  },
     {
       field: 'is_active',
       headerName: 'Status',

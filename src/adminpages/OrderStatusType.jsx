@@ -137,7 +137,7 @@ function OrderStatusTypePage() {
         }}>{params.value}</span>
       )
     },
-    { field: 'remarks', headerName: 'Remarks', flex: 2 },
+    { field: 'remarks', headerName: 'Remarks', width : 150,  },
     {
       field: 'is_active',
       headerName: 'Status',

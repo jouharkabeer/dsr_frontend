@@ -20,7 +20,7 @@ function BranchPage() {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editBranch, setEditBranch] = useState(null);
-  const [form, setForm] = useState({ branch_name: '', remarks: '' });
+  const [form, setForm] = useState({ branch_name: '', branch_code: '' , remarks: '' });
   const [error, setError] = useState('');
 
   const fetchBranches = async () => {
@@ -52,8 +52,9 @@ function BranchPage() {
     setEditBranch(branch);
     setForm(branch ? {
       branch_name: branch.branch_name,
+      branch_code: branch.branch_code,
       remarks: branch.remarks || '',
-    } : { branch_name: '', remarks: '' });
+    } : { branch_name: '', remarks: '', branch_code: '' });
     setError('');
     setShowModal(true);
   };
@@ -62,6 +63,21 @@ function BranchPage() {
     const trimmed = form.branch_name.trim();
     if (trimmed.length < 3 || /^\d+$/.test(trimmed)) {
       setError('Branch name must be at least 3 characters and not all numbers.');
+      return;
+    }
+
+      const isDuplicate = filteredBranches.some(
+        (branch) => branch.branch_code === form.branch_code.toUpperCase()
+      );
+
+      if (isDuplicate) {
+        setError('This branch code is already taken');
+        return;
+      }
+
+
+    if (!/^[a-zA-Z0-9]+$/.test(form.branch_code)) {
+      setError('Spaces and special characters are not allowed in Branch Code');
       return;
     }
 
@@ -75,6 +91,7 @@ function BranchPage() {
         url,
         data: {
           branch_name: form.branch_name,
+          branch_code: form.branch_code,
           remarks: form.remarks,
           is_active: true
         },
@@ -108,7 +125,8 @@ function BranchPage() {
 
   const columns = [
     { field: 'branch_name', headerName: 'Name', width : 150,  },
-    { field: 'remarks', headerName: 'Remarks', flex: 2 },
+    { field: 'branch_code', headerName: 'Code', width : 150,  },
+    { field: 'remarks', headerName: 'Remarks', width : 150,  },
     {
       field: 'is_active',
       headerName: 'Status',
@@ -184,7 +202,7 @@ function BranchPage() {
               <Modal.Title>{editBranch ? 'Edit' : 'Add'} Branch</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              {error && <Alert variant="danger">{error}</Alert>}
+              {error && <Alert style={{color: 'red', backgroundColor: 'white', fontSize: '12px', border: 'none'}}>{error}</Alert>}
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Branch Name</Form.Label>
@@ -192,6 +210,15 @@ function BranchPage() {
                     type="text"
                     value={form.branch_name}
                     onChange={(e) => setForm({ ...form, branch_name: e.target.value })}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Branch Code</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={form.branch_code}
+                    onChange={(e) => setForm({ ...form, branch_code: e.target.value })}
                     required
                   />
                 </Form.Group>

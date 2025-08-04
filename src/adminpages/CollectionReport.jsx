@@ -23,7 +23,7 @@ console.log(dateFilter)
   const fetchReport = async () => {
     try {
       setLoading(true)
-      const res = await axios.get(`${Api}/sales/admin/report/`, {
+      const res = await axios.get(`${Api}/sales/admin/collectionreport/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`
         }
@@ -151,8 +151,8 @@ const downloadPDF = () => {
   renderCell: (params) => params.api.getAllRowIds().indexOf(params.id)+1
 },
 
-    { field: 'customer_name', headerName: 'Customer', flex: 2 },
-    { field: 'salesman_name', headerName: 'SalesMan', flex: 2 },
+    { field: 'customer_name', headerName: 'Customer', width : 150,  },
+    { field: 'salesman_name', headerName: 'SalesMan', width : 150,  },
     { field: 'call_status', headerName: 'Fresh/Followup', flex: 1 },
 
 
@@ -173,7 +173,7 @@ const downloadPDF = () => {
     {
       field: 'created_at',
       headerName : 'Sale Time',
-      flex: 2,
+      width : 150,
     }, 
     {
       field: 'time_in',

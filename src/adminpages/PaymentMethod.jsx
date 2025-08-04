@@ -111,7 +111,7 @@ function PaymentMethodPage() {
 
   const columns = [
     { field: 'payment_type_name', headerName: 'Name', width : 150,  },
-    { field: 'remarks', headerName: 'Remarks', flex: 2 },
+    { field: 'remarks', headerName: 'Remarks', width : 150,  },
     {
       field: 'is_active',
       headerName: 'Status',

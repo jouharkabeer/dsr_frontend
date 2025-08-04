@@ -239,7 +239,7 @@ function AdminSidebar() {
                 to="/sales/report"
                 className={`sidebar-subitem ${isActive('/sales/report') ? 'sidebar-subitem-active' : ''}`}
               >
-                Sales Report
+                Daily Report
               </Nav.Link>
               <Nav.Link
                 as={Link}
