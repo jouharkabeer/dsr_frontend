@@ -10,6 +10,11 @@ import { DataGrid } from '@mui/x-data-grid';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import Pdficon from '@mui/icons-material/PictureAsPdfOutlined';
+import Exelicon from '@mui/icons-material/DatasetOutlined';
+
 
 function CollectionForcastReport() {
   const newtoday =  new Date().toISOString().split('T')[0];
@@ -56,6 +61,37 @@ console.log(dateFilter)
     setFilteredData(result);
   };
 
+console.log(filteredData)
+
+
+const downloadExcel = () => {
+  // Convert filtered data to worksheet
+  const worksheetData = filteredData.map((row, index) => ({
+    'S.No': index + 1,
+    'Customer': row.customer_name,
+    'Salesman': row.salesman_name,
+    'Branch': row.branch_code,
+    'Mode of Collection': row.payment_method_name,
+    'Expected Collection': row.expected_payment_amount,
+    'Expected Date': row.expected_payment_date,
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Collection Forecast Report');
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  saveAs(blob, `Collection_forecast_Report_${dateFilter}.xlsx`);
+};
+
 
 
 const downloadPDF = () => {
@@ -75,7 +111,7 @@ const downloadPDF = () => {
   doc.setFontSize(14);
   doc.text('LUMBER WORLD BUILDING MATERIAL TRADING L.L.C', 14, 15);
   doc.setFontSize(12);
-  doc.text('COLLECTION REPORT', 14, 23);
+  doc.text('COLLECTION FORECAST REPORT', 14, 23);
   doc.text(`Date: ${dateFilter || today}`, 150, 23, { align: 'right' });
 
   // Table data
@@ -143,7 +179,6 @@ const downloadPDF = () => {
 
 
   const columns = [
-    // { field: 'sno', headerName: 'S.No', width: 70, valueGetter: (params) => params.api.getRowIndex(params.id) + 1 },
     {
   field: 'sno',
   headerName: 'S.No',
@@ -153,45 +188,14 @@ const downloadPDF = () => {
 
     { field: 'customer_name', headerName: 'Customer', width : 150,  },
     { field: 'salesman_name', headerName: 'SalesMan', width : 150,  },
-    { field: 'call_status', headerName: 'Fresh/Followup', flex: 1 },
+    { field: 'branch_code', headerName: 'Branch', width : 150,  },
+    { field: 'payment_method_name', headerName: 'Mode of Collection', width: 150, },
+    { field: 'quotation_value', headerName: 'Quotation Amount', width: 150, },
+    { field: 'expected_payment_amount', headerName: 'Expected Collection', width: 150, },
+    { field: 'expected_payment_date', headerName: 'Expected Date', width: 150, },
+    { field: 'payment_recieved', headerName: 'Recived Amount', width: 150, },
+    { field: 'due_amount', headerName: 'Due Amount', width: 150, },
 
-
-    { field: 'timber_material_name', headerName: 'Timber Materials', flex : 2, },
-    { field: 'hardware_material_name', headerName: 'Hardware Materials', flex : 2, },
-
-    {
-      field: 'payment_recieved',
-      headerName: 'Payment',
-      width : 150, 
-      renderCell: (params) => (params.value ? '✅ Yes' : '❌ No'),
-    },
-    {
-      field: 'order_value',
-      headerName: 'Total O/S',
-      flex :1,
-    },
-    {
-      field: 'created_at',
-      headerName : 'Sale Time',
-      width : 150,
-    }, 
-    {
-      field: 'time_in',
-      headerName: 'Time In',
-      width : 150, 
-      renderCell: (params) => params.value ? new Date(params.value).toLocaleTimeString() : ''
-    },
-    {
-      field: 'time_out',
-      headerName: 'Time Out',
-      width : 150, 
-      renderCell: (params) => params.value ? new Date(params.value).toLocaleTimeString() : ''
-    },
-    {
-      field: 'remarks',
-      headerName: 'Outcome of the call',
-      flex: 1
-    },
   ];
 
   return (
@@ -202,7 +206,7 @@ const downloadPDF = () => {
         {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-end">
-            <Col><h4>Collection Report</h4></Col>
+            <Col><h4>Collection Forecast Report</h4></Col>
             <Col md={3}>
               <Form.Group>
                 <Form.Label>Date</Form.Label>
@@ -213,37 +217,38 @@ const downloadPDF = () => {
                 />
               </Form.Group>
             </Col>
-            {/* <Col md={3}>
-              <Form.Group>
-                <Form.Label>Customer</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Search Customer"
-                  value={customerFilter}
-                  onChange={(e) => setCustomerFilter(e.target.value)}
-                />
-              </Form.Group>
-            </Col> */}
             <Col md="auto">
               <Button variant="secondary" onClick={filterSales}>Apply Filters</Button>
             </Col>
             <Col md="auto">
-              <Button variant="success" onClick={downloadPDF}>Download PDF</Button>
+              <Button variant="success" onClick={downloadExcel}> <Exelicon/>  </Button>
+            </Col>
+            <Col md="auto">
+              <Button variant="success" onClick={downloadPDF}> <Pdficon/> </Button>
             </Col>
           </Row>
 
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
             <DataGrid
-            rowNumberDisplayMode="static"
               rows={filteredData}
               columns={columns}
               getRowId={(row) => row.id}
               initialState={{
-                pagination: { paginationModel: { pageSize: 10 } },
+                pagination: {
+                  paginationModel: { pageSize: 10 },
+                },
               }}
               pageSizeOptions={[5, 10, 25]}
+              checkboxSelection
               disableRowSelectionOnClick
               disableColumnMenu
+              disableDensitySelector
+              showToolbar // ✅ NEW: enables full toolbar (search, export, columns)
+              slotProps={{
+                toolbar: {
+                  quickFilterProps: { debounceMs: 500 },
+                },
+              }}
             />
           </div>
         </div>}

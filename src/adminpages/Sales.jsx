@@ -36,6 +36,7 @@ function SalesPage() {
     final_due_date: null,
     quotation_provided: false,
     quotation_value: null,
+    expected_payment_amount: null,
     order_value: null,
     remarks: null,
   });
@@ -143,6 +144,7 @@ console.log(form)
       final_due_date: null,
       quotation_provided: false,
       quotation_value: null,
+      expected_payment_amount: null,
       order_value: null,
       remarks: null,
     });
@@ -170,6 +172,7 @@ console.log(form)
     }
   };
 
+  console.log(sales)
   
 const handleShowModal = (row) => {
   setEditSales(row);
@@ -188,6 +191,7 @@ console.log(row)
     final_due_date: row.final_due_date || null,
     quotation_provided: row.quotation_provided || false,
     quotation_value: row.quotation_value || '',
+    expected_payment_amount: row.expected_payment_amount || '',
     order_value: row.order_value || '',
     remarks: row.remarks || '',
   });
@@ -242,6 +246,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
     { field: 'customer_name', headerName: 'Customer', width : 150,  },
     { field: 'salesman_name', headerName: 'Salesman', width : 150,  },
     { field: 'order_value', headerName: 'Order Value', width : 150,  },
+    { field: 'quotation_value', headerName: 'Quotation Amount', width: 150, },
     { field: 'payment_recieved', headerName: 'Payment Recived', width : 150,  },
     { field: 'due_amount', headerName: 'Due Amount', width : 150,  },
     { field: 'next_meeting_date', headerName : 'Appointment Date', width : 150,  },
@@ -360,26 +365,26 @@ if (row.hardwarematerials && row.hardware_material_name) {
             <ToggleButton id="inactive" value="inactive" variant="outline-danger">Inactive</ToggleButton>
           </ToggleButtonGroup>
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
-<DataGrid
-  rows={filteredSales}
-  columns={columns}
-  getRowId={(row) => row.id}
-  initialState={{
-    pagination: {
-      paginationModel: { pageSize: 10 },
-    },
-  }}
-  pageSizeOptions={[5, 10, 25]}
-  checkboxSelection
-  disableRowSelectionOnClick
-  disableColumnMenu
-  disableDensitySelector
-  showToolbar // ✅ NEW: enables full toolbar (search, export, columns)
-  slotProps={{
-    toolbar: {
-      quickFilterProps: { debounceMs: 500 },
-    },
-  }}
+            <DataGrid
+              rows={filteredSales}
+              columns={columns}
+              getRowId={(row) => row.id}
+              initialState={{
+                pagination: {
+                  paginationModel: { pageSize: 10 },
+                },
+              }}
+              pageSizeOptions={[5, 10, 25]}
+              checkboxSelection
+              disableRowSelectionOnClick
+              disableColumnMenu
+              disableDensitySelector
+              showToolbar // ✅ NEW: enables full toolbar (search, export, columns)
+              slotProps={{
+                toolbar: {
+                  quickFilterProps: { debounceMs: 500 },
+                },
+              }}
             />
           </div>
           <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
@@ -535,6 +540,14 @@ if (row.hardwarematerials && row.hardware_material_name) {
                     onChange={(e) => setForm({ ...form, order_value: e.target.value })}
                   />
                 </Form.Group>
+                <Form.Group className="mb-2">
+                  <Form.Label>Expected Payment Amount</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={form.expected_payment_amount || ''}
+                    onChange={(e) => setForm({ ...form, expected_payment_amount: e.target.value })}
+                  />
+                </Form.Group>
                     <Form.Label>Appoinment Date</Form.Label>
                     <Form.Control
                       type="date"
@@ -558,6 +571,13 @@ if (row.hardwarematerials && row.hardware_material_name) {
                       type="number"
                       value={form.payment_recieved || ''}
                       onChange={(e) => setForm({ ...form, payment_recieved: e.target.value })}
+                    />
+
+                  <Form.Label>Quotation value</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={form.quotation_value || ''}
+                      onChange={(e) => setForm({ ...form, quotation_value: e.target.value })}
                     />
                 <Form.Group className="mb-2">
                   <Form.Label>Remarks</Form.Label>

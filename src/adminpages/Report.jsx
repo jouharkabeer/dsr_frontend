@@ -10,6 +10,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
+import Dowloadicon from '@mui/icons-material/DownloadForOfflineOutlined';
 
 function DailySalesReportPage() {
   const newtoday =  new Date().toISOString().split('T')[0];
@@ -20,26 +21,66 @@ function DailySalesReportPage() {
   const [loading, setLoading] = useState(true)
 console.log(dateFilter)
   
+  // const fetchReport = async () => {
+  //   try {
+  //     setLoading(true)
+  //     const res = await axios.get(`${Api}/sales/admin/report/`, {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem('access_token')}`
+  //       }
+  //     });
+  //     setSalesData(res.data);
+  //     let result = salesData
+  //   if (dateFilter) {
+  //     result = salesData.filter((item) =>
+  //       item.created_at?.startsWith(dateFilter)
+  //     );
+  //   }
+  //     setFilteredData(result);
+  //     setLoading(false)
+  //   } catch (err) {
+  //     console.error('Failed to fetch sales data:', err);
+  //   }
+  // };
+
+
   const fetchReport = async () => {
-    try {
-      setLoading(true)
-      const res = await axios.get(`${Api}/sales/admin/report/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`
-        }
-      });
-      setSalesData(res.data);
-      setFilteredData(res.data);
-      console.log(filteredData)
-      setLoading(false)
-    } catch (err) {
-      console.error('Failed to fetch sales data:', err);
+  try {
+    setLoading(true);
+    const res = await axios.get(`${Api}/sales/admin/report/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`
+      }
+    });
+
+    const fetchedData = res.data;
+    setSalesData(fetchedData);
+
+    let result = fetchedData; // use fetched data directly
+console.log(fetchedData)
+    if (dateFilter) {
+      result = fetchedData.filter((item) =>
+        item.created_at?.startsWith(dateFilter)
+      );
     }
-  };
+
+    setFilteredData(result);
+  } catch (err) {
+    console.error('Failed to fetch sales data:', err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchReport();
   }, []);
+
+  const ResetSales = () => {
+    setDateFilter('')
+    setFilteredData(salesData)
+  }
 
   const filterSales = () => {
     let result = [...salesData];
@@ -156,13 +197,13 @@ const downloadPDF = () => {
     { field: 'call_status', headerName: 'Fresh/Followup', flex: 1 },
 
 
-    { field: 'timber_material_name', headerName: 'Timber Materials', flex : 2, },
-    { field: 'hardware_material_name', headerName: 'Hardware Materials', flex : 2, },
+    { field: 'timber_material_name', headerName: 'Timber Materials', width : 150, },
+    { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150, },
 
     {
       field: 'payment_recieved',
-      headerName: 'Payment',
-      width : 150, 
+      headerName: 'Payment ',
+      width : 80, 
       renderCell: (params) => (params.value ? '✅ Yes' : '❌ No'),
     },
     {
@@ -170,11 +211,11 @@ const downloadPDF = () => {
       headerName: 'Total O/S',
       flex :1,
     },
-    {
-      field: 'created_at',
-      headerName : 'Sale Time',
-      width : 150, 
-    }, 
+    // {
+    //   field: 'created_at',
+    //   headerName : 'Sale Time',
+    //   width : 150, 
+    // }, 
     {
       field: 'time_in',
       headerName: 'Time In',
@@ -190,7 +231,7 @@ const downloadPDF = () => {
     {
       field: 'remarks',
       headerName: 'Outcome of the call',
-      flex: 1
+      width : 150
     },
   ];
 
@@ -213,7 +254,7 @@ const downloadPDF = () => {
                 />
               </Form.Group>
             </Col>
-            <Col md={3}>
+            {/* <Col md={3}>
               <Form.Group>
                 <Form.Label>Customer</Form.Label>
                 <Form.Control
@@ -223,28 +264,41 @@ const downloadPDF = () => {
                   onChange={(e) => setCustomerFilter(e.target.value)}
                 />
               </Form.Group>
+            </Col> */}
+            <Col md="auto">
+              <Button variant="warning" onClick={filterSales}>Apply Date</Button>
             </Col>
             <Col md="auto">
-              <Button variant="secondary" onClick={filterSales}>Apply Filters</Button>
+              <Button variant="danger" onClick={ResetSales}>Reset</Button>
             </Col>
             <Col md="auto">
-              <Button variant="success" onClick={downloadPDF}>Download PDF</Button>
+              <Button variant="success" onClick={downloadPDF}><Dowloadicon/> Report</Button>
             </Col>
           </Row>
 
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
-            <DataGrid
-            rowNumberDisplayMode="static"
-              rows={filteredData}
-              columns={columns}
-              getRowId={(row) => row.id}
-              initialState={{
-                pagination: { paginationModel: { pageSize: 10 } },
-              }}
-              pageSizeOptions={[5, 10, 25]}
-              disableRowSelectionOnClick
-              disableColumnMenu
-            />
+
+                        <DataGrid
+                          rows={filteredData}
+                          columns={columns}
+                          getRowId={(row) => row.id}
+                          initialState={{
+                            pagination: {
+                              paginationModel: { pageSize: 10 },
+                            },
+                          }}
+                          pageSizeOptions={[5, 10, 25]}
+                          checkboxSelection
+                          disableRowSelectionOnClick
+                          disableColumnMenu
+                          disableDensitySelector
+                          showToolbar // ✅ NEW: enables full toolbar (search, export, columns)
+                          slotProps={{
+                            toolbar: {
+                              quickFilterProps: { debounceMs: 500 },
+                            },
+                          }}
+                        />
           </div>
         </div>}
       </div>
