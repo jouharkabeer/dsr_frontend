@@ -20,7 +20,7 @@ function CustomerPage() {
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editCustomer, setEditCustomer] = useState(null);
-  const [form, setForm] = useState({ customer_name: '', remarks: '', address: '' });
+  const [form, setForm] = useState({ customer_name: '', remarks: '', address: '', view_all: true, });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true)
 
@@ -57,7 +57,8 @@ function CustomerPage() {
       customer_name: customer.customer_name,
       remarks: customer.remarks || '',
       address: customer.address || '',
-    } : { customer_name: '', remarks: '', address: '' });
+      view_all: customer.view_all || true,
+    } : { customer_name: '', remarks: '', address: '', view_all: true });
     setError('');
     setShowModal(true);
   };
@@ -82,6 +83,7 @@ function CustomerPage() {
           customer_name: form.customer_name,
           remarks: form.remarks,
           address: form.address,
+          view_all: form.view_all,
           is_active: true,
         },
         headers: {
@@ -112,11 +114,17 @@ function CustomerPage() {
 
     }
   };
-
+console.log(form.view_all)
   const columns = [
     { field: 'customer_name', headerName: 'Name', width : 150,  },
     { field: 'address', headerName: 'Address', width : 150,  },
     { field: 'remarks', headerName: 'Remarks', width : 150,  },
+    {
+      field: 'view_all',
+      headerName: 'Status',
+      width : 150, 
+      renderCell: (params) => (params.value ? 'Yes' : 'No'),
+    },
     {
       field: 'is_active',
       headerName: 'Status',
@@ -223,6 +231,16 @@ function CustomerPage() {
                     onChange={(e) => setForm({ ...form, remarks: e.target.value })}
                   />
                 </Form.Group>
+<Form.Group>
+  {/* <Form.Label>Need to View by salesman</Form.Label> */}
+  <Form.Check
+    type="checkbox"
+    label="Visible to All Salesmen"
+    checked={form.view_all}
+    onChange={(e) => setForm({ ...form, view_all: e.target.checked })}
+  />
+</Form.Group>
+
               </Form>
             </Modal.Body>
             <Modal.Footer>
