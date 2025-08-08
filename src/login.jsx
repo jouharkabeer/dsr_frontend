@@ -27,7 +27,7 @@ const Tokenvaliditychecker = async () => {
     console.log(data)
     if (data.message === 'its a valid token') { // ✅ Fix: comparison operator `===`, and correct string
       const userrtype = localStorage.getItem('user_type');
-      if (userrtype === 'Super Admin') {
+      if (userrtype === 'SuperAdmin') {
         navigate('/admin/dashboard');
       } else if (userrtype === 'Salesman') {
         navigate('/salesman/dashboard');
@@ -63,7 +63,7 @@ const Tokenvaliditychecker = async () => {
       localStorage.setItem('user_id', user_id);
       localStorage.setItem('login_name', login_name);
 console.log(access)
-      if (usertype === 'Super Admin') {
+      if (usertype === 'SuperAdmin') {
         navigate('/admin/dashboard');
       } else if (usertype === 'Salesman') {
         navigate('/salesman/dashboard');
