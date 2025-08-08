@@ -161,13 +161,13 @@ function AdminSidebar() {
               >
                 Order Types
               </Nav.Link>
-              <Nav.Link
+              {/* <Nav.Link
                 as={Link}
                 to="/admin/paymentmethod"
                 className={`sidebar-subitem ${isActive('/admin/paymentmethod') ? 'sidebar-subitem-active' : ''}`}
               >
                 Payment Methods
-              </Nav.Link>
+              </Nav.Link> */}
             </div>
           )}
         </div>

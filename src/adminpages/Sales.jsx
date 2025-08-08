@@ -670,11 +670,11 @@ function SalesPage() {
 
     expected_pdc: '', collected_pdc: '',
     expected_cash: '', collected_cash: '',
-    expected_online: '', collected_online: '',
-    expected_others: '', collected_others: '',
+    expected_cdc: '', collected_cdc: '',
+    expected_tt: '', collected_tt: '',
 
     order_status: null,
-    payment_method: null,
+    mode_of_collection: null,
     expected_payment_date: null,
     next_meeting_date: null,
     payment_recieved: null,
@@ -685,7 +685,7 @@ function SalesPage() {
 
   const [options, setOptions] = useState({
     customer: [], call_status: [], prospect: [], order_status: [],
-    payment_method: [], timber_categories: [], hardware_categories: [],
+     timber_categories: [], hardware_categories: [],
   });
 
   const [isTimber, setIsTimber] = useState(false);
@@ -708,7 +708,6 @@ function SalesPage() {
       call_status: `${Api}/master/view_activeCallStatus/`,
       prospect: `${Api}/master/view_activeProspect/`,
       order_status: `${Api}/master/view_activeOrderStatusType/`,
-      payment_method: `${Api}/master/view_activePaymentMethod/`,
       timber_categories: `${Api}/master/view_activeTimberMaterialCategory/`,
       hardware_categories: `${Api}/master/view_activeHardWareMaterialCategory/`,
     };
@@ -740,7 +739,7 @@ function SalesPage() {
     fetchSales();
     fetchOptions();
   }, [filter]);
-
+console.log(form, selectedPaymentMethod)
 const handleSave = async () => {
   const url = editSales
     ? `${Api}/sales/update_SalesWeb/${editSales.id}/`
@@ -786,7 +785,7 @@ const handleSave = async () => {
       call_status: '',
       prospect: '',
       order_status: null,
-      payment_method: null,
+      mode_of_collection: null,
       expected_payment_date: null,
       next_meeting_date: null,
 
@@ -795,8 +794,8 @@ const handleSave = async () => {
       order_value: null,
     expected_pdc: '', collected_pdc: '',
     expected_cash: '', collected_cash: '',
-    expected_online: '', collected_online: '',
-    expected_others: '', collected_others: '',
+    expected_cdc: '', collected_cdc: '',
+    expected_tt: '', collected_tt: '',
       remarks: null,
     });
     setIsTimber(false);
@@ -835,24 +834,22 @@ console.log(row)
     call_status: row.call_status || '',
     prospect: row.prospect || '',
     order_status: row.order_status || '',
-    payment_method: row.payment_method || '',
-    expected_payment_amount: row.expected_payment_amount || '',
+    mode_of_collection: row.mode_of_collection || '',
+
     expected_payment_date: row.expected_payment_date || null,
     next_meeting_date: row.next_meeting_date || null,
     payment_recieved: row.payment_recieved || null,
     final_due_date: row.final_due_date || null,
-    quotation_provided: row.quotation_provided || false,
-    quotation_value: row.quotation_value || '',
-    expected_payment_amount: row.expected_payment_amount || '',
+
     order_value: row.order_value || '',
     expected_pdc: row.expected_pdc || '', 
     collected_pdc: row.collected_pdc || '',
     expected_cash:row.expected_cash || '', 
     collected_cash: row.collected_cash ||'',
-    expected_online:row.expected_online || '', 
-    collected_online: row.collected_online ||'',
-    expected_others:row.expected_others || '', 
-    collected_others: row.collected_others ||'',
+    expected_cdc:row.expected_cdc || '', 
+    collected_cdc: row.collected_cdc ||'',
+    expected_tt:row.expected_tt || '', 
+    collected_tt: row.collected_tt ||'',
     remarks: row.remarks || '',
   });
 
@@ -1223,11 +1220,14 @@ if (row.hardwarematerials && row.hardware_material_name) {
 <Form.Group className="mb-3">
   <Form.Label>Payment Method</Form.Label>
   <div className="d-flex gap-2 flex-wrap">
-    {['cash', 'pdc', 'online', 'others'].map((method) => (
+    {['cash', 'pdc', 'cdc', 'tt'].map((method) => (
       <Button
         key={method}
         variant={selectedPaymentMethod === method ? 'primary' : 'outline-primary'}
-        onClick={() => setSelectedPaymentMethod(method)}
+        onClick={() => {
+          setSelectedPaymentMethod(method);
+          setForm((prevForm) => ({ ...prevForm, mode_of_collection: method }));
+        }}
       >
         {method.toUpperCase()}
       </Button>
