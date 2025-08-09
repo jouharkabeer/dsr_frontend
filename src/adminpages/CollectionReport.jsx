@@ -253,7 +253,7 @@ console.log(filsalesman)
   />
 </Col>
             <Col md="auto">
-              <Button variant="secondary" onClick={fetchColletionReport}>Apply Filters</Button>
+              <Button variant="warning" onClick={fetchColletionReport}>Apply Filters</Button>
             </Col>
                         <Col md="auto">
                           <Button variant="danger" onClick={ResetReport}>Reset</Button>

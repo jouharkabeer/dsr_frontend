@@ -18,7 +18,7 @@ function SalesMeet() {
   const fetchSalesMeet = async () => {
     try {
       setLoading(true)
-      const res = await axios.get(`${Api}/sales/view_allSalesMobiles/`, {
+      const res = await axios.get(`${Api}/sales/view_allMeetingLog/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
@@ -58,17 +58,45 @@ console.log(salesmeet)
       width : 80,
       renderCell: (params) => (params.value ? '✅ Yes' : '❌ No'),
     },
-    { field: 'time_in', headerName: 'time in', width:150 },
-    { field: 'time_out', headerName: 'time out', width:150 },
-    { field: 'latitude', headerName: 'Latitude', width:150 },
-    { field: 'longitude', headerName: 'Longitude', width:150 },
+{
+  field: 'time_in',
+  headerName: 'Time In',
+  width: 200,
+  renderCell: (params) => {
+    if (!params.value) return '';
+    const date = new Date(params.value);
+    return date.toLocaleString([], { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  }
+},
+{
+  field: 'time_out',
+  headerName: 'Time Out',
+  width: 200,
+  renderCell: (params) => {
+    if (!params.value) return '';
+    const date = new Date(params.value);
+    return date.toLocaleString([], { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  }
+}
 
-    {
-      field: 'is_active',
-      headerName: 'Status',
-      width : 80,
-      renderCell: (params) => (params.value ? 'Active' : 'Inactive'),
-    },
+,
+
+    // { field: 'latitude', headerName: 'Latitude', width:150 },
+    // { field: 'longitude', headerName: 'Longitude', width:150 },
+    { field: 'location_name', headerName: 'Location', width:150 },
+
   ];
 
   return (

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button, Row, Col, Form, InputGroup
+  Button, Row, Col, Form, OverlayTrigger, Tooltip
 } from 'react-bootstrap';
 import axios from 'axios';
 import { Api } from '../api';
@@ -11,6 +11,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
 import Dowloadicon from '@mui/icons-material/DownloadForOfflineOutlined';
+import Pdficon from '@mui/icons-material/PictureAsPdfOutlined';
 
 function DailySalesReportPage() {
   const newtoday =  new Date().toISOString().split('T')[0];
@@ -271,13 +272,22 @@ const downloadPDF = () => {
             <Col md="auto">
               <Button variant="danger" onClick={ResetSales}>Reset</Button>
             </Col>
-            <Col md="auto">
-              <Button variant="success" onClick={downloadPDF}><Dowloadicon/> Report</Button>
-            </Col>
+
           </Row>
 
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
-
+              <Row className="justify-content-end mb-2">
+  <Col xs="auto">
+    <OverlayTrigger
+      placement="top"
+      overlay={<Tooltip>Download PDF</Tooltip>}
+    >
+      <div onClick={downloadPDF} style={{ cursor: 'pointer', color: '#007bff' }}>
+        <Pdficon />
+      </div>
+    </OverlayTrigger>
+  </Col>
+  </Row>
                         <DataGrid
                           rows={filteredData}
                           columns={columns}
