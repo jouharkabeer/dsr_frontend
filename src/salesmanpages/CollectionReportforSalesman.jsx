@@ -5,7 +5,7 @@ import {
 import axios from 'axios';
 import { Api } from '../api';
 import TopNavbar from '../components/TopNavbar';
-import AdminSidebar from './adminsidebar';
+import SalesSidebar from './salesmansidebar';
 import { DataGrid } from '@mui/x-data-grid';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -19,13 +19,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 
-function CollectionForcastReport() {
+function SalesManCollectionForcastReport() {
 
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({ start_date: "", end_date: "" });
   const [salesmans, setSalesmans] = useState([])
-  const [filsalesman, setFilsalesman] = useState()
   const [dateRange, setDateRange] = useState([null, null]);
 
 
@@ -47,12 +46,13 @@ function CollectionForcastReport() {
 
 const fetchColletionReport = async () => {
   try {
+    const cid = localStorage.getItem('user_id')
     // setLoading(true)
     const res = await axios.get(`${Api}/sales/admin/collection-report-by-date/`, {
       params: {
         start_date: filters.start_date,
         end_date: filters.end_date,
-        sales_id: filsalesman,
+        sales_id: cid,
       },
       headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
     });
@@ -104,7 +104,6 @@ const downloadExcel = () => {
 
 const ResetReport = () =>{
   setFilters ({start_date: "", end_date: ""})
-  setFilsalesman('')
   setDateRange([null, null]); 
   fetchColletionReport()
 }
@@ -202,7 +201,7 @@ const downloadPDF = () => {
 },
 
     { field: 'customer_name', headerName: 'Customer', width : 150,  },
-    { field: 'salesman_name', headerName: 'SalesMan', width : 150,  },
+    // { field: 'salesman_name', headerName: 'SalesMan', width : 150,  },
     { field: 'branch_code', headerName: 'Branch', width : 150,  },
     { field: 'payment_method_name', headerName: 'Mode of Collection', width: 150, },
     { field: 'quotation_value', headerName: 'Quotation Amount', width: 150, },
@@ -212,30 +211,17 @@ const downloadPDF = () => {
     { field: 'due_amount', headerName: 'Due Amount', width: 150, },
 
   ];
-console.log(filsalesman)
+
   return (
     <div className="d-flex flex-column" style={{ height: '100vh' }}>
       <TopNavbar />
       <div className="d-flex flex-grow-1">
-        <AdminSidebar />
+        <SalesSidebar />
         {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-end">
             <Col><h5>Collection Forecast Report</h5></Col>
-            <Col md={3}>
-                                  <Form.Group>
-                                {/* <Form.Label>salesman</Form.Label> */}
-                                <Form.Select
-                                  value={filsalesman}
-                                  onChange={(e) => setFilsalesman(e.target.value)}
-                                >
-                                  <option value="">Select Salesman</option>
-                                  {salesmans.map((item) => (
-                                    <option key={item.id} value={item.id}>{item.namefull}</option>
-                                  ))}
-                                </Form.Select>
-                                  </Form.Group>
-            </Col>
+
             <Col md={3}>
   <DatePicker
     selectsRange
@@ -313,4 +299,4 @@ console.log(filsalesman)
     </div>
   );
 }
-export default CollectionForcastReport;
+export default SalesManCollectionForcastReport;

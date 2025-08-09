@@ -2,16 +2,19 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Form, Button, Card } from 'react-bootstrap';
+import { Container, Form, Button, Card, InputGroup } from 'react-bootstrap';
 import { Api } from './api';
 import logo from './assets/logo.png'
 import Loader from './components/Loader';
+import { BiShow, BiHide } from "react-icons/bi";
 
 function Login() {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [login, setLogin] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
 const Tokenvaliditychecker = async () => {
@@ -49,6 +52,7 @@ const Tokenvaliditychecker = async () => {
 
 
   const handleLogin = async (e) => {
+    setLogin(true)
     e.preventDefault();
     try {
       const res = await axios.post(`${Api}/user/login/`, {
@@ -57,6 +61,7 @@ const Tokenvaliditychecker = async () => {
       });
 
       const { access, refresh, usertype, user_id, login_name } = res.data;
+      setLogin(false)
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
       localStorage.setItem('user_type', usertype);
@@ -97,17 +102,30 @@ console.log(access)
 
             <Form.Group controlId="password" className="mb-4">
               <Form.Label>Password</Form.Label>
-              <Form.Control
+              {/* <Form.Control
                 type="password"
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-              />
+              /> */}
+                        <InputGroup>
+            <Form.Control
+            placeholder='Password'
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <BiHide /> : <BiShow />}
+            </Button>
+          </InputGroup>
             </Form.Group>
 
+
             <Button type="submit" variant="primary" className="w-100">
-              Sign In
+              {login ? "Please Wait..." : "Sign In"}
             </Button>
           </Form>
         </Card.Body>

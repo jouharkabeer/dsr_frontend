@@ -26,6 +26,7 @@ import CustomerSalesPage from './salesmanpages/customer_for_sales';
 import Loader from './components/Loader';
 import CollectionForcastReport from './adminpages/CollectionReport';
 import ToastNotify from './components/ToastNotify';
+import SalesManCollectionForcastReport from './salesmanpages/CollectionReportforSalesman';
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
       <Route path="/salesman/dashboard" element={<SalesmanDashboard />} />
       <Route path="/salesman/customer" element={<CustomerSalesPage />} />
       <Route path="/salesman/sales" element={<SalesPage />} />
+      <Route path="/salesman/sales/collectionreport" element={<SalesManCollectionForcastReport />} />
       <Route path="/loader" element={<Loader />} />
     </Routes>
     <ToastNotify/>

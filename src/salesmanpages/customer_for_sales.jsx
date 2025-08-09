@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { act, useEffect, useState } from 'react';
 import {
   Button, Modal, Form, Row, Col, Alert,
 } from 'react-bootstrap';
 import axios from 'axios';
+import SalesSidebar from './salesmansidebar';
 import { Api } from '../api';
 import TopNavbar from '../components/TopNavbar';
 import { DataGrid } from '@mui/x-data-grid';
@@ -11,7 +12,8 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
-import SalesmanSidebar from './salesmansidebar';
+import Loader from '../components/Loader';
+import { showToast } from '../components/ToastNotify';
 
 function CustomerSalesPage() {
   const [customers, setCustomers] = useState([]);
@@ -19,17 +21,20 @@ function CustomerSalesPage() {
   const [showModal, setShowModal] = useState(false);
   const [editCustomer, setEditCustomer] = useState(null);
   const [form, setForm] = useState({ customer_name: '', remarks: '', address: '' });
-  const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true)
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get(`${Api}/master/view_allCustomers/`, {
+      const cid = localStorage.getItem('user_id')
+      setLoading(true)
+      const res = await axios.get(`${Api}/master/view_activeCustomer/bysalesman/${cid}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       setCustomers(res.data);
+      setLoading(false)
     } catch (err) {
       console.error('Failed to fetch customers:', err);
     }
@@ -45,9 +50,7 @@ function CustomerSalesPage() {
       if (filter === 'inactive') return !item.is_active;
       return true;
     })
-    .filter((item) =>
-      item.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+
 
   const handleShowModal = (customer = null) => {
     setEditCustomer(customer);
@@ -88,7 +91,9 @@ function CustomerSalesPage() {
       });
       setShowModal(false);
       fetchCustomers();
+      showToast.success(`Sucessfully ${editCustomer ? 'Edited' : 'Created'} ${form.customer_name}`)
     } catch (err) {
+      showToast.error(`Failed to ${editCustomer ? 'Edit' : 'Create'}  ${form.customer_name}`)
       console.error('Failed to save customer:', err);
     }
   };
@@ -101,8 +106,11 @@ function CustomerSalesPage() {
         },
       });
       fetchCustomers();
+      showToast.success(`Sucessfully ${action}d ${form.customer_name}`)
     } catch (err) {
       console.error(`Failed to ${action} customer:`, err);
+      showToast.error(`Failed to ${action} ${form.customer_name}`)
+
     }
   };
 
@@ -139,7 +147,8 @@ function CustomerSalesPage() {
     <div className="d-flex flex-column" style={{ height: '100vh' }}>
       <TopNavbar />
       <div className="d-flex flex-grow-1">
-        <SalesmanSidebar />
+        <SalesSidebar />
+        {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-center">
             <Col><h3>Customers</h3></Col>
@@ -215,6 +224,7 @@ function CustomerSalesPage() {
                     onChange={(e) => setForm({ ...form, remarks: e.target.value })}
                   />
                 </Form.Group>
+
               </Form>
             </Modal.Body>
             <Modal.Footer>
@@ -224,7 +234,7 @@ function CustomerSalesPage() {
               </Button>
             </Modal.Footer>
           </Modal>
-        </div>
+        </div> }
       </div>
     </div>
   );

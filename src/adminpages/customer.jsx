@@ -121,7 +121,7 @@ console.log(form.view_all)
     { field: 'remarks', headerName: 'Remarks', width : 150,  },
     {
       field: 'view_all',
-      headerName: 'Status',
+      headerName: 'View for all salesman',
       width : 150, 
       renderCell: (params) => (params.value ? 'Yes' : 'No'),
     },

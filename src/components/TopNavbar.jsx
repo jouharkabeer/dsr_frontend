@@ -72,7 +72,7 @@ function TopNavbar() {
     localStorage.removeItem('login_name');
     navigate('/');
   };
-console.log(usertype)
+// console.log(usertype)
   const navigationdashboard = () => {
     if (usertype === 'SuperAdmin') {
         navigate('/admin/dashboard');
