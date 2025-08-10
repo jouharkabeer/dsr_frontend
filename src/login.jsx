@@ -22,7 +22,7 @@ function Login() {
 
 const Tokenvaliditychecker = async () => {
   try {
-    setLoading(true);
+    setLogin(true);
     const res = await axios.get(`${Api}/user/validity/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
@@ -42,10 +42,10 @@ const Tokenvaliditychecker = async () => {
       }
     }
 
-    setLoading(false); // ✅ Move out of if-else to ensure it always runs
+    setLogin(false); // ✅ Move out of if-else to ensure it always runs
   } catch (err) {
     // console.error('Token check failed:', err);
-    setLoading(false); // ✅ Also handle loading off in case of error
+    setLogin(false); // ✅ Also handle loading off in case of error
   }
 };
 
@@ -88,7 +88,6 @@ console.log(access)
 
   return (
     <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-      {loading ? <Loader/> :
       <Card style={{ width: '100%', maxWidth: '400px' }} className="p-4 shadow">
         <Card.Body>
           <div className="text-center mb-4">
@@ -134,12 +133,18 @@ console.log(access)
             </Form.Group>
 
 
-            <Button type="submit" variant="primary" className="w-100">
-              {login ? "Please Wait..." : "Sign In"}
-            </Button>
+<Button 
+  type="submit" 
+  variant="primary" 
+  className="w-100" 
+  disabled={login} // disables when login is true
+>
+  {login ? "Please Wait..." : "Sign In"}
+</Button>
+
           </Form>
         </Card.Body>
-      </Card>}
+      </Card>
     </Container> 
   );
 }
