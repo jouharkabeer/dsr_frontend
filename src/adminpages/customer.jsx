@@ -33,6 +33,7 @@ function CustomerPage() {
         },
       });
       setCustomers(res.data);
+      console.log(res.data)
       setLoading(false)
     } catch (err) {
       console.error('Failed to fetch customers:', err);
@@ -124,6 +125,11 @@ console.log(form.view_all)
       headerName: 'View for all salesman',
       width : 150, 
       renderCell: (params) => (params.value ? 'Yes' : 'No'),
+    },
+    {
+      field: 'creater_name',
+      headerName: 'Created By',
+      width: 150,
     },
     {
       field: 'is_active',

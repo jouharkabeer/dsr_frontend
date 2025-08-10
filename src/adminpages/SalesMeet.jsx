@@ -42,16 +42,10 @@ console.log(salesmeet)
 
   const columns = [
     { field: 'customer_name', headerName: 'Customer Name', width : 150,  },
-    { field: 'salesman_name', headerName: 'salesman Name', width : 150,  },
+    { field: 'salesman_name', headerName: 'Salesman Name', width : 150,  },
     { field: 'timber_material_name', headerName: 'Timber Materials', width : 150,  },
     { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150,  },
     { field: 'remarks', headerName: 'Remarks', width:150 },
-    {
-      field: 'meeting_status',
-      headerName: 'Meeted',
-      width : 80,
-      renderCell: (params) => (params.value ? '✅ Yes' : '❌ No'),
-    },
     {
       field: 'payment_collected',
       headerName: 'Payment Collected',
