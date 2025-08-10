@@ -7,11 +7,14 @@ import { Api } from './api';
 import logo from './assets/logo.png'
 import Loader from './components/Loader';
 import { BiShow, BiHide } from "react-icons/bi";
+import './index.css'
 
 function Login() {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState('');
+  const [consolerr, setConsolerr] = useState('');
   const [loading, setLoading] = useState(false);
   const [login, setLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -76,7 +79,10 @@ console.log(access)
         alert('Unknown user type!');
       }
     } catch (error) {
-      alert('Invalid login credentials');
+      // setConsolerr(error.response.data.detail)
+      console.log(error.response.data)
+      setLogin(false)
+      setErrors('Invalid Login Credentials')
     }
   };
 
@@ -121,6 +127,10 @@ console.log(access)
               {showPassword ? <BiHide /> : <BiShow />}
             </Button>
           </InputGroup>
+                <div className='errorclass'>
+                  {errors}
+                  {/* {consolerr} */}
+                </div>
             </Form.Group>
 
 
