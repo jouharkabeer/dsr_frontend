@@ -102,7 +102,7 @@ function SalesPage() {
     fetchSales();
     fetchOptions();
   }, [filter]);
-console.log(form, selectedPaymentMethod)
+
 const handleSave = async () => {
   const url = editSales
     ? `${Api}/sales/update_SalesWeb/${editSales.id}/`
@@ -175,7 +175,6 @@ const handleSave = async () => {
 
   const toggleStatus = async (id, action) => {
     try {
-      console.log(id)
       await axios.delete(`${Api}/sales/${action}_SalesWeb/${id}/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
       });
@@ -187,11 +186,10 @@ const handleSave = async () => {
     }
   };
 
-  console.log(sales)
   
 const handleShowModal = (row) => {
   setEditSales(row);
-console.log(row)
+
   setForm({
     customer: row.customer || '',
     salesman: row.salesman || '',
@@ -268,7 +266,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
     { field: 'customer_name', headerName: 'Customer', width : 150,  },
     { field: 'salesman_name', headerName: 'Salesman', width : 150,  },
     { field: 'order_value', headerName: 'Order Value', width : 150,  },
-    { field: 'soa_amount', headerName: 'Soa Outstanting', width : 150,  },
+    { field: 'soa_amount', headerName: 'Outstanting Soa Amount', width : 150,  },
     { field: 'payment_recieved', headerName: 'Payment Recived', width : 150,  },
     { field: 'due_amount', headerName: 'Due Amount', width : 150,  },
     { field: 'next_meeting_date', headerName : 'Appointment Date', width : 150,  },
@@ -418,7 +416,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                 <Row className='mb-2'>
                   <Col md={6}>
                     <Form.Group>
-                  <Form.Label>salesman</Form.Label>
+                  <Form.Label>Salesman</Form.Label>
                   <Form.Select
                     value={form.salesman}
                     onChange={(e) => setForm({ ...form, salesman: e.target.value })}
@@ -576,7 +574,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                 ))}
                 </Row>
                 <Row className='mb-2'>
-                  <Col md={6}>
+                  <Col md={4}>
                   <Form.Group className="mb-2">
                   <Form.Label>Order Value</Form.Label>
                   <Form.Control
@@ -586,9 +584,19 @@ if (row.hardwarematerials && row.hardware_material_name) {
                   />
                 </Form.Group>
                   </Col>
-                                    <Col md={6}>
+                                    <Col md={4}>
                   <Form.Group className="mb-2">
-                  <Form.Label>Soa Amount</Form.Label>
+                  <Form.Label>Received Amount</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={form.payment_recieved || ''}
+                    onChange={(e) => setForm({ ...form, payment_recieved: e.target.value })}
+                  />
+                </Form.Group>
+                  </Col>
+                                    <Col md={4}>
+                  <Form.Group className="mb-2">
+                  <Form.Label>OutStanding Soa Amount</Form.Label>
                   <Form.Control
                     type="number"
                     value={form.soa_amount || ''}
@@ -605,9 +613,21 @@ if (row.hardwarematerials && row.hardware_material_name) {
         key={method}
         variant={selectedPaymentMethod === method ? 'primary' : 'outline-primary'}
         onClick={() => {
-          setSelectedPaymentMethod(method);
-          setForm((prevForm) => ({ ...prevForm, mode_of_collection: method }));
-        }}
+  setSelectedPaymentMethod(method);
+
+  setForm((prevForm) => {
+    const clearedForm = { ...prevForm };
+
+    ['cash', 'pdc', 'cdc', 'tt'].forEach(m => {
+      clearedForm[`expected_${m}`] = '';
+      clearedForm[`collected_${m}`] = '';
+    });
+
+    clearedForm.mode_of_collection = method;
+    return clearedForm;
+  });
+}}
+
       >
         {method.toUpperCase()}
       </Button>

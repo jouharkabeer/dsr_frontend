@@ -111,65 +111,89 @@ function UserPage() {
   };
 console.log(form)
 
-  const handleSave = async () => {
+const handleSave = async () => {
+  const errors = [];
 
-     if (!editUser) {
-    // Check password match
-    if (form.password !== form.confirm_password) {
-      setError('Passwords do not match.');
-      return;
+  // Required fields check
+  if (!form.first_name?.trim()) errors.push('First name is required.');
+  if (!form.last_name?.trim()) errors.push('Last name is required.');
+  if (!form.email?.trim()) errors.push('Email is required.');
+  if (!form.username?.trim()) errors.push('Username is required.');
+  if (!form.user_type?.trim()) errors.push('User type is required.');
+  if (!form.branch?.trim()) errors.push('Branch is required.');
+
+  // If creating user, check password fields
+  if (!editUser) {
+    if (!form.password) errors.push('Password is required.');
+    if (!form.confirm_password) errors.push('Confirm password is required.');
+
+    if (form.password && form.confirm_password && form.password !== form.confirm_password) {
+      errors.push('Passwords do not match.');
     }
 
     // Password strength regex
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-    if (!passwordRegex.test(form.password)) {
-      setError(
+    if (form.password && !passwordRegex.test(form.password)) {
+      errors.push(
         'Password must be at least 8 characters long, contain 1 uppercase letter, 1 number, and 1 special character.'
       );
-      return;
     }
   }
-    const payload = {
-      first_name: form.first_name,
-      last_name: form.last_name,
-      email: form.email,
-      username: form.username,
-      user_type: form.user_type,
-      branch: form.branch,
-    };
 
-    if (!editUser) {
-      payload.password = form.password;
-    }
+  // If any errors, show combined error and return
+  if (errors.length > 0) {
+    setError(errors.join(' | '));
+    return;
+  }
 
-    const url = editUser
-      ? `${Api}/user/update_User/${editUser.id}/`
-      : `${Api}/user/create_User/`;
-    const method = editUser ? 'put' : 'post';
+  // Clear previous error before API call
+  setError('');
 
-    try {
-      await axios({
-        method,
-        url,
-        data: payload,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      setShowModal(false);
-      fetchUsers();
-      showToast.success(`Sucessfully ${editUser ? 'Edited' : 'Created'} ${form.first_name}`)
-    } catch (err) {
-      showToast.error(`Failed to ${editUser ? 'Edit' : 'Create'}  ${form.first_name}`)
-      // setError(err.response.data.username || err.response.data.email || "an error occured")
-      const errors = [];
-if (err.response?.data?.username) errors.push(err.response.data.username);
-if (err.response?.data?.email) errors.push(err.response.data.email);
-
-setError(errors.join(' | ') || "An error occurred");
-      console.error('Failed to save user:', err.response.data.username);
-    }
+  // Prepare payload
+  const payload = {
+    first_name: form.first_name,
+    last_name: form.last_name,
+    email: form.email,
+    username: form.username,
+    user_type: form.user_type,
+    branch: form.branch,
   };
+
+  if (!editUser) {
+    payload.password = form.password;
+  }
+
+  const url = editUser
+    ? `${Api}/user/update_User/${editUser.id}/`
+    : `${Api}/user/create_User/`;
+  const method = editUser ? 'put' : 'post';
+
+  try {
+    await axios({
+      method,
+      url,
+      data: payload,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    setShowModal(false);
+    fetchUsers();
+    showToast.success(`Successfully ${editUser ? 'Edited' : 'Created'} ${form.first_name}`);
+  } catch (err) {
+    showToast.error(`Failed to ${editUser ? 'Edit' : 'Create'} ${form.first_name}`);
+
+    const apiErrors = [];
+    if (err.response?.data?.username) apiErrors.push(err.response.data.username);
+    if (err.response?.data?.email) apiErrors.push(err.response.data.email);
+
+    setError(apiErrors.join(' | ') || "An error occurred");
+    console.error('Failed to save user:', err.response?.data);
+  }
+};
+
+
+
 const userid = localStorage.getItem('user_id')
 
 

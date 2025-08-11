@@ -37,157 +37,268 @@ function SalesManCollectionForcastReport() {
       });
       setSalesmans(res2.data)
       setLoading(false)
-      console.log(salesmans)
     } catch (err) {
       console.error('Failed to fetch customer data:', err);
     }
     }
 
-const fetchColletionReport = async () => {
+const ResetReport = () => {
+  const newFilters = { start_date: "", end_date: "" };
+
+  setFilters(newFilters);
+  setDateRange([null, null]);
+
+  fetchColletionReport(newFilters); // pass directly
+};
+
+const fetchColletionReport = async (customFilters = filters) => {
   try {
     const cid = localStorage.getItem('user_id')
-    // setLoading(true)
+    setLoading(true);
     const res = await axios.get(`${Api}/sales/admin/collection-report-by-date/`, {
       params: {
-        start_date: filters.start_date,
-        end_date: filters.end_date,
+        start_date: customFilters.start_date,
+        end_date: customFilters.end_date,
         sales_id: cid,
       },
       headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
     });
-    console.log(params)
 
     setFilteredData(res.data);
-    setLoading(false)
   } catch (err) {
     console.error("Error fetching report:", err);
+  } finally {
+    setLoading(false);
   }
 };
 
-  useEffect(() => {
+
+const applyFilters = () => {
+  if (
+    (filters.start_date && filters.end_date) || 
+    (!filters.start_date && !filters.end_date) )
+    {
     fetchColletionReport();
-    fetchsalesman();
-  }, []);
-
-
-console.log(filteredData)
-
-
-const downloadExcel = () => {
-  // Convert filtered data to worksheet
-  const worksheetData = filteredData.map((row, index) => ({
-    'S.No': index + 1,
-    'Customer': row.customer_name,
-    'Salesman': row.salesman_name,
-    'Branch': row.branch_code,
-    'Mode of Collection': row.payment_method_name,
-    'Expected Collection': row.expected_payment_amount,
-    'Expected Date': row.expected_payment_date,
-  }));
-
-  const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Collection Forecast Report');
-
-  const excelBuffer = XLSX.write(workbook, {
-    bookType: 'xlsx',
-    type: 'array',
-  });
-
-  const blob = new Blob([excelBuffer], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
-
-  saveAs(blob, `Collection_forecast_Report.xlsx`);
+  } else {
+    showToast.error("Please select both dates");
+  }
 };
 
-const ResetReport = () =>{
-  setFilters ({start_date: "", end_date: ""})
-  setDateRange([null, null]); 
-  fetchColletionReport()
-}
+const downloadExcel = () => {
+  // Prepare data with S.No and keys
+  const worksheetData = filteredData.map((row, index) => ({
+    'S.No': index + 1,
+    'Branch': row.branch_code,
+    'Customer': row.customer_name,
+    'Total Outstanding as per SOA': row.soa_amount || 0,
+    'Expected Collection': row.expected_payment_amount || 0,
+    'Expected Date': row.expected_payment_date || "",
+    'Mode of Collection': row.mode_of_collection || "",
+    'Expected PDC': row.expected_pdc || 0,
+    'Expected CDC': row.expected_cdc || 0,
+    'Expected TT': row.expected_tt || 0,
+    'Expected Cash': row.expected_cash || 0,
+    'Collected PDC': row.collected_pdc || 0,
+    'Collected CDC': row.collected_cdc || 0,
+    'Collected TT': row.collected_tt || 0,
+    'Collected Cash': row.collected_cash || 0,
+  }));
+
+  const headers = Object.keys(worksheetData[0]);
+  const dataRows = worksheetData.map(obj => Object.values(obj));
+
+  // Add totals row placeholder
+  const totalRow = new Array(headers.length).fill("");
+  totalRow[0] = "Total";
+
+  const dataWithTitle = [
+    ["Collection Forecast Report"], // Title merged across columns
+    headers,
+    ...dataRows,
+    totalRow
+  ];
+
+  const worksheet = XLSX.utils.aoa_to_sheet(dataWithTitle);
+
+  // Merge title across all header columns
+  const colCount = headers.length;
+  worksheet["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: colCount - 1 } }, // Title row merge
+    { s: { r: dataRows.length + 2, c: 0 }, e: { r: dataRows.length + 2, c: 3 } } // Total label merge
+  ];
+
+  // Calculate total row index (0-based)
+  const totalRowIndex = dataRows.length + 2;
+
+  // Columns to sum
+  const sumCols = [
+    'Total Outstanding as per SOA',
+    'Expected Collection',
+    'Expected CDC',
+    'Expected PDC',
+    'Expected Cash',
+    'Expected TT',
+    'Collected CDC',
+    'Collected PDC',
+    'Collected Cash',
+    'Collected TT'
+  ];
+
+  // Write total values directly (pre-calculated)
+  sumCols.forEach(colName => {
+    const colIndex = headers.indexOf(colName);
+    if (colIndex === -1) return;
+
+    // Sum values from worksheetData by column name
+    const totalValue = worksheetData.reduce((sum, row) => {
+      const val = Number(row[colName]) || 0;
+      return sum + val;
+    }, 0);
+
+    const cellRef = XLSX.utils.encode_cell({ r: totalRowIndex, c: colIndex });
+    worksheet[cellRef] = {
+      v: totalValue,
+      t: "n",
+      s: { font: { bold: true } }
+    };
+  });
+
+  // Style the title row
+  worksheet["A1"].s = { font: { bold: true, sz: 18 }, alignment: { horizontal: "center", vertical: "center" } };
+
+  // Define colors for header groups
+  const yellowHeaders = ["Expected PDC", "Expected CDC", "Expected TT", "Expected Cash"];
+  const greenHeaders = ["Collected PDC", "Collected CDC", "Collected TT", "Collected Cash"];
+
+  // Style header row (row 2 in Excel, zero-based row 1)
+  headers.forEach((header, colIdx) => {
+    const cellAddress = XLSX.utils.encode_cell({ r: 1, c: colIdx });
+    if (!worksheet[cellAddress]) return; // safety check
+
+    worksheet[cellAddress].s = {
+      font: { bold: true },
+      alignment: { horizontal: "center", vertical: "center" },
+      fill: yellowHeaders.includes(header)
+        ? { fgColor: { rgb: "FFFF99" } }
+        : greenHeaders.includes(header)
+          ? { fgColor: { rgb: "CCFFCC" } }
+          : undefined
+    };
+  });
+
+  // Style total row (last row)
+  for (let c = 0; c < headers.length; c++) {
+    const addr = XLSX.utils.encode_cell({ r: totalRowIndex, c });
+    if (!worksheet[addr]) continue;
+    worksheet[addr].s = {
+      font: { bold: true },
+      fill: { fgColor: { rgb: "E0E0E0" } } // light gray background
+    };
+  }
+
+  // Align merged "Total" label to the right
+  const totalLabelCell = XLSX.utils.encode_cell({ r: totalRowIndex, c: 0 });
+  if (worksheet[totalLabelCell]) {
+    worksheet[totalLabelCell].s = {
+      font: { bold: true },
+      alignment: { horizontal: "right", vertical: "center" }
+    };
+  }
+
+  // Auto column widths based on max string length in each column
+  worksheet["!cols"] = headers.map((key) => {
+    const colValues = [key, ...worksheetData.map(row => String(row[key] ?? ""))];
+    const maxLength = Math.max(...colValues.map(v => v.length));
+    return { wch: maxLength + 2 };
+  });
+
+  // Create workbook and append sheet
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Collection Forecast Report");
+
+  // Write workbook to binary array and trigger download
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  saveAs(blob, "Collection_forecast_Report.xlsx");
+};
+
+
+
+
 
 const downloadPDF = () => {
-  const doc = new jsPDF({
-    orientation: 'landscape',
-    unit : 'mm',
-    format : 'a4'
-  });
+  const doc = new jsPDF({ orientation: 'landscape' });
 
-  // Helper to format time
-  const formatTime = (time) =>
-    time ? new Date(time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—';
+  // Main heading
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Collection Forecast Report', doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
 
-  const today = new Date().toISOString().split('T')[0];
+  // Table headers with grouping
+  const head = [
+    [
+      { content: 'S.No', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+      { content: 'Branch', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+      { content: 'Salesman', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+      { content: 'Customer', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+      { content: 'Total Outstanding as per SOA', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+      { content: 'Expected Payment', colSpan: 5, styles: { halign: 'center', fillColor: [255, 255, 153], fontStyle: 'bold' } },
+      { content: 'Collected Payment', colSpan: 4, styles: { halign: 'center', fillColor: [204, 255, 204], fontStyle: 'bold' } }
+    ],
+    [
+      { content: 'Expected PDC', styles: { fillColor: [255, 255, 153] } },
+      { content: 'Expected CDC', styles: { fillColor: [255, 255, 153] } },
+      { content: 'Expected TT', styles: { fillColor: [255, 255, 153] } },
+      { content: 'Expected Cash', styles: { fillColor: [255, 255, 153] } },
+      { content: 'Collected PDC', styles: { fillColor: [204, 255, 204] } },
+      { content: 'Collected CDC', styles: { fillColor: [204, 255, 204] } },
+      { content: 'Collected TT', styles: { fillColor: [204, 255, 204] } },
+      { content: 'Collected Cash', styles: { fillColor: [204, 255, 204] } }
+    ]
+  ];
 
-  // Header
-  doc.setFontSize(14);
-  doc.text('LUMBER WORLD BUILDING MATERIAL TRADING L.L.C', 14, 15);
-  doc.setFontSize(12);
-  doc.text('COLLECTION FORECAST REPORT', 14, 23);
-  // doc.text(`Date: ${dateFilter || today}`, 150, 23, { align: 'right' });
+  // Table body
+  const body = filteredData.map((row, index) => [
+    index + 1,
+    row.branch_code,
+    row.customer_name,
+    row.soa_amount,
+    row.expected_pdc,
+    row.expected_cdc,
+    row.expected_tt,
+    row.expected_cash,
+    row.collected_pdc,
+    row.collected_cdc,
+    row.collected_tt,
+    row.collected_cash
+  ]);
 
-  // Table data
-  const tableData = filteredData.map((item, index) => {
-    const timber = (item.timber_material_name || []).join(', ');
-    const hardware = (item.hardware_material_name || []).join(', ');
-    const saleDateTime = new Date(item.created_at).toLocaleString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-// Output: 24-Jul-2025, 02:35 PM
+  // Totals row
+  const sum = (field) => filteredData.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
 
+  body.push([
+    { content: 'Total', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, '', '', '',
+    { content: sum('soa_amount'), styles: { fontStyle: 'bold' } },
+    { content: sum('expected_pdc'), styles: { fontStyle: 'bold' } },
+    { content: sum('expected_cdc'), styles: { fontStyle: 'bold' } },
+    { content: sum('expected_tt'), styles: { fontStyle: 'bold' } },
+    { content: sum('expected_cash'), styles: { fontStyle: 'bold' } },
+    { content: sum('collected_pdc'), styles: { fontStyle: 'bold' } },
+    { content: sum('collected_cdc'), styles: { fontStyle: 'bold' } },
+    { content: sum('collected_tt'), styles: { fontStyle: 'bold' } },
+    { content: sum('collected_cash'), styles: { fontStyle: 'bold' } }
+  ]);
 
-    return [
-      index + 1,
-      item.customer_name || '—',
-      item.salesman_name || '_',
-      item.call_status || '—',
-      timber || '—',
-      hardware || '—',
-      saleDateTime || '—',
-      item.payment_recieved ? 'Yes' : 'No',
-      item.order_value || '0',
-      item.remarks || '—',
-      formatTime(item.time_in),
-      formatTime(item.time_out),
-    ];
-  });
-
-  // Table
+  // Render table
   autoTable(doc, {
-    head: [[
-      'S.No',
-      'Customer',
-      'Sales Man',
-      'Fresh/Followup',
-      'Timber Materials',
-      'Hardware Materials',
-      'Date',
-      'Payment',
-      'Total O/S',
-      'Remarks',
-      'Time In',
-      'Time Out'
-    ]],
-    body: tableData,
-    startY: 30,
-    styles: { fontSize: 9 },
-    headStyles: {
-      fillColor: [52, 73, 94],
-      textColor: 255,
-      fontStyle: 'bold',
-    },
-    alternateRowStyles: { fillColor: [245, 245, 245] },
-    margin: { left: 14, right: 14 },
+    head: head,
+    body: body,
+    startY: 20,
+    styles: { fontSize: 8, halign: 'center', valign: 'middle' }
   });
 
-  // Save
-  doc.save(`Collection_Report_${today}.pdf`);
+  // Save PDF
+  doc.save('Collection_Forecast_Report.pdf');
 };
 
 
@@ -239,7 +350,7 @@ const downloadPDF = () => {
   />
 </Col>
             <Col md="auto">
-              <Button variant="secondary" onClick={fetchColletionReport}>Apply Filters</Button>
+              <Button variant="secondary" onClick={applyFilters}>Apply Filters</Button>
             </Col>
                         <Col md="auto">
                           <Button variant="danger" onClick={ResetReport}>Reset</Button>

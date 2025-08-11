@@ -1116,7 +1116,9 @@ if (row.hardwarematerials && row.hardware_material_name) {
                   </Col>
                 ))}
                 </Row>
-                                <Form.Group className="mb-2">
+                <Row className='mb-2'>
+                  <Col md={4}>
+                  <Form.Group className="mb-2">
                   <Form.Label>Order Value</Form.Label>
                   <Form.Control
                     type="number"
@@ -1124,6 +1126,28 @@ if (row.hardwarematerials && row.hardware_material_name) {
                     onChange={(e) => setForm({ ...form, order_value: e.target.value })}
                   />
                 </Form.Group>
+                  </Col>
+                                    <Col md={4}>
+                  <Form.Group className="mb-2">
+                  <Form.Label>Received Amount</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={form.payment_recieved || ''}
+                    onChange={(e) => setForm({ ...form, payment_recieved: e.target.value })}
+                  />
+                </Form.Group>
+                  </Col>
+                                    <Col md={4}>
+                  <Form.Group className="mb-2">
+                  <Form.Label>OutStanding Soa Amount</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={form.soa_amount || ''}
+                    onChange={(e) => setForm({ ...form, soa_amount: e.target.value })}
+                  />
+                </Form.Group>
+                  </Col>
+                </Row>
 <Form.Group className="mb-3">
   <Form.Label>Payment Method</Form.Label>
   <div className="d-flex gap-2 flex-wrap">
@@ -1132,9 +1156,21 @@ if (row.hardwarematerials && row.hardware_material_name) {
         key={method}
         variant={selectedPaymentMethod === method ? 'primary' : 'outline-primary'}
         onClick={() => {
-          setSelectedPaymentMethod(method);
-          setForm((prevForm) => ({ ...prevForm, mode_of_collection: method }));
-        }}
+  setSelectedPaymentMethod(method);
+
+  setForm((prevForm) => {
+    const clearedForm = { ...prevForm };
+
+    ['cash', 'pdc', 'cdc', 'tt'].forEach(m => {
+      clearedForm[`expected_${m}`] = '';
+      clearedForm[`collected_${m}`] = '';
+    });
+
+    clearedForm.mode_of_collection = method;
+    return clearedForm;
+  });
+}}
+
       >
         {method.toUpperCase()}
       </Button>
