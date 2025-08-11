@@ -175,7 +175,7 @@ console.log(data)
             <Col className="mb-3">
               <Card style={cardStyle}>
                 <Card.Body>
-                  <Card.Text style={{fontSize: '1rem', textAlign: 'left'}}>Active Salesmens</Card.Text>
+                  <Card.Text style={{fontSize: '1rem', textAlign: 'left'}}>Active Salesmans</Card.Text>
                   <Card.Text style={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'right' }}>
                     {data.salesman_count}
                   </Card.Text>
