@@ -112,10 +112,23 @@ function UserPage() {
 console.log(form)
 
   const handleSave = async () => {
-    if (!editUser && form.password !== form.confirm_password) {
+
+     if (!editUser) {
+    // Check password match
+    if (form.password !== form.confirm_password) {
       setError('Passwords do not match.');
       return;
     }
+
+    // Password strength regex
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    if (!passwordRegex.test(form.password)) {
+      setError(
+        'Password must be at least 8 characters long, contain 1 uppercase letter, 1 number, and 1 special character.'
+      );
+      return;
+    }
+  }
     const payload = {
       first_name: form.first_name,
       last_name: form.last_name,
@@ -148,7 +161,13 @@ console.log(form)
       showToast.success(`Sucessfully ${editUser ? 'Edited' : 'Created'} ${form.first_name}`)
     } catch (err) {
       showToast.error(`Failed to ${editUser ? 'Edit' : 'Create'}  ${form.first_name}`)
-      console.error('Failed to save user:', err);
+      // setError(err.response.data.username || err.response.data.email || "an error occured")
+      const errors = [];
+if (err.response?.data?.username) errors.push(err.response.data.username);
+if (err.response?.data?.email) errors.push(err.response.data.email);
+
+setError(errors.join(' | ') || "An error occurred");
+      console.error('Failed to save user:', err.response.data.username);
     }
   };
 const userid = localStorage.getItem('user_id')
@@ -261,90 +280,6 @@ const userid = localStorage.getItem('user_id')
             </Modal.Header>
             <Modal.Body>
               {error && <Alert variant="danger">{error}</Alert>}
-              {/* <Form>
-
-
-                <Form.Group className="mb-2">
-                  <Form.Label>First Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={form.first_name}
-                    onChange={(e) => setForm({ ...form, first_name: e.target.value })}
-                    required
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-2">
-                  <Form.Label>Last Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={form.last_name}
-                    onChange={(e) => setForm({ ...form, last_name: e.target.value })}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-2">
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    required
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-2">
-                  <Form.Label>Username</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={form.username}
-                    onChange={(e) => setForm({ ...form, username: e.target.value })}
-                    required
-                  />
-                </Form.Group>
-
-                {!editUser && (
-                  <>
-                    <Form.Group className="mb-2">
-                      <Form.Label>Password</Form.Label>
-                      <InputGroup>
-                        <Form.Control
-                          type={showPassword ? 'text' : 'password'}
-                          value={form.password}
-                          onChange={(e) => setForm({ ...form, password: e.target.value })}
-                          required
-                        />
-                        <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>
-                          {showPassword ? <BiHide /> : <BiShow />}
-                        </Button>
-                      </InputGroup>
-                    </Form.Group>
-
-                    <Form.Group className="mb-2">
-                      <Form.Label>Confirm Password</Form.Label>
-                      <Form.Control
-                        type={showPassword ? 'text' : 'password'}
-                        value={form.confirm_password}
-                        onChange={(e) => setForm({ ...form, confirm_password: e.target.value })}
-                        required
-                      />
-                    </Form.Group>
-                  </>
-                )}
-
-                <Form.Group className="mb-2">
-                  <Form.Label>User Type</Form.Label>
-                  <Form.Select
-                    value={form.user_type}
-                    onChange={(e) => setForm({ ...form, user_type: e.target.value })}
-                    required
-                  >
-                    <option value="">Select User Type</option>
-                    {userTypes.map((type) => (
-                      <option key={type.id} value={type.id}>{type.name}</option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-              </Form> */}
 
               <Form>
 
