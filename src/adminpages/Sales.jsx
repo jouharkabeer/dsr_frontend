@@ -420,6 +420,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                   <Form.Select
                     value={form.salesman}
                     onChange={(e) => setForm({ ...form, salesman: e.target.value })}
+                    disabled={editSales}
                   >
                     <option value="">Select Salesman</option>
                     {options.salesman?.map((item) => (
@@ -434,6 +435,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                   <Form.Select
                     value={form.customer}
                     onChange={(e) => setForm({ ...form, customer: e.target.value })}
+                    disabled={editSales}
                   >
                     <option value="">Select Customer</option>
                     {options.customer?.map((item) => (
