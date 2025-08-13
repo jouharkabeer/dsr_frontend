@@ -10,8 +10,6 @@ import { DataGrid } from '@mui/x-data-grid';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
-// import * as XLSX from 'xlsx';
-// import { saveAs } from 'file-saver';
 import XLSX from "xlsx-js-style";
 import { saveAs } from "file-saver";
 import Pdficon from '@mui/icons-material/PictureAsPdfOutlined';

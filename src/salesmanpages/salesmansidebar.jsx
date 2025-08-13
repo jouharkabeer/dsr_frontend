@@ -46,7 +46,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronRight, Menu } from 'lucide-react';
 import './sidebar.css';
 
-function AdminSidebar() {
+function SalemanSidebar() {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openSection, setOpenSection] = useState('');
@@ -98,8 +98,14 @@ function AdminSidebar() {
           {!isCollapsed && 'Sales'}
         </Nav.Link>
         <Nav.Link
+          className={`sidebar-subitem ${isActive('/salesman/sales/dailyreport') ? 'sidebar-subitem-active' : ''}`}
+          as={Link}
+          to="/salesman/sales/dailyreport"
+        >
+          {!isCollapsed && 'Daily Report'}
+        </Nav.Link>
+        <Nav.Link
           className={`sidebar-subitem ${isActive('/salesman/sales/collectionreport') ? 'sidebar-subitem-active' : ''}`}
-          // className={`sidebar-subitem ${isActive('/salesman/sales/collectionreport') ? 'sidebar-subitem-active' : ''}`}
           as={Link}
           to="/salesman/sales/collectionreport"
         >
@@ -110,4 +116,4 @@ function AdminSidebar() {
   );
 }
 
-export default AdminSidebar;
+export default SalemanSidebar;

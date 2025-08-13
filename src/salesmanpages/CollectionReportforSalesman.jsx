@@ -5,17 +5,18 @@ import {
 import axios from 'axios';
 import { Api } from '../api';
 import TopNavbar from '../components/TopNavbar';
-import SalesSidebar from './salesmansidebar';
+import SalesmanSidebar from './salesmansidebar';
 import { DataGrid } from '@mui/x-data-grid';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+import XLSX from "xlsx-js-style";
+import { saveAs } from "file-saver";
 import Pdficon from '@mui/icons-material/PictureAsPdfOutlined';
 import Exelicon from '@mui/icons-material/DatasetOutlined';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { showToast } from '../components/ToastNotify';
 
 
 function SalesManCollectionForcastReport() {
@@ -23,43 +24,27 @@ function SalesManCollectionForcastReport() {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({ start_date: "", end_date: "" });
-  const [salesmans, setSalesmans] = useState([])
   const [dateRange, setDateRange] = useState([null, null]);
 
 
-  const fetchsalesman = async () => {
-    try{
-      setLoading(true)
-      const res2 = await axios.get(`${Api}/user/view_activeSalesman/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`
-        }
-      });
-      setSalesmans(res2.data)
-      setLoading(false)
-    } catch (err) {
-      console.error('Failed to fetch customer data:', err);
-    }
-    }
-
 const ResetReport = () => {
   const newFilters = { start_date: "", end_date: "" };
-
   setFilters(newFilters);
   setDateRange([null, null]);
 
-  fetchColletionReport(newFilters); // pass directly
+  fetchColletionReport(newFilters, newSalesman); // pass directly
 };
 
 const fetchColletionReport = async (customFilters = filters) => {
   try {
-    const cid = localStorage.getItem('user_id')
     setLoading(true);
+    const sid = localStorage.getItem('user_id')
+    console.log(sid)
     const res = await axios.get(`${Api}/sales/admin/collection-report-by-date/`, {
       params: {
         start_date: customFilters.start_date,
         end_date: customFilters.end_date,
-        sales_id: cid,
+        sales_id: sid,
       },
       headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
     });
@@ -76,19 +61,26 @@ const fetchColletionReport = async (customFilters = filters) => {
 const applyFilters = () => {
   if (
     (filters.start_date && filters.end_date) || 
-    (!filters.start_date && !filters.end_date) )
-    {
+    (!filters.start_date && !filters.end_date)
+  ) {
     fetchColletionReport();
   } else {
     showToast.error("Please select both dates");
   }
 };
 
+useEffect(() => {
+  fetchColletionReport(); // initial load
+       // load salesman list
+}, []); // empty dependency array → runs only once
+
+
 const downloadExcel = () => {
   // Prepare data with S.No and keys
   const worksheetData = filteredData.map((row, index) => ({
     'S.No': index + 1,
     'Branch': row.branch_code,
+    'Salesman': row.salesman_name,
     'Customer': row.customer_name,
     'Total Outstanding as per SOA': row.soa_amount || 0,
     'Expected Collection': row.expected_payment_amount || 0,
@@ -225,7 +217,6 @@ const downloadExcel = () => {
 
 
 
-
 const downloadPDF = () => {
   const doc = new jsPDF({ orientation: 'landscape' });
 
@@ -261,6 +252,7 @@ const downloadPDF = () => {
   const body = filteredData.map((row, index) => [
     index + 1,
     row.branch_code,
+    row.salesman_name,
     row.customer_name,
     row.soa_amount,
     row.expected_pdc,
@@ -309,29 +301,32 @@ const downloadPDF = () => {
   width: 70,
   renderCell: (params) => params.api.getAllRowIds().indexOf(params.id)+1
 },
-
-    { field: 'customer_name', headerName: 'Customer', width : 150,  },
-    // { field: 'salesman_name', headerName: 'SalesMan', width : 150,  },
     { field: 'branch_code', headerName: 'Branch', width : 150,  },
-    { field: 'payment_method_name', headerName: 'Mode of Collection', width: 150, },
-    { field: 'quotation_value', headerName: 'Quotation Amount', width: 150, },
+    { field: 'customer_name', headerName: 'Customer Name', width : 150,  },
+    { field: 'soa_amount', headerName: 'Total Outstading Per SOA', width : 150,  },
+    { field: 'expected_payment_date', headerName: 'Expected Date', width : 150,  },
     { field: 'expected_payment_amount', headerName: 'Expected Collection', width: 150, },
-    { field: 'expected_payment_date', headerName: 'Expected Date', width: 150, },
-    { field: 'payment_recieved', headerName: 'Recived Amount', width: 150, },
-    { field: 'due_amount', headerName: 'Due Amount', width: 150, },
-
+    { field: 'mode_of_collection', headerName: 'Mode of Collection', width: 150, },
+    { field: 'expected_pdc', headerName: 'Expected PDC', width: 150, },
+    { field: 'expected_cdc', headerName: 'Expected CDC', width: 150, },
+    { field: 'expected_cash', headerName: 'Expected CASH', width: 150, },
+    { field: 'expected_tt', headerName: 'Expected TT', width: 150, },
+    { field: 'collected_pdc', headerName: 'Collected PDC', width: 150, },
+    { field: 'collected_cdc', headerName: 'Collected CDC', width: 150, },
+    { field: 'collected_cash', headerName: 'Collected CASH', width: 150, },
+    { field: 'collected_tt', headerName: 'Collected TT', width: 150, },
   ];
+
 
   return (
     <div className="d-flex flex-column" style={{ height: '100vh' }}>
       <TopNavbar />
       <div className="d-flex flex-grow-1">
-        <SalesSidebar />
-        {loading ? <Loader/> : 
+        <SalesmanSidebar />
+        {/* {loading ? <Loader/> :  */}
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-end">
             <Col><h5>Collection Forecast Report</h5></Col>
-
             <Col md={3}>
   <DatePicker
     selectsRange
@@ -350,13 +345,13 @@ const downloadPDF = () => {
   />
 </Col>
             <Col md="auto">
-              <Button variant="secondary" onClick={applyFilters}>Apply Filters</Button>
+              <Button variant="warning" onClick={applyFilters}>Apply Filters</Button>
             </Col>
                         <Col md="auto">
                           <Button variant="danger" onClick={ResetReport}>Reset</Button>
                         </Col>
           </Row>
-
+{loading ? <Loader/> : 
           <div style={{ height: 600, width: '100%' }} className="bg-white p-3 rounded shadow-sm">
 
   <Row className="justify-content-end mb-2">
@@ -403,8 +398,8 @@ const downloadPDF = () => {
                 },
               }}
             />
-          </div>
-        </div>}
+          </div>}
+        </div>
       </div>
     </div>
   );

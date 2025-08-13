@@ -5,7 +5,7 @@ import {
 import axios from 'axios';
 import { Api } from '../api';
 import TopNavbar from '../components/TopNavbar';
-import AdminSidebar from './adminsidebar';
+import Salesmansidebar from './salesmansidebar';
 import { DataGrid } from '@mui/x-data-grid';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -13,12 +13,11 @@ import Loader from '../components/Loader';
 import Dowloadicon from '@mui/icons-material/DownloadForOfflineOutlined';
 import Pdficon from '@mui/icons-material/PictureAsPdfOutlined';
 
-function DailySalesReportPage() {
+function DailySalesManReportPage() {
   const newtoday =  new Date().toISOString().split('T')[0];
   const [salesData, setSalesData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [dateFilter, setDateFilter] = useState(newtoday);
-  const [salesmanfilter, setSalesmanfilter] = useState();
   const [customerFilter, setCustomerFilter] = useState('');
   const [loading, setLoading] = useState(true)
 
@@ -26,10 +25,11 @@ function DailySalesReportPage() {
   const fetchReport = async () => {
   try {
     setLoading(true);
+    const sid = localStorage.getItem('user_id')
     const res = await axios.get(`${Api}/sales/admin/report/`, {
         params: {
         date: dateFilter,
-        sales_id: salesmanfilter,
+        sales_id: sid,
       },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('access_token')}`
@@ -39,15 +39,9 @@ function DailySalesReportPage() {
     const fetchedData = res.data;
     setSalesData(fetchedData);
 
-    let result = fetchedData; // use fetched data directly
-console.log(fetchedData)
-    if (dateFilter) {
-      result = fetchedData.filter((item) =>
-        item.created_at?.startsWith(dateFilter)
-      );
-    }
 
-    setFilteredData(result);
+
+    setFilteredData(fetchedData);
   } catch (err) {
     console.error('Failed to fetch sales data:', err);
   } finally {
@@ -62,7 +56,8 @@ console.log(fetchedData)
 
   const ResetSales = () => {
     setDateFilter('')
-    setFilteredData(salesData)
+    // setFilteredData(salesData)
+    fetchReport()
   }
 
   const filterSales = () => {
@@ -176,7 +171,6 @@ const downloadPDF = () => {
 },
 
     { field: 'customer_name', headerName: 'Customer', width : 150,  },
-    { field: 'salesman_name', headerName: 'SalesMan', width : 150,  },
     { field: 'call_status', headerName: 'Fresh/Followup', flex: 1 },
 
 
@@ -222,7 +216,7 @@ const downloadPDF = () => {
     <div className="d-flex flex-column" style={{ height: '100vh' }}>
       <TopNavbar />
       <div className="d-flex flex-grow-1">
-        <AdminSidebar />
+        <Salesmansidebar />
         {loading ? <Loader/> : 
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-end">
@@ -237,17 +231,7 @@ const downloadPDF = () => {
                 />
               </Form.Group>
             </Col>
-            {/* <Col md={3}>
-              <Form.Group>
-                <Form.Label>Customer</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Search Customer"
-                  value={customerFilter}
-                  onChange={(e) => setCustomerFilter(e.target.value)}
-                />
-              </Form.Group>
-            </Col> */}
+
             <Col md="auto">
               <Button variant="warning" onClick={filterSales}>Apply Date</Button>
             </Col>
@@ -298,4 +282,4 @@ const downloadPDF = () => {
   );
 }
 
-export default DailySalesReportPage;
+export default DailySalesManReportPage;

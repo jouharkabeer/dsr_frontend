@@ -41,7 +41,6 @@ function SalesPage() {
     next_meeting_date: null,
     payment_recieved: null,
     final_due_date: null,
-    order_value: null,
     soa_amount: null,
     remarks: null,
   });
@@ -154,7 +153,6 @@ const handleSave = async () => {
 
       final_due_date: null,
 
-      order_value: null,
       soa_amount: null,
     expected_pdc: '', collected_pdc: '',
     expected_cash: '', collected_cash: '',
@@ -203,7 +201,6 @@ const handleShowModal = (row) => {
     payment_recieved: row.payment_recieved || null,
     final_due_date: row.final_due_date || null,
 
-    order_value: row.order_value || '',
     soa_amount: row.soa_amount || '',
     expected_pdc: row.expected_pdc || '', 
     collected_pdc: row.collected_pdc || '',
@@ -265,7 +262,6 @@ if (row.hardwarematerials && row.hardware_material_name) {
   const columns = [
     { field: 'customer_name', headerName: 'Customer', width : 150,  },
     { field: 'salesman_name', headerName: 'Salesman', width : 150,  },
-    { field: 'order_value', headerName: 'Order Value', width : 150,  },
     { field: 'soa_amount', headerName: 'Outstanting Soa Amount', width : 150,  },
     { field: 'payment_recieved', headerName: 'Payment Recived', width : 150,  },
     { field: 'due_amount', headerName: 'Due Amount', width : 150,  },
@@ -576,17 +572,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                 ))}
                 </Row>
                 <Row className='mb-2'>
-                  <Col md={4}>
-                  <Form.Group className="mb-2">
-                  <Form.Label>Order Value</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={form.order_value || ''}
-                    onChange={(e) => setForm({ ...form, order_value: e.target.value })}
-                  />
-                </Form.Group>
-                  </Col>
-                                    <Col md={4}>
+                                    <Col md={8}>
                   <Form.Group className="mb-2">
                   <Form.Label>Received Amount</Form.Label>
                   <Form.Control
@@ -596,7 +582,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                   />
                 </Form.Group>
                   </Col>
-                                    <Col md={4}>
+                                    <Col md={8}>
                   <Form.Group className="mb-2">
                   <Form.Label>OutStanding Soa Amount</Form.Label>
                   <Form.Control
