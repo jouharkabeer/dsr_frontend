@@ -16,20 +16,16 @@ import Pdficon from '@mui/icons-material/PictureAsPdfOutlined';
 function DailySalesReportPage() {
   const newtoday =  new Date().toISOString().split('T')[0];
   const [salesData, setSalesData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [dateFilter, setDateFilter] = useState(newtoday);
-  const [salesmanfilter, setSalesmanfilter] = useState();
-  const [customerFilter, setCustomerFilter] = useState('');
   const [loading, setLoading] = useState(true)
 
   
-  const fetchReport = async () => {
+  const fetchReport = async (date = dateFilter) => {
   try {
     setLoading(true);
     const res = await axios.get(`${Api}/sales/admin/report/`, {
         params: {
-        date: dateFilter,
-        sales_id: salesmanfilter,
+        date: date,
       },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('access_token')}`
@@ -39,15 +35,6 @@ function DailySalesReportPage() {
     const fetchedData = res.data;
     setSalesData(fetchedData);
 
-    let result = fetchedData; // use fetched data directly
-console.log(fetchedData)
-    if (dateFilter) {
-      result = fetchedData.filter((item) =>
-        item.created_at?.startsWith(dateFilter)
-      );
-    }
-
-    setFilteredData(result);
   } catch (err) {
     console.error('Failed to fetch sales data:', err);
   } finally {
@@ -56,30 +43,16 @@ console.log(fetchedData)
 };
 
 
-  useEffect(() => {
-    fetchReport();
-  }, []);
+useEffect(() => {
+  fetchReport(dateFilter);   // <-- always use the latest state value
+}, [dateFilter]);             // <-- trigger whenever dateFilter changes
 
-  const ResetSales = () => {
-    setDateFilter('')
-    setFilteredData(salesData)
-  }
 
-  const filterSales = () => {
-    let result = [...salesData];
-    if (dateFilter) {
-      result = result.filter((item) =>
-        item.created_at?.startsWith(dateFilter)
-      );
-    }
-    if (customerFilter.trim()) {
-      result = result.filter((item) =>
-        item.customer_name?.toLowerCase().includes(customerFilter.toLowerCase())
-      );
-    }
-    setFilteredData(result);
-  };
 
+const ResetSales = () => {
+  const newDateFilter = '';
+  setDateFilter(newDateFilter);
+};
 
 
 const downloadPDF = () => {
@@ -103,7 +76,7 @@ const downloadPDF = () => {
   doc.text(`Date: ${dateFilter || today}`, 150, 23, { align: 'right' });
 
   // Table data
-  const tableData = filteredData.map((item, index) => {
+  const tableData = salesData.map((item, index) => {
     const timber = (item.timber_material_name || []).join(', ');
     const hardware = (item.hardware_material_name || []).join(', ');
     const saleDateTime = new Date(item.created_at).toLocaleString('en-IN', {
@@ -248,9 +221,9 @@ const downloadPDF = () => {
                 />
               </Form.Group>
             </Col> */}
-            <Col md="auto">
-              <Button variant="warning" onClick={filterSales}>Apply Date</Button>
-            </Col>
+            {/* <Col md="auto">
+              <Button variant="warning" onClick={fetchReport()}>Apply Date</Button>
+            </Col> */}
             <Col md="auto">
               <Button variant="danger" onClick={ResetSales}>Reset</Button>
             </Col>
@@ -271,7 +244,7 @@ const downloadPDF = () => {
   </Col>
   </Row>
                         <DataGrid
-                          rows={filteredData}
+                          rows={salesData}
                           columns={columns}
                           getRowId={(row) => row.id}
                           initialState={{
