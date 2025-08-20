@@ -262,7 +262,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
     { field: 'salesman_name', headerName: 'Salesman', width : 150,  },
     { field: 'payment_recieved', headerName: 'Payment Recived', width : 150,  },
     { field: 'due_amount', headerName: 'Due Amount', width : 150,  },
-    { field: 'next_meeting_date', headerName : 'Appointment Date', width : 150,  },
+    { field: 'next_meeting_date', headerName : 'Follow-up Date', width : 150,  },
     { field: 'timber_material_name', headerName: 'Timber Materials', width : 150,  },
     { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150,  },
 {
@@ -632,7 +632,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
 
                <Row className='mb-2'>
                   <Col md={4}>
-                    <Form.Label>Appoinment Date</Form.Label>
+                    <Form.Label>Follow-up Date</Form.Label>
                     <Form.Control
                       type="date"
                       value={form.next_meeting_date || ''}
