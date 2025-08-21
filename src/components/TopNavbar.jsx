@@ -76,7 +76,7 @@ function TopNavbar() {
   const navigationdashboard = () => {
     if (usertype === 'SuperAdmin') {
         navigate('/admin/dashboard');
-      } else if (usertype === 'Salesman') {
+      } else if (usertype === 'Sales Person') {
         navigate('/salesman/dashboard');
       } else {
         console.error('Unknown user type!');

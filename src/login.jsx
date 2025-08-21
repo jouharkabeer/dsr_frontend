@@ -35,7 +35,7 @@ const Tokenvaliditychecker = async () => {
       const userrtype = localStorage.getItem('user_type');
       if (userrtype === 'SuperAdmin') {
         navigate('/admin/dashboard');
-      } else if (userrtype === 'Salesman') {
+      } else if (userrtype === 'Sales Person') {
         navigate('/salesman/dashboard');
       } else {
         alert('Unknown user type!');
@@ -73,7 +73,7 @@ const Tokenvaliditychecker = async () => {
 console.log(access)
       if (usertype === 'SuperAdmin') {
         navigate('/admin/dashboard');
-      } else if (usertype === 'Salesman') {
+      } else if (usertype === 'Sales Person') {
         navigate('/salesman/dashboard');
       } else {
         alert('Unknown user type!');
