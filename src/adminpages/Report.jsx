@@ -185,6 +185,11 @@ const downloadPDF = () => {
       renderCell: (params) => params.value ? new Date(params.value).toLocaleTimeString() : ''
     },
     {
+      field: 'location_name',
+      headerName: 'Location',
+      width : 150
+    },
+    {
       field: 'remarks',
       headerName: 'Outcome of the call',
       width : 150
