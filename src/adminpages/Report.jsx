@@ -14,7 +14,7 @@ import Dowloadicon from '@mui/icons-material/DownloadForOfflineOutlined';
 import Pdficon from '@mui/icons-material/PictureAsPdfOutlined';
 
 function DailySalesReportPage() {
-  const newtoday =  new Date().toISOString().split('T')[0];
+  const newtoday =  new Date().toLocaleDateString("en-CA").split('T')[0];
   const [salesData, setSalesData] = useState([]);
   const [dateFilter, setDateFilter] = useState(newtoday);
   const [loading, setLoading] = useState(true)
@@ -66,7 +66,7 @@ const downloadPDF = () => {
   const formatTime = (time) =>
     time ? new Date(time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—';
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString("en-CA").split('T')[0];
 
   // Header
   doc.setFontSize(14);

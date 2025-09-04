@@ -14,7 +14,7 @@ import Dowloadicon from '@mui/icons-material/DownloadForOfflineOutlined';
 import Pdficon from '@mui/icons-material/PictureAsPdfOutlined';
 
 function DailySalesManReportPage() {
-  const newtoday =  new Date().toISOString().split('T')[0];
+  const newtoday =  new Date().toLocaleDateString("en-CA").split('T')[0];
   const [salesData, setSalesData] = useState([]);
   const [dateFilter, setDateFilter] = useState(newtoday);
   const [loading, setLoading] = useState(true)
@@ -67,13 +67,14 @@ const downloadPDF = () => {
   const formatTime = (time) =>
     time ? new Date(time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—';
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString("en-CA").split('T')[0];
   const usermane = localStorage.getItem('login_name')
   // Header
   doc.setFontSize(14);
   doc.text('LUMBER WORLD BUILDING MATERIAL TRADING L.L.C', 14, 15);
   doc.setFontSize(12);
-  doc.text(`DAILY SALES REPORT by ${usermane}`, 14, 23);
+  doc.text(`DAILY SALES REPORT`, 14, 22);
+  doc.text(`${usermane}`, 14, 29);
   doc.text(`Date: ${dateFilter || today}`, 150, 23, { align: 'right' });
 
   // Table data
@@ -122,7 +123,7 @@ const downloadPDF = () => {
       'Time Out'
     ]],
     body: tableData,
-    startY: 30,
+    startY: 33,
     styles: { fontSize: 9 },
     headStyles: {
       fillColor: [52, 73, 94],

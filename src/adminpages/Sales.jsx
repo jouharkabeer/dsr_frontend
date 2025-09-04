@@ -21,15 +21,15 @@ import { showToast } from '../components/ToastNotify';
 function SalesPage() {
   const [sales, setSales] = useState([]);
   const [filter, setFilter] = useState('all');
-  const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editSales, setEditSales] = useState(null);
   const [form, setForm] = useState({
+    id: '',
     customer: '',
     salesman: '',
     call_status: '',
     prospect: '',
-
+    collected_amount_now: '',
     expected_pdc: '', collected_pdc: '',
     expected_cash: '', collected_cash: '',
     expected_cdc: '', collected_cdc: '',
@@ -54,14 +54,17 @@ function SalesPage() {
   const [timberCategories, setTimberCategories] = useState([]);
   const [timberMaterials, setTimberMaterials] = useState([]);
   const [selectedTimberMaterials, setSelectedTimberMaterials] = useState([]);
-
+  const [selectedTimberCategories, setSelectedTimberCategories] = useState([]);
+  const [selectedHardwareCategories, setSelectedHardwareCategories] = useState([]);
+  
+  const [methodLocked, setMethodLocked] = useState(false);
+setSelectedTimberCategories
   const [isHardware, setIsHardware] = useState(false);
   const [loading, setLoading] = useState(true);
   const [hardwareCategories, setHardwareCategories] = useState([]);
   const [hardwareMaterials, setHardwareMaterials] = useState([]);
   const [selectedHardwareMaterials, setSelectedHardwareMaterials] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
-
   const fetchOptions = async () => {
     // setLoading(true)
     const endpoints = {
@@ -97,10 +100,21 @@ function SalesPage() {
     setLoading(false)
   };
 
-  useEffect(() => {
-    fetchSales();
-    fetchOptions();
-  }, [filter]);
+// 🔹 Fetch data only when filter changes
+useEffect(() => {
+  fetchSales();
+  fetchOptions();
+}, [filter]);
+
+// 🔹 Lock/unlock payment method only when editSales changes
+useEffect(() => {
+  if (editSales) {
+    setMethodLocked(!!editSales.mode_of_collection);
+  } else {
+    setMethodLocked(false);
+  }
+}, [editSales]);
+
 
 const handleSave = async () => {
   const url = editSales
@@ -113,10 +127,13 @@ const handleSave = async () => {
     paymentData[`expected_${selectedPaymentMethod}`] = form[`expected_${selectedPaymentMethod}`];
     paymentData[`collected_${selectedPaymentMethod}`] = form[`collected_${selectedPaymentMethod}`];
   }
-
+console.log(selectedTimberMaterials.map((m) => m.value))
+console.log(selectedHardwareCategories, selectedTimberCategories)
   const payload = {
     ...form,
     ...paymentData,
+    timbercategories: selectedTimberCategories.map((m) => m.value),
+    hardwarecategories: selectedHardwareCategories.map((m) => m.value),
     timbermaterials: selectedTimberMaterials.map((m) => m.value),
     hardwarematerials: selectedHardwareMaterials.map((m) => m.value),
   };
@@ -142,6 +159,7 @@ const handleSave = async () => {
   const formreset = async => {
     // setForm(null)
      setForm({
+      id: '',
       customer: '',
       salesman: '',
       call_status: '',
@@ -150,6 +168,7 @@ const handleSave = async () => {
       mode_of_collection: null,
       expected_payment_date: null,
       next_meeting_date: null,
+      collected_amount_now: null,
 
       final_due_date: null,
 
@@ -165,6 +184,8 @@ const handleSave = async () => {
     setTimberCategories([]);
     setHardwareCategories([]);
     setSelectedTimberMaterials([]);
+    setSelectedTimberCategories([]);
+    setSelectedHardwareCategories([]);
     setSelectedHardwareMaterials([]);
     setTimberMaterials([]);
     setHardwareMaterials([]);
@@ -187,8 +208,8 @@ const handleSave = async () => {
   
 const handleShowModal = (row) => {
   setEditSales(row);
-
   setForm({
+    id : row.id || '',
     customer: row.customer || '',
     salesman: row.salesman || '',
     call_status: row.call_status || '',
@@ -200,18 +221,30 @@ const handleShowModal = (row) => {
     next_meeting_date: row.next_meeting_date || null,
     payment_recieved: row.payment_recieved || null,
     final_due_date: row.final_due_date || null,
-
+    collected_amount_now : '',
     soa_amount: row.soa_amount || '',
-    expected_pdc: row.expected_pdc || '', 
-    collected_pdc: row.collected_pdc || '',
-    expected_cash:row.expected_cash || '', 
-    collected_cash: row.collected_cash ||'',
-    expected_cdc:row.expected_cdc || '', 
-    collected_cdc: row.collected_cdc ||'',
-    expected_tt:row.expected_tt || '', 
-    collected_tt: row.collected_tt ||'',
+
     remarks: row.remarks || '',
+      collected_amount_now: '',
+  expected_cash: row.expected_cash || '',
+  collected_cash: row.collected_cash || '',
+  original_cash: row.collected_cash || 0,   // 🔹 keep original separately
+  expected_pdc: row.expected_pdc || '',
+  collected_pdc: row.collected_pdc || '',
+  original_pdc: row.collected_pdc || 0,     // 🔹 same for others
+  expected_cdc: row.expected_cdc || '',
+  collected_cdc: row.collected_cdc || '',
+  original_cdc: row.collected_cdc || 0,
+  expected_tt: row.expected_tt || '',
+  collected_tt: row.collected_tt || '',
+  original_tt: row.collected_tt || 0,
   });
+
+    if (row.mode_of_collection) {
+    setSelectedPaymentMethod(row.mode_of_collection);
+  } else {
+    setSelectedPaymentMethod(null);
+  }
 
 // For Timber Materials
 if (row.timbermaterials && row.timber_material_name) {
@@ -228,6 +261,30 @@ if (row.timbermaterials && row.timber_material_name) {
   setIsTimber(false);
 }
 
+if (row.hardwarecategories && row.hardware_category_name){
+  const hardwarecategoryValues = row.hardwarecategories.map((id, index) => ({
+    value: id,
+    label: row.hardware_category_name[index] || 'Hardware Category',
+  }));
+  setSelectedHardwareCategories(hardwarecategoryValues)
+  setHardwareCategories(hardwarecategoryValues);
+} else{
+  setSelectedHardwareCategories([])
+  setHardwareCategories([])
+}
+
+if (row.timbercategories && row.timber_category_name){
+  const timbercategoryValues = row.timbercategories.map((id, index) => ({
+    value: id,
+    label: row.timber_category_name[index] || 'Hardware Category',
+  }));
+  setSelectedTimberCategories(timbercategoryValues)
+  setHardwareCategories(timbercategoryValues);
+} else{
+  setSelectedTimberCategories([])
+  setHardwareCategories([])
+}
+
 // For Hardware Materials
 if (row.hardwarematerials && row.hardware_material_name) {
   const hardwareValues = row.hardwarematerials.map((id, index) => ({
@@ -242,10 +299,8 @@ if (row.hardwarematerials && row.hardware_material_name) {
   setHardwareMaterials([]);
   setIsHardware(false);
 }
-
   setIsTimber((row.timbermaterials || []).length > 0);
   setIsHardware((row.hardwarematerials || []).length > 0);
-
   setShowModal(true);
 };
 
@@ -255,9 +310,6 @@ if (row.hardwarematerials && row.hardware_material_name) {
       if (filter === 'inactive') return !mat.is_active;
       return true;
     })
-  sales.filter(item =>
-    item.customer_name?.toLowerCase().includes(search.toLowerCase())
-  );
 
   const columns = [
     { field: 'customer_name', headerName: 'Customer', width : 150,  },
@@ -267,7 +319,9 @@ if (row.hardwarematerials && row.hardware_material_name) {
     { field: 'due_amount', headerName: 'Due Amount', width : 150,  },
     { field: 'next_meeting_date', headerName : 'Follow-up Date', width : 150,  },
     { field: 'timber_material_name', headerName: 'Timber Materials', width : 150,  },
+    { field: 'timber_category_name', headerName: 'Timber Category', width : 150,  },
     { field: 'hardware_material_name', headerName: 'Hardware Materials', width : 150,  },
+    { field: 'hardware_category_name', headerName: 'Hardware category', width : 150,  },
 {
   field: 'prospect_name',
   headerName: 'Prospect',
@@ -441,8 +495,6 @@ if (row.hardwarematerials && row.hardware_material_name) {
                 </Form.Group>
                   </Col>
                 </Row>
-
-
                 <Form.Check
                   type="checkbox"
                   label="Is Timber Required?"
@@ -452,6 +504,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                     if (!e.target.checked) {
                       setTimberCategories([]);
                       setSelectedTimberMaterials([]);
+                      setSelectedTimberCategories([]);
                     }
                   }}
                   className="mb-3"
@@ -466,9 +519,9 @@ if (row.hardwarematerials && row.hardware_material_name) {
                       <Select
                         isMulti
                         options={options.timber_categories.map((cat) => ({ value: cat.id, label: cat.timber_material_catagory_name }))}
-                        value={timberCategories}
+                        value={selectedTimberCategories}
                         onChange={async (selected) => {
-                          setTimberCategories(selected);
+                          setSelectedTimberCategories(selected);
                           const res = await axios.post(`${Api}/master/filter_timber_materials/`, {
                             category_ids: selected.map((c) => c.value),
                           }, {
@@ -503,6 +556,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                     if (!e.target.checked) {
                       setHardwareCategories([]);
                       setSelectedHardwareMaterials([]);
+                      setSelectedHardwareCategories([])
                     }
                   }}
                   className="mb-3"
@@ -517,9 +571,9 @@ if (row.hardwarematerials && row.hardware_material_name) {
                       <Select
                         isMulti
                         options={options.hardware_categories.map((cat) => ({ value: cat.id, label: cat.hardware_material_catagory_name }))}
-                        value={hardwareCategories}
+                        value={selectedHardwareCategories}
                         onChange={async (selected) => {
-                          setHardwareCategories(selected);
+                          setSelectedHardwareCategories(selected);
                           const res = await axios.post(`${Api}/master/filter_hardware_materials/`, {
                             category_ids: selected.map((c) => c.value),
                           }, {
@@ -542,9 +596,6 @@ if (row.hardwarematerials && row.hardware_material_name) {
                     </Form.Group>                    
                     </Col>
                   </Row>
-
-
-
                   </>
                 )}
                 <Row className='mb-2'>
@@ -572,17 +623,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                 ))}
                 </Row>
                 <Row className='mb-2'>
-                                    <Col md={8}>
-                  <Form.Group className="mb-2">
-                  <Form.Label>Received Amount</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={form.payment_recieved || ''}
-                    onChange={(e) => setForm({ ...form, payment_recieved: e.target.value })}
-                  />
-                </Form.Group>
-                  </Col>
-                                    <Col md={8}>
+                                    <Col md={12}>
                   <Form.Group className="mb-2">
                   <Form.Label>OutStanding Soa Amount</Form.Label>
                   <Form.Control
@@ -593,39 +634,51 @@ if (row.hardwarematerials && row.hardware_material_name) {
                 </Form.Group>
                   </Col>
                 </Row>
+
 <Form.Group className="mb-3">
   <Form.Label>Payment Method</Form.Label>
   <div className="d-flex gap-2 flex-wrap">
-    {['cash', 'pdc', 'cdc', 'tt'].map((method) => (
-      <Button
-        key={method}
-        variant={selectedPaymentMethod === method ? 'primary' : 'outline-primary'}
-        onClick={() => {
-  setSelectedPaymentMethod(method);
+{['cash', 'pdc', 'cdc', 'tt'].map((method) => (
+  <Button
+    key={method}
+    variant={selectedPaymentMethod === method ? 'primary' : 'outline-primary'}
+    disabled={
+      methodLocked && selectedPaymentMethod && selectedPaymentMethod !== method
+    }
+    onClick={() => {
+      if (methodLocked && selectedPaymentMethod && selectedPaymentMethod !== method) {
+        return; // stop switching if locked
+      }
 
-  setForm((prevForm) => {
-    const clearedForm = { ...prevForm };
+      setSelectedPaymentMethod(method);
 
-    ['cash', 'pdc', 'cdc', 'tt'].forEach(m => {
-      clearedForm[`expected_${m}`] = '';
-      clearedForm[`collected_${m}`] = '';
-    });
+      setForm((prevForm) => {
+        const clearedForm = { ...prevForm };
 
-    clearedForm.mode_of_collection = method;
-    return clearedForm;
-  });
-}}
+        if (!methodLocked) {
+          // Clear other modes only if not locked yet
+          ['cash', 'pdc', 'cdc', 'tt'].forEach((m) => {
+            clearedForm[`expected_${m}`] = '';
+            clearedForm[`collected_${m}`] = '';
+          });
+        }
 
-      >
-        {method.toUpperCase()}
-      </Button>
-    ))}
+        clearedForm.mode_of_collection = method;
+        return clearedForm;
+      });
+    }}
+  >
+    {method.toUpperCase()}
+  </Button>
+))}
+
   </div>
 </Form.Group>
 
+
 {selectedPaymentMethod && (
   <Row className="mb-3">
-    <Col md={6}>
+    <Col md={4}>
       <Form.Label>Expected {selectedPaymentMethod.toUpperCase()}</Form.Label>
       <Form.Control
         type="number"
@@ -635,16 +688,34 @@ if (row.hardwarematerials && row.hardware_material_name) {
         }
       />
     </Col>
-    <Col md={6}>
-      <Form.Label>Collected {selectedPaymentMethod.toUpperCase()}</Form.Label>
-      <Form.Control
-        type="number"
-        value={form[`collected_${selectedPaymentMethod}`] || ''}
-        onChange={(e) =>
-          setForm({ ...form, [`collected_${selectedPaymentMethod}`]: e.target.value })
-        }
-      />
-    </Col>
+       <Col md={4}>
+  <Form.Label>Collected Today</Form.Label>
+<Form.Control
+  type="number"
+  value={form.collected_amount_now}
+  onChange={(e) => {
+    const value = Number(e.target.value) || 0;
+    setForm((prev) => ({
+      ...prev,
+      collected_amount_now: value,
+      [`collected_${selectedPaymentMethod}`]:
+        (Number(prev[`original_${selectedPaymentMethod}`]) || 0) + value, // ✅ always base on original
+    }));
+  }}
+/>
+
+
+</Col>
+
+<Col md={4}>
+  <Form.Label>Collected {selectedPaymentMethod.toUpperCase()}</Form.Label>
+  <Form.Control
+    type="number"
+    disabled
+    value={form[`collected_${selectedPaymentMethod}`] || ''}
+  />
+</Col>
+
   </Row>
 )}
 

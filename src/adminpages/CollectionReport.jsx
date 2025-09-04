@@ -26,9 +26,10 @@ function CollectionForcastReport() {
   const [filters, setFilters] = useState({ start_date: "", end_date: "" });
   const [salesmans, setSalesmans] = useState([])
   const [filsalesman, setFilsalesman] = useState('')
-  const [dateRange, setDateRange] = useState([null, null]);
-
-
+const today = new Date();
+  const currentMonth = today.toLocaleDateString("en-CA").slice(0, 7);
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth)
+console.log(selectedMonth)
   const fetchsalesman = async () => {
     try{
       const res2 = await axios.get(`${Api}/user/view_activeSalesman/`, {
@@ -42,39 +43,17 @@ function CollectionForcastReport() {
     }
     }
 
-// const fetchColletionReport = async () => {
-//   try {
-//     setLoading(true)
-//     const res = await axios.get(`${Api}/sales/admin/collection-report-by-date/`, {
-//       params: {
-//         start_date: filters.start_date,
-//         end_date: filters.end_date,
-//         sales_id: filsalesman,
-//       },
-//       headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-//     });
-  
-//     setFilteredData(res.data);
-//     setLoading(false)
-//   } catch (err) {
-//     console.error("Error fetching report:", err);
-//   }
-// };
+const getMonthName = (selectedMonth) => {
+  if (!selectedMonth) return "";
 
-//   useEffect(() => {
-//     fetchColletionReport();
-//     fetchsalesman();
-//   }, []);
+  // Convert "YYYY-MM" into a Date
+  const [year, month] = selectedMonth.split("-");
+  const date = new Date(year, month - 1); // month is 0-based
 
+  // Format as "January 2025"
+  return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+};
 
-// const ResetReport = () =>{
-//   setFilters ({start_date: "", end_date: ""})
-//   setFilsalesman('')
-//   console.log(filters)
-//   console.log(filsalesman)
-//   setDateRange([null, null]); 
-//   fetchColletionReport()
-// }
 
 
 const ResetReport = () => {
@@ -83,7 +62,7 @@ const ResetReport = () => {
 
   setFilters(newFilters);
   setFilsalesman(newSalesman);
-  setDateRange([null, null]);
+  setSelectedMonth(currentMonth)
 
   fetchColletionReport(newFilters, newSalesman); // pass directly
 };
@@ -93,8 +72,7 @@ const fetchColletionReport = async (customFilters = filters, customSalesman = fi
     setLoading(true);
     const res = await axios.get(`${Api}/sales/admin/collection-report-by-date/`, {
       params: {
-        start_date: customFilters.start_date,
-        end_date: customFilters.end_date,
+        month: selectedMonth,
         sales_id: customSalesman,
       },
       headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
@@ -261,6 +239,7 @@ const downloadExcel = () => {
     'Salesman': row.salesman_name,
     'Customer': row.customer_name,
     'Total Outstanding as per SOA': row.soa_amount || 0,
+    [`Collection on ${getMonthName(selectedMonth)}`]: row.this_month_collection || 0,
     'Expected Collection': row.expected_payment_amount || 0,
     'Expected Date': row.expected_payment_date || "",
     'Mode of Collection': row.mode_of_collection || "",
@@ -282,7 +261,7 @@ const downloadExcel = () => {
   totalRow[0] = "Total";
 
   const dataWithTitle = [
-    ["Collection Forecast Report"], // Title merged across columns
+    [`Collection Forecast Report : ${getMonthName(selectedMonth)}`], // Title merged across columns
     headers,
     ...dataRows,
     totalRow
@@ -303,6 +282,7 @@ const downloadExcel = () => {
   // Columns to sum
   const sumCols = [
     'Total Outstanding as per SOA',
+    `Collection on ${getMonthName(selectedMonth)}`,
     'Expected Collection',
     'Expected CDC',
     'Expected PDC',
@@ -384,7 +364,7 @@ const downloadExcel = () => {
 
   // Create workbook and append sheet
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Collection Forecast Report");
+  XLSX.utils.book_append_sheet(workbook, worksheet, `Collection Forecast Report`);
 
   // Write workbook to binary array and trigger download
   const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
@@ -482,6 +462,7 @@ const downloadPDF = () => {
     { field: 'branch_code', headerName: 'Branch', width : 150,  },
     { field: 'salesman_name', headerName: 'SalesMan', width : 150,  },
     { field: 'customer_name', headerName: 'Customer Name', width : 150,  },
+    { field: 'this_month_collection', headerName: `Collection ${currentMonth}`, width : 150,  },
     { field: 'soa_amount', headerName: 'Total Outstading Per SOA', width : 150,  },
     { field: 'expected_payment_date', headerName: 'Expected Date', width : 150,  },
     { field: 'expected_payment_amount', headerName: 'Expected Collection', width: 150, },
@@ -521,21 +502,22 @@ const downloadPDF = () => {
                                   </Form.Group>
             </Col>
             <Col md={3}>
-  <DatePicker
-    selectsRange
-    startDate={dateRange[0]}
-    endDate={dateRange[1]}
-    onChange={(update) => {
-      setDateRange(update);
-      setFilters({
-        start_date: update[0] ? update[0].toLocaleDateString("en-CA") : "",
-        end_date: update[1] ? update[1].toLocaleDateString("en-CA") : ""
-      });
-    }}
-    isClearable
-    placeholderText="Select date range"
-    className="form-control"
-  />
+  <Form.Group>
+    <Form.Control
+      type="month"
+      value={selectedMonth}
+      max={currentMonth} 
+      onChange={(e) => {
+        setSelectedMonth(e.target.value);
+        const [year, month] = e.target.value.split("-");
+        setFilters({
+          month: month,
+          year: year
+        });
+      }}
+      className="form-control"
+    />
+  </Form.Group>
 </Col>
             <Col md="auto">
               <Button variant="warning" onClick={applyFilters}>Apply Filters</Button>

@@ -27,39 +27,6 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-
-  // useEffect(() => {
-  //   Tokenvaliditychecker()
-  //   setLoading(true)
-  //   axios.get(`${Api}/user/dashboarddetails`)
-  //     .then(res => setData(res.data))
-  //     .catch(err => console.error(err));
-
-  //   axios.get(`${Api}/user/order_amount_data`)
-  //   .then(res => {
-  //     const lastSix = res.data.slice(-6).map(item => ({
-  //       date: item.timestamp,
-  //       value: parseFloat(item.today_order_value)
-  //     }));
-  //     setChartData(lastSix);
-
-  //     setLoading(false)
-  //   })
-  //   .catch(err => console.error(err));
-
-  //   axios.get(`${Api}/user/order_chart_data`)
-  //   .then(res => {
-  //     const lastSix = res.data.slice(-6).map(item => ({
-  //       date: item.timestamp,
-  //       value: parseFloat(item.today_order_value)
-  //     }));
-  //     setOrderchartData(lastSix);
-
-  //     setLoading(false)
-  //   })
-  //   .catch(err => console.error(err));
-  // }, []);
-
   useEffect(() => {
   const fetchData = async () => {
     try {
@@ -71,19 +38,12 @@ function AdminDashboard() {
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       };
 
-      const [dashboardRes, orderAmountRes, orderChartRes] = await Promise.all([
+      const [dashboardRes,  orderChartRes] = await Promise.all([
         axios.get(`${Api}/user/dashboarddetails`, { headers }),
-        axios.get(`${Api}/user/order_amount_data`, { headers }),
         axios.get(`${Api}/user/order_chart_data`, { headers }),
       ]);
 
       setData(dashboardRes.data);
-
-      const lastSixAmount = orderAmountRes.data.slice(-6).map(item => ({
-        date: item.timestamp,
-        value: parseFloat(item.today_order_value),
-      }));
-      setChartData(lastSixAmount);
 
       const lastSixChart = orderChartRes.data.slice(-6).map(item => ({
         date: item.timestamp,
@@ -190,10 +150,10 @@ console.log(data)
 
 
 
-              <Card style={{ borderRadius: '12px', padding: '20px' }}>
+  <Card style={{ borderRadius: '12px', padding: '20px' }}>
   <h5 className="mb-3">Daily Order Progress (Last 6 Days)</h5>
   <ResponsiveContainer width="100%" height={300}>
-    <LineChart data={chartData}>
+    <LineChart data={orderchartData}>
       <YAxis />
       <XAxis dataKey="date" />
       <Tooltip />
@@ -240,23 +200,6 @@ console.log(data)
               </Card>
             </Col>
           </Row>
-                        <Card style={{ borderRadius: '12px', padding: '20px' }}>
-  <h5 className="mb-3">Daily Order Progress (Last 6 Days)</h5>
-  <ResponsiveContainer width="100%" height={300}>
-    <LineChart data={orderchartData}>
-      <YAxis />
-      <XAxis dataKey="date" />
-      <Tooltip />
-      <Line
-        type="monotone"
-        dataKey="value"
-        stroke="#00C49F"
-        strokeWidth={3}
-        activeDot={{ r: 6 }}
-      />
-    </LineChart>
-  </ResponsiveContainer>
-</Card>
         </Container>}
       </div>
     </div>
