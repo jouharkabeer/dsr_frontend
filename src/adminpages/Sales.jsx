@@ -625,7 +625,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                 <Row className='mb-2'>
                                     <Col md={12}>
                   <Form.Group className="mb-2">
-                  <Form.Label>OutStanding Soa Amount</Form.Label>
+                  <Form.Label>OutStanding Total Soa Amount</Form.Label>
                   <Form.Control
                     type="number"
                     value={form.soa_amount || ''}
