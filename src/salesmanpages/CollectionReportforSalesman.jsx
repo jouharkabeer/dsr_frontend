@@ -5,7 +5,7 @@ import {
 import axios from 'axios';
 import { Api } from '../api';
 import TopNavbar from '../components/TopNavbar';
-import SalesmanSidebar from './salesmansidebar';
+import SalemanSidebar from './salesmansidebar';
 import { DataGrid } from '@mui/x-data-grid';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -23,27 +23,47 @@ function SalesManCollectionForcastReport() {
 
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState({ start_date: "", end_date: "" });
-  const [dateRange, setDateRange] = useState([null, null]);
+  const today = new Date();
+  const currentMonth = today.toLocaleDateString("en-CA").slice(0, 7);
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth)
+
+
+const getDateFormat = () => {
+  const day = String(today.getDate()).padStart(2, '0'); // 01, 02...
+  const month = today.toLocaleString('en-US', { month: 'long' }); // January, February...
+  const year = today.getFullYear(); // 2025
+  return `${day} ${month} ${year}`;
+};
+
+
+const getMonthName = (selectedMonth) => {
+  if (!selectedMonth) return "";
+
+  // Convert "YYYY-MM" into a Date
+  const [year, month] = selectedMonth.split("-");
+  const date = new Date(year, month - 1); // month is 0-based
+
+  // Format as "January 2025"
+  return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+};
+
 
 
 const ResetReport = () => {
-  const newFilters = { start_date: "", end_date: "" };
-  setFilters(newFilters);
-  setDateRange([null, null]);
 
-  fetchColletionReport(newFilters, newSalesman); // pass directly
+
+  setSelectedMonth(currentMonth)
+
+  fetchColletionReport(); // pass directly
 };
 
-const fetchColletionReport = async (customFilters = filters) => {
+const fetchColletionReport = async () => {
   try {
     setLoading(true);
     const sid = localStorage.getItem('user_id')
-    console.log(sid)
     const res = await axios.get(`${Api}/sales/admin/collection-report-by-date/`, {
       params: {
-        start_date: customFilters.start_date,
-        end_date: customFilters.end_date,
+        month: selectedMonth,
         sales_id: sid,
       },
       headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
@@ -59,19 +79,14 @@ const fetchColletionReport = async (customFilters = filters) => {
 
 
 const applyFilters = () => {
-  if (
-    (filters.start_date && filters.end_date) || 
-    (!filters.start_date && !filters.end_date)
-  ) {
+
     fetchColletionReport();
-  } else {
-    showToast.error("Please select both dates");
-  }
+
 };
 
 useEffect(() => {
   fetchColletionReport(); // initial load
-       // load salesman list
+      // load salesman list
 }, []); // empty dependency array → runs only once
 
 
@@ -80,9 +95,9 @@ const downloadExcel = () => {
   const worksheetData = filteredData.map((row, index) => ({
     'S.No': index + 1,
     'Branch': row.branch_code,
-    'Salesman': row.salesman_name,
     'Customer': row.customer_name,
     'Total Outstanding as per SOA': row.soa_amount || 0,
+    [`Collection on ${getMonthName(selectedMonth)}`]: row.this_month_collection || 0,
     'Expected Collection': row.expected_payment_amount || 0,
     'Expected Date': row.expected_payment_date || "",
     'Mode of Collection': row.mode_of_collection || "",
@@ -104,7 +119,8 @@ const downloadExcel = () => {
   totalRow[0] = "Total";
 
   const dataWithTitle = [
-    ["Collection Forecast Report"], // Title merged across columns
+    [`Collection Forecast Report : ${getMonthName(selectedMonth)}, Generated on : ${getDateFormat()} (${localStorage.getItem('login_name')})` ], // Title merged across columns
+    // [`Report Generated: ${getDateFormat()}`], // Title merged across columns
     headers,
     ...dataRows,
     totalRow
@@ -125,6 +141,7 @@ const downloadExcel = () => {
   // Columns to sum
   const sumCols = [
     'Total Outstanding as per SOA',
+    `Collection on ${getMonthName(selectedMonth)}`,
     'Expected Collection',
     'Expected CDC',
     'Expected PDC',
@@ -206,45 +223,50 @@ const downloadExcel = () => {
 
   // Create workbook and append sheet
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Collection Forecast Report");
+  XLSX.utils.book_append_sheet(workbook, worksheet, `Collection Forecast Report`);
 
   // Write workbook to binary array and trigger download
   const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
   const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  saveAs(blob, "Collection_forecast_Report.xlsx");
+  saveAs(blob, `Collection_forecast_Report_${getDateFormat()}.xlsx`);
 };
-
-
 
 
 const downloadPDF = () => {
   const doc = new jsPDF({ orientation: 'landscape' });
 
   // Main heading
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Collection Forecast Report', doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
+// Heading
+doc.setFontSize(16);
+doc.setFont('helvetica', 'bold');
+doc.text('Collection Forecast Report', doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
+
+// Date (smaller, left-aligned, a bit lower)
+doc.setFontSize(10);
+doc.setFont('helvetica', 'normal');
+doc.text(getDateFormat(), 14, 22); // (x=14 for left margin, y=22 for below heading)
+doc.text(`${localStorage.getItem('login_name')}`, 14, 26); // (x=14 for left margin, y=22 for below heading)
 
   // Table headers with grouping
   const head = [
     [
       { content: 'S.No', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
       { content: 'Branch', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
-      { content: 'Salesman', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
       { content: 'Customer', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+      { content: 'This Month Collection', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
       { content: 'Total Outstanding as per SOA', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
-      { content: 'Expected Payment', colSpan: 5, styles: { halign: 'center', fillColor: [255, 255, 153], fontStyle: 'bold' } },
-      { content: 'Collected Payment', colSpan: 4, styles: { halign: 'center', fillColor: [204, 255, 204], fontStyle: 'bold' } }
+      { content: 'Expected Payment', colSpan: 4, styles: { halign: 'center', fillColor: [155, 135, 13], fontStyle: 'bold' } },
+      { content: 'Collected Payment', colSpan: 4, styles: { halign: 'center', fillColor: [0, 100, 0], fontStyle: 'bold' } }
     ],
     [
-      { content: 'Expected PDC', styles: { fillColor: [255, 255, 153] } },
-      { content: 'Expected CDC', styles: { fillColor: [255, 255, 153] } },
-      { content: 'Expected TT', styles: { fillColor: [255, 255, 153] } },
-      { content: 'Expected Cash', styles: { fillColor: [255, 255, 153] } },
-      { content: 'Collected PDC', styles: { fillColor: [204, 255, 204] } },
-      { content: 'Collected CDC', styles: { fillColor: [204, 255, 204] } },
-      { content: 'Collected TT', styles: { fillColor: [204, 255, 204] } },
-      { content: 'Collected Cash', styles: { fillColor: [204, 255, 204] } }
+      { content: 'Expected PDC', styles: { fillColor: [155, 135, 13] } },
+      { content: 'Expected CDC', styles: { fillColor: [155, 135, 13] } },
+      { content: 'Expected TT', styles: { fillColor: [155, 135, 13] } },
+      { content: 'Expected Cash', styles: { fillColor: [155, 135, 13] } },
+      { content: 'Collected PDC', styles: { fillColor: [0, 100, 0] } },
+      { content: 'Collected CDC', styles: { fillColor: [0, 100, 0] } },
+      { content: 'Collected TT', styles: { fillColor: [0, 100, 0] } },
+      { content: 'Collected Cash', styles: { fillColor: [0, 100, 0] } }
     ]
   ];
 
@@ -252,8 +274,8 @@ const downloadPDF = () => {
   const body = filteredData.map((row, index) => [
     index + 1,
     row.branch_code,
-    row.salesman_name,
     row.customer_name,
+    row.this_month_collection,
     row.soa_amount,
     row.expected_pdc,
     row.expected_cdc,
@@ -268,29 +290,30 @@ const downloadPDF = () => {
   // Totals row
   const sum = (field) => filteredData.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
 
-  body.push([
-    { content: 'Total', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, '', '', '',
-    { content: sum('soa_amount'), styles: { fontStyle: 'bold' } },
-    { content: sum('expected_pdc'), styles: { fontStyle: 'bold' } },
-    { content: sum('expected_cdc'), styles: { fontStyle: 'bold' } },
-    { content: sum('expected_tt'), styles: { fontStyle: 'bold' } },
-    { content: sum('expected_cash'), styles: { fontStyle: 'bold' } },
-    { content: sum('collected_pdc'), styles: { fontStyle: 'bold' } },
-    { content: sum('collected_cdc'), styles: { fontStyle: 'bold' } },
-    { content: sum('collected_tt'), styles: { fontStyle: 'bold' } },
-    { content: sum('collected_cash'), styles: { fontStyle: 'bold' } }
-  ]);
+body.push([
+  { content: 'Total', colSpan: 3, styles: { halign: 'right', fontStyle: 'bold' } }, // S.No - Customer
+  { content: sum('this_month_collection'), styles: { fontStyle: 'bold' } },  // This Month Collection
+  { content: sum('soa_amount'), styles: { fontStyle: 'bold' } },  // SOA
+  { content: sum('expected_pdc'), styles: { fontStyle: 'bold' } }, // Expected PDC
+  { content: sum('expected_cdc'), styles: { fontStyle: 'bold' } }, // Expected CDC
+  { content: sum('expected_tt'), styles: { fontStyle: 'bold' } },  // Expected TT
+  { content: sum('expected_cash'), styles: { fontStyle: 'bold' } },// Expected Cash
+  { content: sum('collected_pdc'), styles: { fontStyle: 'bold' } },// Collected PDC
+  { content: sum('collected_cdc'), styles: { fontStyle: 'bold' } },// Collected CDC
+  { content: sum('collected_tt'), styles: { fontStyle: 'bold' } }, // Collected TT
+  { content: sum('collected_cash'), styles: { fontStyle: 'bold' } } // Collected Cash
+]);
 
   // Render table
   autoTable(doc, {
     head: head,
     body: body,
-    startY: 20,
+    startY: 28,
     styles: { fontSize: 8, halign: 'center', valign: 'middle' }
   });
 
   // Save PDF
-  doc.save('Collection_Forecast_Report.pdf');
+  doc.save(`Collection_Forecast_Report_${getDateFormat()}.pdf`);
 };
 
 
@@ -303,6 +326,7 @@ const downloadPDF = () => {
 },
     { field: 'branch_code', headerName: 'Branch', width : 150,  },
     { field: 'customer_name', headerName: 'Customer Name', width : 150,  },
+    { field: 'this_month_collection', headerName: `Collection ${currentMonth}`, width : 150,  },
     { field: 'soa_amount', headerName: 'Total Outstading Per SOA', width : 150,  },
     { field: 'expected_payment_date', headerName: 'Expected Date', width : 150,  },
     { field: 'expected_payment_amount', headerName: 'Expected Collection', width: 150, },
@@ -322,27 +346,29 @@ const downloadPDF = () => {
     <div className="d-flex flex-column" style={{ height: '100vh' }}>
       <TopNavbar />
       <div className="d-flex flex-grow-1">
-        <SalesmanSidebar />
+        <SalemanSidebar />
         {/* {loading ? <Loader/> :  */}
         <div className="p-4 flex-grow-1 overflow-auto" style={{ backgroundColor: '#f8f9fa' }}>
           <Row className="mb-3 align-items-end">
             <Col><h5>Collection Forecast Report</h5></Col>
+
             <Col md={3}>
-  <DatePicker
-    selectsRange
-    startDate={dateRange[0]}
-    endDate={dateRange[1]}
-    onChange={(update) => {
-      setDateRange(update);
-      setFilters({
-        start_date: update[0] ? update[0].toLocaleDateString("en-CA") : "",
-        end_date: update[1] ? update[1].toLocaleDateString("en-CA") : ""
-      });
-    }}
-    isClearable
-    placeholderText="Select date range"
-    className="form-control"
-  />
+  <Form.Group>
+    <Form.Control
+      type="month"
+      value={selectedMonth}
+      max={currentMonth} 
+      onChange={(e) => {
+        setSelectedMonth(e.target.value);
+        const [year, month] = e.target.value.split("-");
+        setFilters({
+          month: month,
+          year: year
+        });
+      }}
+      className="form-control"
+    />
+  </Form.Group>
 </Col>
             <Col md="auto">
               <Button variant="warning" onClick={applyFilters}>Apply Filters</Button>
@@ -405,3 +431,7 @@ const downloadPDF = () => {
   );
 }
 export default SalesManCollectionForcastReport;
+
+
+
+

@@ -26,10 +26,10 @@ function CollectionForcastReport() {
   const [filters, setFilters] = useState({ start_date: "", end_date: "" });
   const [salesmans, setSalesmans] = useState([])
   const [filsalesman, setFilsalesman] = useState('')
-const today = new Date();
+  const today = new Date();
   const currentMonth = today.toLocaleDateString("en-CA").slice(0, 7);
   const [selectedMonth, setSelectedMonth] = useState(currentMonth)
-console.log(selectedMonth)
+
   const fetchsalesman = async () => {
     try{
       const res2 = await axios.get(`${Api}/user/view_activeSalesman/`, {
@@ -42,6 +42,14 @@ console.log(selectedMonth)
       console.error('Failed to fetch customer data:', err);
     }
     }
+
+const getDateFormat = () => {
+  const day = String(today.getDate()).padStart(2, '0'); // 01, 02...
+  const month = today.toLocaleString('en-US', { month: 'long' }); // January, February...
+  const year = today.getFullYear(); // 2025
+  return `${day} ${month} ${year}`;
+};
+
 
 const getMonthName = (selectedMonth) => {
   if (!selectedMonth) return "";
@@ -105,132 +113,6 @@ useEffect(() => {
 }, []); // empty dependency array → runs only once
 
 
-// const downloadExcel = () => {
-//   const worksheetData = filteredData.map((row, index) => ({
-//     'S.No': index + 1,
-//     'Branch': row.branch_code,
-//     'Salesman': row.salesman_name,
-//     'Customer': row.customer_name,
-//     'Total Outstanding as per SOA': row.soa_amount || 0,
-//     'Expected Collection': row.expected_payment_amount || 0,
-//     'Expected Date': row.expected_payment_date || "",
-//     'Mode of Collection': row.mode_of_collection || "",
-//     'Expected PDC': row.expected_pdc || 0,
-//     'Expected CDC': row.expected_cdc || 0,
-//     'Expected TT': row.expected_tt || 0,
-//     'Expected Cash': row.expected_cash || 0,
-//     'Collected PDC': row.collected_pdc || 0,
-//     'Collected CDC': row.collected_cdc || 0,
-//     'Collected TT': row.collected_tt || 0,
-//     'Collected Cash': row.collected_cash || 0,
-//   }));
-
-//   const headers = Object.keys(worksheetData[0]);
-//   const dataRows = worksheetData.map(obj => Object.values(obj));
-
-//   // Add totals row placeholder
-//   const totalRow = new Array(headers.length).fill("");
-//   totalRow[0] = "Total";
-
-//   const dataWithTitle = [
-//     ["Collection Forecast Report"], // Title
-//     headers,
-//     ...dataRows,
-//     totalRow
-//   ];
-
-//   const worksheet = XLSX.utils.aoa_to_sheet(dataWithTitle);
-
-//   // Merge title
-//   const colCount = headers.length;
-//   worksheet["!merges"] = [
-//     { s: { r: 0, c: 0 }, e: { r: 0, c: colCount - 1 } }, // Title row
-//     { s: { r: dataRows.length + 2, c: 0 }, e: { r: dataRows.length + 2, c: 3 } } // Merge Total label
-//   ];
-
-//   // Set formulas for totals
-//   const sumCols = [
-//     'Total Outstanding as per SOA',
-//     'Expected Collection',
-//     'Expected CDC',
-//     'Expected PDC',
-//     'Expected Cash',
-//     'Expected TT',
-//     'Collected CDC',
-//     'Collected PDC',
-//     'Collected Cash',
-//     'Collected TT'
-//   ];
-
-//   sumCols.forEach(colName => {
-//     const colIndex = headers.indexOf(colName);
-//     if (colIndex === -1) return;
-//     const startExcelRow = 3; // First data row in Excel
-//     const endExcelRow = startExcelRow + dataRows.length - 1;
-//     const totalExcelRow = endExcelRow + 1; // Row for total
-//     const colLetter = XLSX.utils.encode_col(colIndex);
-//     const cellRef = `${colLetter}${totalExcelRow}`;
-//     worksheet[cellRef] = {
-//       f: `SUM(${colLetter}${startExcelRow}:${colLetter}${endExcelRow})`,
-//       t: "n",
-//       s: { font: { bold: true } }
-//     };
-//   });
-
-//   // === Styling ===
-//   worksheet["A1"].s = { font: { bold: true, sz: 18 }, alignment: { horizontal: "center", vertical: "center" } };
-
-//   const yellowHeaders = ["Expected PDC", "Expected CDC", "Expected TT", "Expected Cash"];
-//   const greenHeaders = ["Collected PDC", "Collected CDC", "Collected TT", "Collected Cash"];
-
-//   headers.forEach((header, colIdx) => {
-//     const cellAddress = XLSX.utils.encode_cell({ r: 1, c: colIdx });
-//     worksheet[cellAddress].s = {
-//       font: { bold: true },
-//       alignment: { horizontal: "center", vertical: "center" },
-//       fill: yellowHeaders.includes(header)
-//         ? { fgColor: { rgb: "FFFF99" } }
-//         : greenHeaders.includes(header)
-//         ? { fgColor: { rgb: "CCFFCC" } }
-//         : undefined
-//     };
-//   });
-
-//   // Style total row
-//   const totalRowIndex = dataRows.length + 2;
-//   for (let c = 0; c < headers.length; c++) {
-//     const addr = XLSX.utils.encode_cell({ r: totalRowIndex, c });
-//     if (!worksheet[addr]) continue;
-//     worksheet[addr].s = {
-//       font: { bold: true },
-//       fill: { fgColor: { rgb: "E0E0E0" } } // light gray
-//     };
-//   }
-//   // Align merged "Total" label to the right
-// const totalLabelCell = XLSX.utils.encode_cell({ r: totalRowIndex, c: 0 });
-// if (worksheet[totalLabelCell]) {
-//   worksheet[totalLabelCell].s = {
-//     font: { bold: true },
-//     alignment: { horizontal: "right", vertical: "center" }
-//   };
-// }
-
-
-//   // Auto column width
-//   worksheet["!cols"] = headers.map((key) => {
-//     const colValues = [key, ...worksheetData.map(row => String(row[key] ?? ""))];
-//     const maxLength = Math.max(...colValues.map(v => v.length));
-//     return { wch: maxLength + 2 };
-//   });
-
-//   const workbook = XLSX.utils.book_new();
-//   XLSX.utils.book_append_sheet(workbook, worksheet, "Collection Forecast Report");
-
-//   const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-//   const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-//   saveAs(blob, "Collection_forecast_Report.xlsx");
-// };
-
 const downloadExcel = () => {
   // Prepare data with S.No and keys
   const worksheetData = filteredData.map((row, index) => ({
@@ -261,7 +143,8 @@ const downloadExcel = () => {
   totalRow[0] = "Total";
 
   const dataWithTitle = [
-    [`Collection Forecast Report : ${getMonthName(selectedMonth)}`], // Title merged across columns
+    [`Collection Forecast Report : ${getMonthName(selectedMonth)}, Generated on : ${getDateFormat()}`], // Title merged across columns
+    // [`Report Generated: ${getDateFormat()}`], // Title merged across columns
     headers,
     ...dataRows,
     totalRow
@@ -369,19 +252,23 @@ const downloadExcel = () => {
   // Write workbook to binary array and trigger download
   const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
   const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  saveAs(blob, "Collection_forecast_Report.xlsx");
+  saveAs(blob, `Collection_forecast_Report_${getDateFormat()}.xlsx`);
 };
-
-
 
 
 const downloadPDF = () => {
   const doc = new jsPDF({ orientation: 'landscape' });
 
   // Main heading
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Collection Forecast Report', doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
+// Heading
+doc.setFontSize(16);
+doc.setFont('helvetica', 'bold');
+doc.text('Collection Forecast Report', doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
+
+// Date (smaller, left-aligned, a bit lower)
+doc.setFontSize(10);
+doc.setFont('helvetica', 'normal');
+doc.text(getDateFormat(), 14, 22); // (x=14 for left margin, y=22 for below heading)
 
   // Table headers with grouping
   const head = [
@@ -390,19 +277,20 @@ const downloadPDF = () => {
       { content: 'Branch', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
       { content: 'Salesman', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
       { content: 'Customer', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
+      { content: 'This Month Collection', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
       { content: 'Total Outstanding as per SOA', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontStyle: 'bold' } },
-      { content: 'Expected Payment', colSpan: 5, styles: { halign: 'center', fillColor: [255, 255, 153], fontStyle: 'bold' } },
-      { content: 'Collected Payment', colSpan: 4, styles: { halign: 'center', fillColor: [204, 255, 204], fontStyle: 'bold' } }
+      { content: 'Expected Payment', colSpan: 4, styles: { halign: 'center', fillColor: [155, 135, 13], fontStyle: 'bold' } },
+      { content: 'Collected Payment', colSpan: 4, styles: { halign: 'center', fillColor: [0, 100, 0], fontStyle: 'bold' } }
     ],
     [
-      { content: 'Expected PDC', styles: { fillColor: [255, 255, 153] } },
-      { content: 'Expected CDC', styles: { fillColor: [255, 255, 153] } },
-      { content: 'Expected TT', styles: { fillColor: [255, 255, 153] } },
-      { content: 'Expected Cash', styles: { fillColor: [255, 255, 153] } },
-      { content: 'Collected PDC', styles: { fillColor: [204, 255, 204] } },
-      { content: 'Collected CDC', styles: { fillColor: [204, 255, 204] } },
-      { content: 'Collected TT', styles: { fillColor: [204, 255, 204] } },
-      { content: 'Collected Cash', styles: { fillColor: [204, 255, 204] } }
+      { content: 'Expected PDC', styles: { fillColor: [155, 135, 13] } },
+      { content: 'Expected CDC', styles: { fillColor: [155, 135, 13] } },
+      { content: 'Expected TT', styles: { fillColor: [155, 135, 13] } },
+      { content: 'Expected Cash', styles: { fillColor: [155, 135, 13] } },
+      { content: 'Collected PDC', styles: { fillColor: [0, 100, 0] } },
+      { content: 'Collected CDC', styles: { fillColor: [0, 100, 0] } },
+      { content: 'Collected TT', styles: { fillColor: [0, 100, 0] } },
+      { content: 'Collected Cash', styles: { fillColor: [0, 100, 0] } }
     ]
   ];
 
@@ -412,6 +300,7 @@ const downloadPDF = () => {
     row.branch_code,
     row.salesman_name,
     row.customer_name,
+    row.this_month_collection,
     row.soa_amount,
     row.expected_pdc,
     row.expected_cdc,
@@ -426,29 +315,30 @@ const downloadPDF = () => {
   // Totals row
   const sum = (field) => filteredData.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
 
-  body.push([
-    { content: 'Total', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, '', '', '',
-    { content: sum('soa_amount'), styles: { fontStyle: 'bold' } },
-    { content: sum('expected_pdc'), styles: { fontStyle: 'bold' } },
-    { content: sum('expected_cdc'), styles: { fontStyle: 'bold' } },
-    { content: sum('expected_tt'), styles: { fontStyle: 'bold' } },
-    { content: sum('expected_cash'), styles: { fontStyle: 'bold' } },
-    { content: sum('collected_pdc'), styles: { fontStyle: 'bold' } },
-    { content: sum('collected_cdc'), styles: { fontStyle: 'bold' } },
-    { content: sum('collected_tt'), styles: { fontStyle: 'bold' } },
-    { content: sum('collected_cash'), styles: { fontStyle: 'bold' } }
-  ]);
+body.push([
+  { content: 'Total', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, // S.No - Customer
+  { content: sum('this_month_collection'), styles: { fontStyle: 'bold' } },  // This Month Collection
+  { content: sum('soa_amount'), styles: { fontStyle: 'bold' } },  // SOA
+  { content: sum('expected_pdc'), styles: { fontStyle: 'bold' } }, // Expected PDC
+  { content: sum('expected_cdc'), styles: { fontStyle: 'bold' } }, // Expected CDC
+  { content: sum('expected_tt'), styles: { fontStyle: 'bold' } },  // Expected TT
+  { content: sum('expected_cash'), styles: { fontStyle: 'bold' } },// Expected Cash
+  { content: sum('collected_pdc'), styles: { fontStyle: 'bold' } },// Collected PDC
+  { content: sum('collected_cdc'), styles: { fontStyle: 'bold' } },// Collected CDC
+  { content: sum('collected_tt'), styles: { fontStyle: 'bold' } }, // Collected TT
+  { content: sum('collected_cash'), styles: { fontStyle: 'bold' } } // Collected Cash
+]);
 
   // Render table
   autoTable(doc, {
     head: head,
     body: body,
-    startY: 20,
+    startY: 25,
     styles: { fontSize: 8, halign: 'center', valign: 'middle' }
   });
 
   // Save PDF
-  doc.save('Collection_Forecast_Report.pdf');
+  doc.save(`Collection_Forecast_Report_${getDateFormat()}.pdf`);
 };
 
 
