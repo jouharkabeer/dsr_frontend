@@ -30,7 +30,6 @@ const Tokenvaliditychecker = async () => {
     });
 
     const data = res.data; // ✅ Fix: use res.data instead of res.message
-    console.log(data)
     if (data.message === 'its a valid token') { // ✅ Fix: comparison operator `===`, and correct string
       const userrtype = localStorage.getItem('user_type');
       if (userrtype === 'SuperAdmin') {
@@ -70,7 +69,6 @@ const Tokenvaliditychecker = async () => {
       localStorage.setItem('user_type', usertype);
       localStorage.setItem('user_id', user_id);
       localStorage.setItem('login_name', login_name);
-console.log(access)
       if (usertype === 'SuperAdmin') {
         navigate('/admin/dashboard');
       } else if (usertype === 'Sales Person') {
@@ -80,7 +78,6 @@ console.log(access)
       }
     } catch (error) {
       // setConsolerr(error.response.data.detail)
-      console.log(error.response.data)
       setLogin(false)
       setErrors('Invalid Login Credentials')
     }

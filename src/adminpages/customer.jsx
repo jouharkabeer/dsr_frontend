@@ -33,7 +33,6 @@ function CustomerPage() {
         },
       });
       setCustomers(res.data);
-      console.log(res.data)
       setLoading(false)
     } catch (err) {
       console.error('Failed to fetch customers:', err);
@@ -115,7 +114,6 @@ function CustomerPage() {
 
     }
   };
-console.log(form.view_all)
   const columns = [
     { field: 'customer_name', headerName: 'Name', width : 150,  },
     { field: 'address', headerName: 'Address', width : 150,  },

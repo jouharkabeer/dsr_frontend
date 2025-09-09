@@ -66,7 +66,6 @@ function UserPage() {
         },
       });
       setBranches(res2.data);
-      console.log(res2.data)
       setUserTypes(res.data);
       setLoading(false)
     } catch (err) {
@@ -109,7 +108,7 @@ function UserPage() {
     setError('');
     setShowModal(true);
   };
-console.log(form)
+
 
 const handleSave = async () => {
   const errors = [];

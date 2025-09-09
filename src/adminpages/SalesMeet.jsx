@@ -29,7 +29,7 @@ function SalesMeet() {
       console.error('Failed to fetch regiones:', err);
     }
   };
-console.log(salesmeet)
+
   useEffect(() => {
     fetchSalesMeet();
   }, []);

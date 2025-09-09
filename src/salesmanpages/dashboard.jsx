@@ -62,7 +62,7 @@ const Tokenvaliditychecker = async () => {
     });
 
     const data = res.data;
-    console.log(data);
+
 
     if (data.message === 'its a valid token') {
       // Do nothing (this replaces `pass`)

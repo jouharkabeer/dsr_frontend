@@ -71,7 +71,7 @@ const Tokenvaliditychecker = async () => {
     });
 
     const data = res.data;
-    console.log(data);
+
 
     if (data.message === 'its a valid token') {
       // Do nothing (this replaces `pass`)
@@ -100,7 +100,7 @@ const Tokenvaliditychecker = async () => {
     textAlign: 'center',
     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
   };
-console.log(data)
+
   return (
     <div className="d-flex flex-column" style={{ height: '100vh' }}>
       <TopNavbar />

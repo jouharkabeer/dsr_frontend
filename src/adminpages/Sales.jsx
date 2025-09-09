@@ -127,8 +127,7 @@ const handleSave = async () => {
     paymentData[`expected_${selectedPaymentMethod}`] = form[`expected_${selectedPaymentMethod}`];
     paymentData[`collected_${selectedPaymentMethod}`] = form[`collected_${selectedPaymentMethod}`];
   }
-console.log(selectedTimberMaterials.map((m) => m.value))
-console.log(selectedHardwareCategories, selectedTimberCategories)
+
   const payload = {
     ...form,
     ...paymentData,
