@@ -126,10 +126,11 @@ const handleSave = async () => {
     paymentData[`expected_${selectedPaymentMethod}`] = form[`expected_${selectedPaymentMethod}`];
     paymentData[`collected_${selectedPaymentMethod}`] = form[`collected_${selectedPaymentMethod}`];
   }
-
+const sid = localStorage.getItem('user_id')
   const payload = {
     ...form,
     ...paymentData,
+    salesman : sid,
     timbercategories: selectedTimberCategories.map((m) => m.value),
     hardwarecategories: selectedHardwareCategories.map((m) => m.value),
     timbermaterials: selectedTimberMaterials.map((m) => m.value),
