@@ -134,7 +134,7 @@ function TimberMaterialCategoryPage() {
             color={params.row.is_active ? 'error' : 'success'}
             onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
           >
-            {params.row.is_active ? <ToggleOffIcon /> : <ToggleOnIcon />}
+            {params.row.is_active ? <ToggleOnIcon /> : <ToggleOffIcon />}
           </IconButton>
         </>
       )

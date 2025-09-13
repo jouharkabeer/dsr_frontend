@@ -153,7 +153,11 @@ const handleSave = async () => {
     console.error('Failed to save sales record:', err);
   }
 };
+const dubaiNow = new Date().toLocaleString("en-US", { timeZone: "Asia/Dubai" });
+const dubaiDate = new Date(dubaiNow);
+const today = dubaiDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
+console.log(today)
 
   const formreset = async => {
     // setForm(null)
@@ -237,6 +241,7 @@ const handleShowModal = (row) => {
   expected_tt: row.expected_tt || '',
   collected_tt: row.collected_tt || '',
   original_tt: row.collected_tt || 0,
+  meeting_done: row.meeting_done ?? false,
   });
 
     if (row.mode_of_collection) {
@@ -407,7 +412,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
             color={params.row.is_active ? 'error' : 'success'}
             onClick={() => toggleStatus(params.row.id, params.row.is_active ? 'disable' : 'enable')}
           >
-            {params.row.is_active ? <ToggleOffIcon /> : <ToggleOnIcon />}
+            {params.row.is_active ? <ToggleOnIcon /> : <ToggleOffIcon />}
           </IconButton>
         </>
       )
@@ -721,11 +726,19 @@ if (row.hardwarematerials && row.hardware_material_name) {
                <Row className='mb-2'>
                   <Col md={4}>
                     <Form.Label>Follow-up Date</Form.Label>
-                    <Form.Control
-                      type="date"
-                      value={form.next_meeting_date || ''}
-                      onChange={(e) => setForm({ ...form, next_meeting_date: e.target.value })}
-                    />
+                  <Form.Control
+                    type="date"
+                    min={today}
+                    value={form.next_meeting_date || ''}
+                    onChange={(e) => {
+                      const newDate = e.target.value;
+                      setForm((prev) => ({
+                        ...prev,
+                        next_meeting_date: newDate,
+                        meeting_done: newDate !== prev.next_meeting_date ? false : prev.meeting_done
+                      }));
+                    }}
+                  />
                     </Col>
                   <Col md={4}>
                     <Form.Label>Expected Payment Date</Form.Label>
