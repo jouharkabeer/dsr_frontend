@@ -20,7 +20,7 @@ function UserTypePage() {
   const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editUserType, setEditUserType] = useState(null);
-  const [form, setForm] = useState({ userType_name: '', remarks: '' });
+  const [form, setForm] = useState({ userType_name: '', description: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true)
 
@@ -54,8 +54,8 @@ function UserTypePage() {
     setEditUserType(userType);
     setForm(userType ? {
       userType_name: userType.name,
-      remarks: userType.remarks || '',
-    } : { userType_name: '', remarks: '' });
+      description: userType.description || '',
+    } : { userType_name: '', description: '' });
     setError('');
     setShowModal(true);
   };
@@ -78,7 +78,7 @@ function UserTypePage() {
         url,
         data: {
           name: form.userType_name,
-          remarks: form.remarks,
+          description: form.description,
           is_active: true,
         },
         headers: {
@@ -111,7 +111,7 @@ function UserTypePage() {
 
   const columns = [
     { field: 'name', headerName: 'User Type', width : 150,  },
-    { field: 'remarks', headerName: 'Remarks', width : 150,  },
+    { field: 'description', headerName: 'Remarks', width : 150,  },
     {
       field: 'is_active',
       headerName: 'Status',
@@ -203,8 +203,8 @@ function UserTypePage() {
                   <Form.Control
                     as="textarea"
                     rows={3}
-                    value={form.remarks}
-                    onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
                   />
                 </Form.Group>
               </Form>
