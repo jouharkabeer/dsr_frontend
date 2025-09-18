@@ -96,8 +96,7 @@ setSelectedTimberCategories
   const fetchcustomer = async () => {
   try {
     setLockcustomer(true);
-
-    const url = `${Api}/master/view_activeCustomer/lesmanbysa/${lockedsalesman}/`;
+    const url = `${Api}/master/view_activeCustomer/bysalesman/${lockedsalesman}/`;
     const res = await axios.get(url, {
       headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
     });
