@@ -64,10 +64,12 @@ setSelectedTimberCategories
   const [hardwareMaterials, setHardwareMaterials] = useState([]);
   const [selectedHardwareMaterials, setSelectedHardwareMaterials] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+const sid = localStorage.getItem('user_id')
+
   const fetchOptions = async () => {
     // setLoading(true)
     const endpoints = {
-      customer: `${Api}/master/view_activeCustomer/`,
+      customer: `${Api}/master/view_activeCustomer/bysalesman/${sid}/`,
       call_status: `${Api}/master/view_activeCallStatus/`,
       prospect: `${Api}/master/view_activeProspect/`,
       order_status: `${Api}/master/view_activeOrderStatusType/`,
@@ -126,7 +128,6 @@ const handleSave = async () => {
     paymentData[`expected_${selectedPaymentMethod}`] = form[`expected_${selectedPaymentMethod}`];
     paymentData[`collected_${selectedPaymentMethod}`] = form[`collected_${selectedPaymentMethod}`];
   }
-const sid = localStorage.getItem('user_id')
   const payload = {
     ...form,
     ...paymentData,
@@ -208,7 +209,6 @@ const dubaiNow = new Date().toLocaleString("en-US", { timeZone: "Asia/Dubai" });
 const dubaiDate = new Date(dubaiNow);
 const today = dubaiDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
-console.log(today)
   
 const handleShowModal = (row) => {
   setEditSales(row);
@@ -224,7 +224,6 @@ const handleShowModal = (row) => {
     next_meeting_date: row.next_meeting_date || null,
     payment_recieved: row.payment_recieved || null,
     final_due_date: row.final_due_date || null,
-    collected_amount_now : '',
     soa_amount: row.soa_amount || '',
 
     remarks: row.remarks || '',

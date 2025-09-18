@@ -58,6 +58,9 @@ function SalesPage() {
   const [selectedHardwareCategories, setSelectedHardwareCategories] = useState([]);
   
   const [methodLocked, setMethodLocked] = useState(false);
+  const [lockedsalesman, setLockedsalesman] = useState();
+  const [lockcustomer, setLockcustomer] = useState(false);
+
 setSelectedTimberCategories
   const [isHardware, setIsHardware] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -65,11 +68,12 @@ setSelectedTimberCategories
   const [hardwareMaterials, setHardwareMaterials] = useState([]);
   const [selectedHardwareMaterials, setSelectedHardwareMaterials] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+
   const fetchOptions = async () => {
     // setLoading(true)
     const endpoints = {
       salesman: `${Api}/user/view_activeSalesman/`,
-      customer: `${Api}/master/view_activeCustomer/`,
+      // customer: `${Api}/master/view_activeCustomer/`,
       call_status: `${Api}/master/view_activeCallStatus/`,
       prospect: `${Api}/master/view_activeProspect/`,
       order_status: `${Api}/master/view_activeOrderStatusType/`,
@@ -89,6 +93,33 @@ setSelectedTimberCategories
     // setLoading(false)
   };
     
+  const fetchcustomer = async () => {
+  try {
+    setLockcustomer(true);
+
+    const url = `${Api}/master/view_activeCustomer/lesmanbysa/${lockedsalesman}/`;
+    const res = await axios.get(url, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
+    });
+
+    setLockcustomer(false);
+
+    // 👇 Append into options state
+    setOptions((prevOptions) => ({
+      ...prevOptions,
+      customer: res.data, // add new key or overwrite existing
+    }));
+  } catch (error) {
+    setLockcustomer(false);
+    console.error("Error fetching customers:", error);
+  }
+};
+
+useEffect(() => {
+  if (lockedsalesman){
+  fetchcustomer()}
+}, [lockedsalesman])
+
 
   const fetchSales = async () => {
     setLoading(true)
@@ -157,7 +188,6 @@ const dubaiNow = new Date().toLocaleString("en-US", { timeZone: "Asia/Dubai" });
 const dubaiDate = new Date(dubaiNow);
 const today = dubaiDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
-console.log(today)
 
   const formreset = async => {
     // setForm(null)
@@ -224,7 +254,6 @@ const handleShowModal = (row) => {
     next_meeting_date: row.next_meeting_date || null,
     payment_recieved: row.payment_recieved || null,
     final_due_date: row.final_due_date || null,
-    collected_amount_now : '',
     soa_amount: row.soa_amount || '',
 
     remarks: row.remarks || '',
@@ -243,6 +272,22 @@ const handleShowModal = (row) => {
   original_tt: row.collected_tt || 0,
   meeting_done: row.meeting_done ?? false,
   });
+
+    if (row.customer && row.customer_name) {
+    setOptions((prev) => {
+      const alreadyExists = prev.customer?.some(c => c.id === row.customer);
+      if (!alreadyExists) {
+        return {
+          ...prev,
+          customer: [
+            ...(prev.customer || []),
+            { id: row.customer, customer_name: row.customer_name },
+          ],
+        };
+      }
+      return prev;
+    });
+  }
 
     if (row.mode_of_collection) {
     setSelectedPaymentMethod(row.mode_of_collection);
@@ -473,7 +518,8 @@ if (row.hardwarematerials && row.hardware_material_name) {
                   <Form.Label>Salesman</Form.Label>
                   <Form.Select
                     value={form.salesman}
-                    onChange={(e) => setForm({ ...form, salesman: e.target.value })}
+                    onChange={(e) => {setForm({ ...form, salesman: e.target.value }),
+                  setLockedsalesman(e.target.value)}}
                     disabled={editSales}
                   >
                     <option value="">Select Salesman</option>
@@ -489,7 +535,7 @@ if (row.hardwarematerials && row.hardware_material_name) {
                   <Form.Select
                     value={form.customer}
                     onChange={(e) => setForm({ ...form, customer: e.target.value })}
-                    disabled={editSales}
+                    disabled={editSales || lockcustomer}
                   >
                     <option value="">Select Customer</option>
                     {options.customer?.map((item) => (
